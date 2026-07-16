@@ -13,9 +13,10 @@ type Body = Record<string, unknown>;
 
 const ALLOWED_KINDS = new Set([
   "milestone",
+  "revenue",
+  "partnership",
   "launch",
   "hire",
-  "revenue",
   "fundraise",
   "product",
   "legal",

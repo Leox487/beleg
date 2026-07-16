@@ -77,3 +77,355 @@ a {
   justify-content: center;
   padding: 24px;
 }
+
+/* ——— shared primitives ——— */
+:root {
+  --border: #e5e7eb;
+  --muted: #6b7280;
+  --radius: 8px;
+}
+
+.mono,
+.entry-hash,
+.copy-text .mono {
+  font-family: ui-monospace, monospace;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.btn {
+  display: inline-block;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: #111111;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: #000000;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.btn-ghost:hover {
+  background: #f9fafb;
+}
+
+/* ——— navbar ——— */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.wordmark {
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: -0.02em;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.navbar-link {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.navbar-link:hover {
+  color: var(--foreground);
+}
+
+/* ——— page shell ——— */
+.page {
+  padding: 40px 24px;
+}
+
+.page-inner {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* ——— empty state ——— */
+.empty-state {
+  max-width: 460px;
+  margin: 80px auto 0;
+  text-align: center;
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.empty-state .muted {
+  margin-bottom: 24px;
+}
+
+/* ——— venture cards ——— */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.venture-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+
+.venture-card:hover {
+  border-color: #d1d5db;
+}
+
+.venture-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.venture-tagline {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.venture-meta {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.new-venture-section {
+  margin-top: 32px;
+}
+
+/* ——— forms ——— */
+.venture-form,
+.entry-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: left;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-row {
+  display: flex;
+  gap: 16px;
+}
+
+.field-row .field-group {
+  flex: 1;
+}
+
+.field-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.text-input {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--foreground);
+  background: #ffffff;
+  width: 100%;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #9ca3af;
+}
+
+.textarea {
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.form-error {
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+
+/* ——— ledger ——— */
+.ledger-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+}
+
+.ledger-tagline {
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.public-link {
+  margin-top: 14px;
+  font-size: 0.9rem;
+}
+
+.copy-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #f9fafb;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.copy-text:hover {
+  border-color: #d1d5db;
+}
+
+.copy-hint {
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.append-note {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.new-entry-section {
+  margin-bottom: 32px;
+}
+
+.empty-chain {
+  margin-top: 8px;
+}
+
+/* ——— the chain ——— */
+.chain {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-left: 2px solid var(--border);
+  padding-left: 20px;
+}
+
+.entry-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+
+.entry-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.entry-seq {
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.badge {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
+  color: var(--muted);
+}
+
+.entry-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.entry-body {
+  margin-top: 6px;
+  white-space: pre-wrap;
+}
+
+.entry-occurred {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.entry-recorded {
+  margin-top: 2px;
+  font-size: 0.85rem;
+}
+
+.entry-hash {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--muted);
+  word-break: break-all;
+}
