@@ -13,10 +13,15 @@ export interface EntryContent {
 }
 
 // Deterministic serialization: fixed key order, no whitespace variance.
+// Canonicalization normalizes timestamps because DB round-trips alter string
+// representation (Postgres timestamptz returns "+00:00" where toISOString()
+// emits "Z"). new Date(...).toISOString() reproduces the original insert-time
+// value. occurred_at is a plain YYYY-MM-DD date and round-trips unchanged.
 export function canonicalize(c: EntryContent): string {
   return JSON.stringify([
     c.venture_id, c.seq, c.kind, c.title,
-    c.body ?? "", c.occurred_at ?? "", c.recorded_at,
+    c.body ?? "", c.occurred_at ?? "",
+    new Date(c.recorded_at).toISOString(),
   ]);
 }
 
