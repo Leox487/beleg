@@ -1,10 +1,8 @@
-import { auth } from "@clerk/nextjs/server";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import type { Entry, Venture } from "@/lib/types";
-import { NewEntryForm } from "@/app/components/NewEntryForm";
-import { CopyText } from "@/app/components/CopyText";
+import { VerifyChain } from "@/app/components/VerifyChain";
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {
@@ -26,26 +24,31 @@ function formatDate(iso: string): string {
   });
 }
 
-export default async function LedgerPage({
+function formatStarted(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+export default async function PublicProofPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { id } = await params;
-
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  const { slug } = await params;
 
   const supabase = createSupabaseServiceRoleClient();
 
   const { data: ventureData } = await supabase
     .from("ventures")
     .select("id, clerk_user_id, name, slug, tagline, created_at")
-    .eq("id", id)
+    .eq("slug", slug)
     .maybeSingle();
 
   const venture = ventureData as Venture | null;
-  if (!venture || venture.clerk_user_id !== userId) notFound();
+  if (!venture) notFound();
 
   const { data: entriesData } = await supabase
     .from("entries")
@@ -55,11 +58,8 @@ export default async function LedgerPage({
     .eq("venture_id", venture.id)
     .order("seq", { ascending: true });
 
+  // Oldest-first: a reader wants the story in order.
   const entries = (entriesData ?? []) as Entry[];
-  // Render newest-first visually; seq numbering is preserved on each card.
-  const ordered = [...entries].reverse();
-
-  const publicUrl = `/p/${venture.slug}`;
 
   return (
     <main className="page">
@@ -69,30 +69,22 @@ export default async function LedgerPage({
           {venture.tagline ? (
             <p className="ledger-tagline">{venture.tagline}</p>
           ) : null}
-          <div className="public-link">
-            <span className="muted">Public proof page:</span>{" "}
-            <CopyText value={publicUrl} />
-            <a className="public-open" href={publicUrl} target="_blank" rel="noopener noreferrer">
-              Open public page →
-            </a>
-          </div>
-          <p className="append-note">
-            Entries are append-only. Nothing on this ledger can be edited or
-            deleted after recording.
+          <p className="badge-line muted">
+            Append-only ledger · {entries.length}{" "}
+            {entries.length === 1 ? "entry" : "entries"}
+            {entries.length > 0
+              ? ` · started ${formatStarted(entries[0].recorded_at)}`
+              : ""}
           </p>
         </header>
 
-        <section className="new-entry-section">
-          <NewEntryForm ventureId={venture.id} />
-        </section>
+        <VerifyChain entries={entries} />
 
-        {ordered.length === 0 ? (
-          <p className="muted empty-chain">
-            No entries yet. Record your first milestone above.
-          </p>
+        {entries.length === 0 ? (
+          <p className="muted empty-chain">This ledger has no entries yet.</p>
         ) : (
           <div className="chain">
-            {ordered.map((entry) => (
+            {entries.map((entry) => (
               <article key={entry.id} className="entry-card">
                 <div className="entry-top">
                   <span className="entry-seq">#{entry.seq}</span>
@@ -116,6 +108,21 @@ export default async function LedgerPage({
             ))}
           </div>
         )}
+
+        <footer className="proof-footer">
+          <h2 className="proof-footer-title">How to read this page</h2>
+          <p>
+            Each entry is cryptographically sealed and linked to the one before
+            it. Editing, deleting, or reordering any past entry would break every
+            seal after it. Verification runs in your browser — this server is not
+            trusted with the answer.
+          </p>
+          <p className="proof-footer-fine muted">
+            This ledger proves when entries were recorded and that they haven&apos;t
+            changed since. It does not by itself prove the underlying claims are
+            true.
+          </p>
+        </footer>
       </div>
     </main>
   );
