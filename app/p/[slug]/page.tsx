@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
-import type { Entry, Venture } from "@/lib/types";
+import type { Attestation, Entry, Venture } from "@/lib/types";
 import { VerifyChain } from "@/app/components/VerifyChain";
 
 function formatDateTime(iso: string): string {
@@ -61,6 +61,26 @@ export default async function PublicProofPage({
   // Oldest-first: a reader wants the story in order.
   const entries = (entriesData ?? []) as Entry[];
 
+  // Only confirmed attestations are shown publicly — a reviewer should never
+  // see unfulfilled requests. Attestations are corroboration layered on top of
+  // the chain, not yet hashed into it — a v2 enhancement.
+  const { data: attestationData } = await supabase
+    .from("attestations")
+    .select(
+      "id, venture_id, entry_id, attester_email, attester_name, statement, token, status, requested_at, confirmed_at",
+    )
+    .eq("venture_id", venture.id)
+    .eq("status", "confirmed")
+    .order("confirmed_at", { ascending: true });
+
+  const confirmedByEntry = new Map<string, Attestation[]>();
+  for (const a of (attestationData ?? []) as Attestation[]) {
+    if (!a.entry_id) continue;
+    const list = confirmedByEntry.get(a.entry_id) ?? [];
+    list.push(a);
+    confirmedByEntry.set(a.entry_id, list);
+  }
+
   return (
     <main className="page">
       <div className="page-inner ledger">
@@ -104,6 +124,16 @@ export default async function PublicProofPage({
                   hash: {entry.chain_hash.slice(0, 16)}… ← prev:{" "}
                   {entry.prev_hash.slice(0, 16)}…
                 </p>
+
+                {(confirmedByEntry.get(entry.id) ?? []).map((a) => (
+                  <p key={a.id} className="attest-confirmed">
+                    ✓ Confirmed by {a.attester_name ?? "—"}
+                    {a.confirmed_at
+                      ? ` on ${formatStarted(a.confirmed_at)}`
+                      : ""}
+                    : “{a.statement}”
+                  </p>
+                ))}
               </article>
             ))}
           </div>
@@ -116,6 +146,10 @@ export default async function PublicProofPage({
             it. Editing, deleting, or reordering any past entry would break every
             seal after it. Verification runs in your browser — this server is not
             trusted with the answer.
+          </p>
+          <p>
+            Entries marked ✓ Confirmed have been independently verified by the
+            named person, who attested to them via a private link.
           </p>
           <p className="proof-footer-fine muted">
             This ledger proves when entries were recorded and that they haven&apos;t

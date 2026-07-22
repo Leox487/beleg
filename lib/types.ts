@@ -21,6 +21,19 @@ export interface Entry {
   chain_hash: string;
 }
 
+export interface Attestation {
+  id: string;
+  venture_id: string;
+  entry_id: string | null;
+  attester_email: string;
+  attester_name: string | null;
+  statement: string;
+  token: string;
+  status: string;
+  requested_at: string;
+  confirmed_at: string | null;
+}
+
 export const ENTRY_KINDS = [
   "milestone",
   "revenue",

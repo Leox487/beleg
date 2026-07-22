@@ -2,9 +2,10 @@ import { auth } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
-import type { Entry, Venture } from "@/lib/types";
+import type { Attestation, Entry, Venture } from "@/lib/types";
 import { NewEntryForm } from "@/app/components/NewEntryForm";
 import { CopyText } from "@/app/components/CopyText";
+import { RequestAttestForm } from "@/app/components/RequestAttestForm";
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {
@@ -59,6 +60,24 @@ export default async function LedgerPage({
   // Render newest-first visually; seq numbering is preserved on each card.
   const ordered = [...entries].reverse();
 
+  // All attestations for this venture, grouped by entry for per-card display.
+  const { data: attestationData } = await supabase
+    .from("attestations")
+    .select(
+      "id, venture_id, entry_id, attester_email, attester_name, statement, token, status, requested_at, confirmed_at",
+    )
+    .eq("venture_id", venture.id)
+    .order("requested_at", { ascending: true });
+
+  const attestations = (attestationData ?? []) as Attestation[];
+  const attestationsByEntry = new Map<string, Attestation[]>();
+  for (const a of attestations) {
+    if (!a.entry_id) continue;
+    const list = attestationsByEntry.get(a.entry_id) ?? [];
+    list.push(a);
+    attestationsByEntry.set(a.entry_id, list);
+  }
+
   const publicUrl = `/p/${venture.slug}`;
 
   return (
@@ -112,6 +131,28 @@ export default async function LedgerPage({
                   hash: {entry.chain_hash.slice(0, 16)}… ← prev:{" "}
                   {entry.prev_hash.slice(0, 16)}…
                 </p>
+
+                <div className="attest-list">
+                  {(attestationsByEntry.get(entry.id) ?? []).map((a) =>
+                    a.status === "confirmed" ? (
+                      <p key={a.id} className="attest-confirmed">
+                        ✓ Confirmed by {a.attester_name ?? "—"} ({a.attester_email})
+                        {a.confirmed_at
+                          ? ` on ${formatDateTime(a.confirmed_at)}`
+                          : ""}{" "}
+                        — “{a.statement}”
+                      </p>
+                    ) : (
+                      <div key={a.id} className="attest-pending muted">
+                        <span>
+                          Awaiting confirmation from {a.attester_email}
+                        </span>
+                        <CopyText value={`/attest/${a.token}`} />
+                      </div>
+                    ),
+                  )}
+                  <RequestAttestForm entryId={entry.id} />
+                </div>
               </article>
             ))}
           </div>
