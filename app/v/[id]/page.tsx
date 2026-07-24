@@ -2,10 +2,11 @@ import { auth } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
-import type { Attestation, Entry, Venture } from "@/lib/types";
+import type { Anchor, Attestation, Entry, Venture } from "@/lib/types";
 import { NewEntryForm } from "@/app/components/NewEntryForm";
 import { CopyText } from "@/app/components/CopyText";
 import { RequestAttestForm } from "@/app/components/RequestAttestForm";
+import { AnchorButton } from "@/app/components/AnchorButton";
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {
@@ -78,6 +79,21 @@ export default async function LedgerPage({
     attestationsByEntry.set(a.entry_id, list);
   }
 
+  // Past anchors, newest first, for the anchoring panel.
+  const { data: anchorData } = await supabase
+    .from("anchors")
+    .select(
+      "id, venture_id, anchored_seq, chain_tip_hash, status, created_at, upgraded_at, bitcoin_block_height",
+    )
+    .eq("venture_id", venture.id)
+    .order("created_at", { ascending: false });
+
+  const anchors = (anchorData ?? []) as Anchor[];
+  const latestSeq = entries.length > 0 ? entries[entries.length - 1].seq : 0;
+  const tipAlreadyAnchored = anchors.some(
+    (a) => a.anchored_seq === latestSeq && latestSeq > 0,
+  );
+
   const publicUrl = `/p/${venture.slug}`;
 
   return (
@@ -103,6 +119,63 @@ export default async function LedgerPage({
 
         <section className="new-entry-section">
           <NewEntryForm ventureId={venture.id} />
+        </section>
+
+        <section className="anchor-section">
+          <div className="anchor-header">
+            <h2 className="section-title">Bitcoin anchoring</h2>
+            <p className="muted">
+              Anchoring commits the current chain tip to the Bitcoin blockchain
+              via OpenTimestamps, proving these entries existed by a certain
+              time — verifiable without trusting Beleg.
+            </p>
+          </div>
+
+          {entries.length === 0 ? (
+            <p className="muted">Record an entry before anchoring.</p>
+          ) : tipAlreadyAnchored ? (
+            <p className="muted">
+              The current chain tip (entry #{latestSeq}) is already anchored.
+              Add a new entry to anchor again.
+            </p>
+          ) : (
+            <AnchorButton ventureId={venture.id} />
+          )}
+
+          {anchors.length > 0 ? (
+            <ul className="anchor-list">
+              {anchors.map((a) => (
+                <li key={a.id} className="anchor-item">
+                  <div className="anchor-item-main">
+                    <span className="anchor-seq">Sealed at entry #{a.anchored_seq}</span>
+                    <span
+                      className={
+                        a.status === "confirmed"
+                          ? "badge badge-attestation"
+                          : "badge"
+                      }
+                    >
+                      {a.status === "confirmed"
+                        ? `✓ Confirmed in block ${a.bitcoin_block_height ?? "?"}`
+                        : "Pending Bitcoin confirmation"}
+                    </span>
+                  </div>
+                  <p className="muted anchor-meta">
+                    Submitted {formatDateTime(a.created_at)}
+                    {a.upgraded_at
+                      ? ` · confirmed ${formatDateTime(a.upgraded_at)}`
+                      : ""}
+                  </p>
+                  <a
+                    className="anchor-download"
+                    href={`/api/anchor/${a.id}/proof`}
+                  >
+                    Download proof (.ots)
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </section>
 
         {ordered.length === 0 ? (

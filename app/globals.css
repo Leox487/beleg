@@ -655,3 +655,98 @@ a {
   padding: 14px 16px;
   font-size: 0.95rem;
 }
+
+/* ——— Bitcoin anchoring ——— */
+.anchor-section {
+  margin: 28px 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.anchor-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.anchor-action {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.anchor-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.anchor-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.anchor-item-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.anchor-seq {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.anchor-meta {
+  font-size: 0.85rem;
+}
+
+.anchor-download {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Prominent anchor block on the public proof page. */
+.anchor-proof {
+  margin: 20px 0;
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.anchor-proof-confirmed {
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+}
+
+.anchor-proof-pending {
+  border: 1px solid var(--border);
+  background: #f9fafb;
+}
+
+.anchor-proof-headline {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.anchor-proof-explainer {
+  font-size: 0.95rem;
+}
+
+.anchor-proof-fine {
+  font-size: 0.85rem;
+}

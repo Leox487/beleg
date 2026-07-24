@@ -35,6 +35,18 @@ export interface Attestation {
   chain_entry_id: string | null;
 }
 
+export interface Anchor {
+  id: string;
+  venture_id: string;
+  anchored_seq: number;
+  chain_tip_hash: string;
+  ots_proof: string;
+  status: string;
+  created_at: string;
+  upgraded_at: string | null;
+  bitcoin_block_height: number | null;
+}
+
 export const ENTRY_KINDS = [
   "milestone",
   "revenue",

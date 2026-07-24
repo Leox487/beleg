@@ -40,3 +40,20 @@ create table if not exists public.attestations (
   chain_entry_id uuid references public.entries(id)
 );
 create index if not exists attestations_venture_idx on public.attestations (venture_id);
+
+-- OpenTimestamps anchors: each row seals a chain tip (highest seq entry and its
+-- chain_hash) to Bitcoin via an .ots proof. ots_proof is base64 of the serialized
+-- proof bytes. status starts 'pending' and becomes 'confirmed' once the proof
+-- upgrades to carry a Bitcoin block attestation.
+create table if not exists public.anchors (
+  id uuid primary key default gen_random_uuid(),
+  venture_id uuid not null references public.ventures(id),
+  anchored_seq integer not null,
+  chain_tip_hash text not null,
+  ots_proof text not null,
+  status text not null default 'pending',
+  created_at timestamptz not null default now(),
+  upgraded_at timestamptz,
+  bitcoin_block_height integer
+);
+create index if not exists anchors_venture_idx on public.anchors (venture_id, created_at desc);

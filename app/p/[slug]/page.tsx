@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
-import type { Entry, Venture } from "@/lib/types";
+import type { Anchor, Entry, Venture } from "@/lib/types";
 import { VerifyChain } from "@/app/components/VerifyChain";
 
 function formatDateTime(iso: string): string {
@@ -63,6 +63,24 @@ export default async function PublicProofPage({
   // 'attestation'-kind entries, so they carry the same tamper-evidence as every
   // other entry and the in-browser verifier covers them too.
   const entries = (entriesData ?? []) as Entry[];
+  const latestSeq = entries.length > 0 ? entries[entries.length - 1].seq : 0;
+
+  const { data: anchorData } = await supabase
+    .from("anchors")
+    .select(
+      "id, venture_id, anchored_seq, chain_tip_hash, status, created_at, upgraded_at, bitcoin_block_height",
+    )
+    .eq("venture_id", venture.id)
+    .order("anchored_seq", { ascending: false });
+
+  const anchors = (anchorData ?? []) as Anchor[];
+  // Prefer the confirmed anchor covering the most entries; fall back to the
+  // most recent pending one.
+  const confirmedAnchor =
+    anchors.find((a) => a.status === "confirmed") ?? null;
+  const pendingAnchor = anchors.find((a) => a.status === "pending") ?? null;
+  const entriesAfterAnchor =
+    confirmedAnchor && latestSeq > confirmedAnchor.anchored_seq;
 
   return (
     <main className="page">
@@ -80,6 +98,50 @@ export default async function PublicProofPage({
               : ""}
           </p>
         </header>
+
+        {confirmedAnchor ? (
+          <section className="anchor-proof anchor-proof-confirmed">
+            <p className="anchor-proof-headline">
+              ✓ Anchored to Bitcoin — entries #1–{confirmedAnchor.anchored_seq}{" "}
+              provably existed as of{" "}
+              {formatDateTime(
+                confirmedAnchor.upgraded_at ?? confirmedAnchor.created_at,
+              )}
+              .
+            </p>
+            <p className="anchor-proof-explainer">
+              This ledger&apos;s fingerprint was committed to the Bitcoin
+              blockchain, which means its contents provably existed at that time
+              and cannot be backdated — verifiable without trusting this
+              website.
+            </p>
+            <a
+              className="anchor-download"
+              href={`/api/anchor/${confirmedAnchor.id}/proof`}
+            >
+              Download proof (.ots)
+            </a>
+            {entriesAfterAnchor ? (
+              <p className="anchor-proof-fine muted">
+                Entries recorded after the last anchor are covered by the hash
+                chain but not yet independently timestamped.
+              </p>
+            ) : null}
+          </section>
+        ) : pendingAnchor ? (
+          <section className="anchor-proof anchor-proof-pending">
+            <p className="anchor-proof-headline">
+              Anchor submitted {formatDateTime(pendingAnchor.created_at)},
+              awaiting Bitcoin confirmation.
+            </p>
+            <a
+              className="anchor-download"
+              href={`/api/anchor/${pendingAnchor.id}/proof`}
+            >
+              Download proof (.ots)
+            </a>
+          </section>
+        ) : null}
 
         <VerifyChain entries={entries} />
 
