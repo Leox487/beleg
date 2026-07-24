@@ -2,15 +2,13 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
-import {
-  GENESIS_HASH,
-  chainHash,
-  contentHash,
-  type EntryContent,
-} from "@/lib/hash";
+import { appendEntry } from "@/lib/chain";
 
 type Body = Record<string, unknown>;
 
+// 'attestation' is accepted so system-sealed confirmations validate, but it is
+// NOT offered in the founder-facing NewEntryForm — only the confirm route
+// creates attestation entries.
 const ALLOWED_KINDS = new Set([
   "milestone",
   "revenue",
@@ -20,6 +18,7 @@ const ALLOWED_KINDS = new Set([
   "fundraise",
   "product",
   "legal",
+  "attestation",
   "other",
 ]);
 
@@ -27,8 +26,9 @@ function asTrimmedString(v: unknown): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
-// Append-only: this route only ever INSERTs. There is deliberately no PATCH,
-// PUT, or DELETE handler here or anywhere else — the immutable chain is the product.
+// Append-only: this route only ever INSERTs (via appendEntry). There is
+// deliberately no PATCH, PUT, or DELETE handler here or anywhere else — the
+// immutable chain is the product.
 export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) {
@@ -97,69 +97,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Venture not found" }, { status: 404 });
   }
 
-  // Fetch the current chain tip: highest seq and its chain_hash.
-  const { data: lastEntry, error: lastError } = await supabase
-    .from("entries")
-    .select("seq, chain_hash")
-    .eq("venture_id", ventureId)
-    .order("seq", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (lastError) {
-    console.error("Last entry lookup error:", lastError);
-    return NextResponse.json(
-      { error: "Failed to load chain tip" },
-      { status: 500 },
-    );
-  }
-
-  const prevHash = lastEntry?.chain_hash ?? GENESIS_HASH;
-  const seq = (lastEntry?.seq ?? 0) + 1;
-
-  // recorded_at is set server-side, never trusted from the client.
-  const recordedAt = new Date().toISOString();
-
-  const content: EntryContent = {
-    venture_id: ventureId,
-    seq,
-    kind,
-    title,
-    body: entryBody,
-    occurred_at: occurredAt,
-    recorded_at: recordedAt,
-  };
-
-  const contentHashHex = contentHash(content);
-  const chainHashHex = chainHash(prevHash, contentHashHex);
-
-  const { data: inserted, error: insertError } = await supabase
-    .from("entries")
-    .insert({
+  try {
+    const entry = await appendEntry({
       venture_id: ventureId,
-      seq,
       kind,
       title,
       body: entryBody,
       occurred_at: occurredAt,
-      recorded_at: recordedAt,
-      content_hash: contentHashHex,
-      prev_hash: prevHash,
-      chain_hash: chainHashHex,
-    })
-    .select(
-      "id, venture_id, seq, kind, title, body, occurred_at, recorded_at, content_hash, prev_hash, chain_hash",
-    )
-    .single();
-
-  if (insertError || !inserted) {
-    // A unique violation on (venture_id, seq) means a concurrent append raced us.
-    console.error("Entry insert error:", insertError);
+    });
+    return NextResponse.json({ entry }, { status: 201 });
+  } catch (e) {
+    console.error("Entry append error:", e);
     return NextResponse.json(
       { error: "Failed to append entry" },
       { status: 500 },
     );
   }
-
-  return NextResponse.json({ entry: inserted }, { status: 201 });
 }

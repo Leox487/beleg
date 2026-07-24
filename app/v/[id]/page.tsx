@@ -111,50 +111,66 @@ export default async function LedgerPage({
           </p>
         ) : (
           <div className="chain">
-            {ordered.map((entry) => (
-              <article key={entry.id} className="entry-card">
-                <div className="entry-top">
-                  <span className="entry-seq">#{entry.seq}</span>
-                  <span className="badge">{entry.kind}</span>
-                </div>
-                <h3 className="entry-title">{entry.title}</h3>
-                {entry.body ? <p className="entry-body">{entry.body}</p> : null}
-                {entry.occurred_at ? (
-                  <p className="entry-occurred">
-                    Occurred {formatDate(entry.occurred_at)}
+            {ordered.map((entry) => {
+              const isAttestation = entry.kind === "attestation";
+              // Only pending requests are working state shown under an entry;
+              // confirmed attestations now live in the timeline as their own
+              // sealed chain entries.
+              const pending = (attestationsByEntry.get(entry.id) ?? []).filter(
+                (a) => a.status !== "confirmed",
+              );
+              return (
+                <article
+                  key={entry.id}
+                  className={
+                    isAttestation ? "entry-card entry-attestation" : "entry-card"
+                  }
+                >
+                  <div className="entry-top">
+                    <span className="entry-seq">#{entry.seq}</span>
+                    <span
+                      className={
+                        isAttestation ? "badge badge-attestation" : "badge"
+                      }
+                    >
+                      {isAttestation ? "✓ attestation" : entry.kind}
+                    </span>
+                  </div>
+                  <h3 className="entry-title">{entry.title}</h3>
+                  {entry.body ? (
+                    <p className="entry-body">{entry.body}</p>
+                  ) : null}
+                  {entry.occurred_at ? (
+                    <p className="entry-occurred">
+                      Occurred {formatDate(entry.occurred_at)}
+                    </p>
+                  ) : null}
+                  <p className="entry-recorded muted">
+                    Recorded {formatDateTime(entry.recorded_at)}
                   </p>
-                ) : null}
-                <p className="entry-recorded muted">
-                  Recorded {formatDateTime(entry.recorded_at)}
-                </p>
-                <p className="entry-hash">
-                  hash: {entry.chain_hash.slice(0, 16)}… ← prev:{" "}
-                  {entry.prev_hash.slice(0, 16)}…
-                </p>
+                  <p className="entry-hash">
+                    hash: {entry.chain_hash.slice(0, 16)}… ← prev:{" "}
+                    {entry.prev_hash.slice(0, 16)}…
+                  </p>
 
-                <div className="attest-list">
-                  {(attestationsByEntry.get(entry.id) ?? []).map((a) =>
-                    a.status === "confirmed" ? (
-                      <p key={a.id} className="attest-confirmed">
-                        ✓ Confirmed by {a.attester_name ?? "—"} ({a.attester_email})
-                        {a.confirmed_at
-                          ? ` on ${formatDateTime(a.confirmed_at)}`
-                          : ""}{" "}
-                        — “{a.statement}”
-                      </p>
-                    ) : (
-                      <div key={a.id} className="attest-pending muted">
-                        <span>
-                          Awaiting confirmation from {a.attester_email}
-                        </span>
-                        <CopyText value={`/attest/${a.token}`} />
-                      </div>
-                    ),
+                  {/* Attestation entries are themselves evidence — you don't
+                      attest an attestation, so no request UI on those. */}
+                  {isAttestation ? null : (
+                    <div className="attest-list">
+                      {pending.map((a) => (
+                        <div key={a.id} className="attest-pending muted">
+                          <span>
+                            Awaiting confirmation from {a.attester_email}
+                          </span>
+                          <CopyText value={`/attest/${a.token}`} />
+                        </div>
+                      ))}
+                      <RequestAttestForm entryId={entry.id} />
+                    </div>
                   )}
-                  <RequestAttestForm entryId={entry.id} />
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         )}
       </div>

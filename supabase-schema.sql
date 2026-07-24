@@ -36,6 +36,7 @@ create table if not exists public.attestations (
   token text not null unique,
   status text not null default 'pending',
   requested_at timestamptz not null default now(),
-  confirmed_at timestamptz
+  confirmed_at timestamptz,
+  chain_entry_id uuid references public.entries(id)
 );
 create index if not exists attestations_venture_idx on public.attestations (venture_id);

@@ -32,6 +32,7 @@ export interface Attestation {
   status: string;
   requested_at: string;
   confirmed_at: string | null;
+  chain_entry_id: string | null;
 }
 
 export const ENTRY_KINDS = [

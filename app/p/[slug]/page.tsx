@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
-import type { Attestation, Entry, Venture } from "@/lib/types";
+import type { Entry, Venture } from "@/lib/types";
 import { VerifyChain } from "@/app/components/VerifyChain";
 
 function formatDateTime(iso: string): string {
@@ -58,28 +58,11 @@ export default async function PublicProofPage({
     .eq("venture_id", venture.id)
     .order("seq", { ascending: true });
 
-  // Oldest-first: a reader wants the story in order.
+  // Oldest-first: a reader wants the story in order. Confirmations are no longer
+  // read from the attestations table — they are sealed into the chain as
+  // 'attestation'-kind entries, so they carry the same tamper-evidence as every
+  // other entry and the in-browser verifier covers them too.
   const entries = (entriesData ?? []) as Entry[];
-
-  // Only confirmed attestations are shown publicly — a reviewer should never
-  // see unfulfilled requests. Attestations are corroboration layered on top of
-  // the chain, not yet hashed into it — a v2 enhancement.
-  const { data: attestationData } = await supabase
-    .from("attestations")
-    .select(
-      "id, venture_id, entry_id, attester_email, attester_name, statement, token, status, requested_at, confirmed_at",
-    )
-    .eq("venture_id", venture.id)
-    .eq("status", "confirmed")
-    .order("confirmed_at", { ascending: true });
-
-  const confirmedByEntry = new Map<string, Attestation[]>();
-  for (const a of (attestationData ?? []) as Attestation[]) {
-    if (!a.entry_id) continue;
-    const list = confirmedByEntry.get(a.entry_id) ?? [];
-    list.push(a);
-    confirmedByEntry.set(a.entry_id, list);
-  }
 
   return (
     <main className="page">
@@ -104,38 +87,55 @@ export default async function PublicProofPage({
           <p className="muted empty-chain">This ledger has no entries yet.</p>
         ) : (
           <div className="chain">
-            {entries.map((entry) => (
-              <article key={entry.id} className="entry-card">
-                <div className="entry-top">
-                  <span className="entry-seq">#{entry.seq}</span>
-                  <span className="badge">{entry.kind}</span>
-                </div>
-                <h3 className="entry-title">{entry.title}</h3>
-                {entry.body ? <p className="entry-body">{entry.body}</p> : null}
-                {entry.occurred_at ? (
-                  <p className="entry-occurred">
-                    Occurred {formatDate(entry.occurred_at)}
+            {entries.map((entry) =>
+              entry.kind === "attestation" ? (
+                <article
+                  key={entry.id}
+                  className="entry-card entry-attestation"
+                >
+                  <div className="entry-top">
+                    <span className="entry-seq">#{entry.seq}</span>
+                    <span className="badge badge-attestation">
+                      ✓ attestation
+                    </span>
+                  </div>
+                  <h3 className="entry-title">{entry.title}</h3>
+                  {entry.body ? (
+                    <p className="entry-body">{entry.body}</p>
+                  ) : null}
+                  <p className="entry-recorded muted">
+                    Recorded {formatDateTime(entry.recorded_at)}
                   </p>
-                ) : null}
-                <p className="entry-recorded muted">
-                  Recorded {formatDateTime(entry.recorded_at)}
-                </p>
-                <p className="entry-hash">
-                  hash: {entry.chain_hash.slice(0, 16)}… ← prev:{" "}
-                  {entry.prev_hash.slice(0, 16)}…
-                </p>
-
-                {(confirmedByEntry.get(entry.id) ?? []).map((a) => (
-                  <p key={a.id} className="attest-confirmed">
-                    ✓ Confirmed by {a.attester_name ?? "—"}
-                    {a.confirmed_at
-                      ? ` on ${formatStarted(a.confirmed_at)}`
-                      : ""}
-                    : “{a.statement}”
+                  <p className="entry-hash">
+                    hash: {entry.chain_hash.slice(0, 16)}… ← prev:{" "}
+                    {entry.prev_hash.slice(0, 16)}…
                   </p>
-                ))}
-              </article>
-            ))}
+                </article>
+              ) : (
+                <article key={entry.id} className="entry-card">
+                  <div className="entry-top">
+                    <span className="entry-seq">#{entry.seq}</span>
+                    <span className="badge">{entry.kind}</span>
+                  </div>
+                  <h3 className="entry-title">{entry.title}</h3>
+                  {entry.body ? (
+                    <p className="entry-body">{entry.body}</p>
+                  ) : null}
+                  {entry.occurred_at ? (
+                    <p className="entry-occurred">
+                      Occurred {formatDate(entry.occurred_at)}
+                    </p>
+                  ) : null}
+                  <p className="entry-recorded muted">
+                    Recorded {formatDateTime(entry.recorded_at)}
+                  </p>
+                  <p className="entry-hash">
+                    hash: {entry.chain_hash.slice(0, 16)}… ← prev:{" "}
+                    {entry.prev_hash.slice(0, 16)}…
+                  </p>
+                </article>
+              ),
+            )}
           </div>
         )}
 
@@ -148,8 +148,9 @@ export default async function PublicProofPage({
             trusted with the answer.
           </p>
           <p>
-            Entries marked ✓ Confirmed have been independently verified by the
-            named person, who attested to them via a private link.
+            Confirmations from third parties are themselves recorded as sealed
+            entries in the chain — they carry the same tamper-evidence as
+            everything else, and the verifier above checks them too.
           </p>
           <p className="proof-footer-fine muted">
             This ledger proves when entries were recorded and that they haven&apos;t

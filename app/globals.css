@@ -577,6 +577,17 @@ a {
   color: #166534;
 }
 
+/* Attestation entries are sealed chain entries — mark them distinctly. */
+.entry-attestation {
+  border-left: 3px solid #16a34a;
+  background: #f0fdf4;
+}
+
+.badge-attestation {
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
 .attest-pending {
   display: flex;
   flex-wrap: wrap;
