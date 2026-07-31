@@ -8,7 +8,7 @@ export async function Navbar() {
 
   return (
     <header className="navbar">
-      <Link href={signedIn ? "/dashboard" : "/"} className="wordmark">
+      <Link href="/" className="wordmark">
         Beleg
       </Link>
 
