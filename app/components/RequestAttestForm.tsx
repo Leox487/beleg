@@ -87,6 +87,10 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
           placeholder="who@example.com"
           required
         />
+        <p className="field-help">
+          They&apos;ll receive a one-click confirmation link. No account needed
+          on their end.
+        </p>
       </div>
 
       <div className="field-group">
@@ -116,6 +120,11 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
           placeholder="e.g. I was the design partner on this launch and it shipped on this date."
           required
         />
+        <p className="field-help">
+          Write what you want them to confirm. Example: &ldquo;I confirmed the
+          wrist prototype&apos;s hydration sensor worked correctly on July 16,
+          2026.&rdquo; Keep it factual and specific.
+        </p>
       </div>
 
       {error ? <p className="form-error">{error}</p> : null}

@@ -60,11 +60,11 @@ export default async function AttestPage({
         <div className="attest-inner">
           <h1 className="page-title">Already confirmed</h1>
           <p className="muted">
-            You already confirmed this
+            You confirmed this
             {attestation.confirmed_at
               ? ` on ${formatDateTime(attestation.confirmed_at)}`
               : ""}
-            . Nothing further is needed.
+            . Nothing more to do — thanks.
           </p>
         </div>
       </main>
@@ -96,10 +96,13 @@ export default async function AttestPage({
         <h1 className="page-title">Confirm an entry</h1>
         {venture ? <p className="ledger-tagline">{venture.name}</p> : null}
 
-        <p className="attest-explainer">
+        <p className="attest-framing">
           {founderLabel} is asking you to confirm this happened as described.
-          Your confirmation will be publicly recorded alongside this entry,
-          linked to your email address. Only confirm what you know to be true.
+        </p>
+
+        <p className="attest-explainer">
+          Only confirm what you know to be true. Your confirmation becomes a
+          permanent part of this venture&apos;s public record.
         </p>
 
         {entry ? (

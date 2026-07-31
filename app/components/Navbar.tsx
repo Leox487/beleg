@@ -14,7 +14,12 @@ export async function Navbar() {
 
       <nav className="navbar-actions" aria-label="Main">
         {signedIn ? (
-          <UserButton />
+          <>
+            <Link href="/dashboard" className="navbar-link">
+              Ledgers
+            </Link>
+            <UserButton />
+          </>
         ) : (
           <Link href="/sign-in" className="navbar-link">
             Sign in

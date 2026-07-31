@@ -91,6 +91,11 @@ export function AttestForm({
       >
         {submitting ? "Confirming…" : "Confirm"}
       </button>
+
+      <p className="field-help">
+        Your name and email will be publicly visible on their proof page. You can
+        only confirm once. There is no account to create.
+      </p>
     </form>
   );
 }

@@ -71,6 +71,10 @@ export function NewEntryForm({ ventureId }: { ventureId: string }) {
           placeholder="What happened?"
           required
         />
+        <p className="field-help">
+          Be specific. This will be sealed exactly as written and can&apos;t be
+          edited later.
+        </p>
       </div>
 
       <div className="field-group">
@@ -84,6 +88,9 @@ export function NewEntryForm({ ventureId }: { ventureId: string }) {
           onChange={(e) => setBody(e.target.value)}
           rows={3}
         />
+        <p className="field-help">
+          Optional — links, numbers, names, context. Also sealed.
+        </p>
       </div>
 
       <div className="field-row">

@@ -85,13 +85,18 @@ export default async function PublicProofPage({
   return (
     <main className="page">
       <div className="page-inner ledger">
+        <p className="proof-preamble">
+          This is a public proof page from Beleg. The person who created it does
+          not control what you&apos;re about to verify.
+        </p>
+
         <header className="ledger-header">
           <h1 className="page-title">{venture.name}</h1>
           {venture.tagline ? (
             <p className="ledger-tagline">{venture.tagline}</p>
           ) : null}
           <p className="badge-line muted">
-            Append-only ledger · {entries.length}{" "}
+            Sealed timeline · {entries.length}{" "}
             {entries.length === 1 ? "entry" : "entries"}
             {entries.length > 0
               ? ` · started ${formatStarted(entries[0].recorded_at)}`
@@ -123,10 +128,15 @@ export default async function PublicProofPage({
             </a>
             {entriesAfterAnchor ? (
               <p className="anchor-proof-fine muted">
-                Entries recorded after the last anchor are covered by the hash
+                Entries recorded after the last anchor are covered by the sealed
                 chain but not yet independently timestamped.
               </p>
             ) : null}
+            <p className="anchor-proof-fine muted">
+              Bitcoin&apos;s blockchain is not owned by Beleg. It&apos;s a public
+              system that timestamps data in a way nobody, including us, can
+              rewrite.
+            </p>
           </section>
         ) : pendingAnchor ? (
           <section className="anchor-proof anchor-proof-pending">
@@ -140,6 +150,11 @@ export default async function PublicProofPage({
             >
               Download proof (.ots)
             </a>
+            <p className="anchor-proof-fine muted">
+              Bitcoin&apos;s blockchain is not owned by Beleg. It&apos;s a public
+              system that timestamps data in a way nobody, including us, can
+              rewrite.
+            </p>
           </section>
         ) : null}
 
@@ -204,6 +219,11 @@ export default async function PublicProofPage({
         <footer className="proof-footer">
           <h2 className="proof-footer-title">How to read this page</h2>
           <p>
+            Every entry below has a cryptographic seal linking it to the one
+            before it. If anything were changed, edited, or reordered after the
+            fact, the seals would break and the verifier above would say so.
+          </p>
+          <p>
             Each entry is cryptographically sealed and linked to the one before
             it. Editing, deleting, or reordering any past entry would break every
             seal after it. Verification runs in your browser — this server is not
@@ -211,8 +231,8 @@ export default async function PublicProofPage({
           </p>
           <p>
             Confirmations from third parties are themselves recorded as sealed
-            entries in the chain — they carry the same tamper-evidence as
-            everything else, and the verifier above checks them too.
+            entries in the chain — they carry the same protection as everything
+            else, and the verifier above checks them too.
           </p>
           <p className="proof-footer-fine muted">
             This ledger proves when entries were recorded and that they haven&apos;t

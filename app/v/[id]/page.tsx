@@ -112,10 +112,28 @@ export default async function LedgerPage({
             </a>
           </div>
           <p className="append-note">
-            Entries are append-only. Nothing on this ledger can be edited or
-            deleted after recording.
+            Entries are permanent. Once recorded, nothing on this ledger can be
+            edited or deleted.
           </p>
         </header>
+
+        {entries.length === 0 ? (
+          <section className="entry-empty">
+            <h2 className="entry-empty-title">No entries yet.</h2>
+            <p className="entry-empty-text">
+              An entry is anything real that happened — a milestone, a paying
+              customer, a signed pilot, a shipped prototype. Add your first
+              below.
+            </p>
+            <p className="entry-empty-label">Examples:</p>
+            <ul className="entry-empty-list">
+              <li>Shipped v1 of the prototype</li>
+              <li>Signed pilot agreement with Acme Health</li>
+              <li>First paying customer at $500/mo</li>
+              <li>Approved by IRB for pilot testing</li>
+            </ul>
+          </section>
+        ) : null}
 
         <section className="new-entry-section">
           <NewEntryForm ventureId={venture.id} />
@@ -178,11 +196,7 @@ export default async function LedgerPage({
           ) : null}
         </section>
 
-        {ordered.length === 0 ? (
-          <p className="muted empty-chain">
-            No entries yet. Record your first milestone above.
-          </p>
-        ) : (
+        {ordered.length === 0 ? null : (
           <div className="chain">
             {ordered.map((entry) => {
               const isAttestation = entry.kind === "attestation";

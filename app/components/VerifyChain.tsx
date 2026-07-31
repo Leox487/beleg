@@ -175,6 +175,10 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
         >
           Verify chain
         </button>
+        <p className="verify-note">
+          Your browser will independently recompute every hash and check the
+          seal — this server is not trusted with the answer.
+        </p>
       </div>
 
       {status.state === "running" ? (
