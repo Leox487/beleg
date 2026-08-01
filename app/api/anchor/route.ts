@@ -67,7 +67,7 @@ export async function POST(req: Request) {
   if (tipError) {
     console.error("Chain tip lookup error:", tipError);
     return NextResponse.json(
-      { error: "Failed to load chain tip" },
+      { error: "Failed to load your latest entry" },
       { status: 500 },
     );
   }
@@ -103,7 +103,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         error:
-          "The current chain tip is already anchored. Add a new entry before anchoring again.",
+          "Your latest entry is already anchored. Add a new entry before anchoring again.",
       },
       { status: 409 },
     );

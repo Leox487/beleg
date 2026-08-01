@@ -143,9 +143,9 @@ export default async function LedgerPage({
           <div className="anchor-header">
             <h2 className="section-title">Bitcoin anchoring</h2>
             <p className="muted">
-              Anchoring commits the current chain tip to the Bitcoin blockchain
-              via OpenTimestamps, proving these entries existed by a certain
-              time — verifiable without trusting Beleg.
+              Anchoring commits the current state of your ledger to the Bitcoin
+              blockchain via OpenTimestamps, proving these entries existed by a
+              certain time — verifiable without trusting Beleg.
             </p>
           </div>
 
@@ -153,8 +153,8 @@ export default async function LedgerPage({
             <p className="muted">Record an entry before anchoring.</p>
           ) : tipAlreadyAnchored ? (
             <p className="muted">
-              The current chain tip (entry #{latestSeq}) is already anchored.
-              Add a new entry to anchor again.
+              Your latest entry (#{latestSeq}) is already anchored. Add a new
+              entry to anchor again.
             </p>
           ) : (
             <AnchorButton ventureId={venture.id} />
