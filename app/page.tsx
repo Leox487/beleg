@@ -3,14 +3,17 @@ import { auth } from "@clerk/nextjs/server";
 
 const HOW_IT_WORKS = [
   {
+    step: "01",
     label: "Record.",
     text: "Add a milestone — the system seals it with a cryptographic timestamp.",
   },
   {
+    step: "02",
     label: "Witness.",
     text: "Send a one-click link to whoever was there. Their confirmation is sealed into the same chain.",
   },
   {
+    step: "03",
     label: "Share.",
     text: "Send anyone your public proof page. They verify the chain independently — in their own browser.",
   },
@@ -44,7 +47,8 @@ export default async function Home() {
         <ul className="how-strip">
           {HOW_IT_WORKS.map((item) => (
             <li key={item.label} className="how-item">
-              <span className="how-label">{item.label}</span>{" "}
+              <span className="how-step mono">{item.step}</span>
+              <span className="how-label">{item.label}</span>
               <span className="how-text">{item.text}</span>
             </li>
           ))}

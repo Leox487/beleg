@@ -106,6 +106,10 @@ export default async function PublicProofPage({
 
         {confirmedAnchor ? (
           <section className="anchor-proof anchor-proof-confirmed">
+            <span className="anchor-glyph" aria-hidden="true">
+              ✓
+            </span>
+            <div className="anchor-proof-body">
             <p className="anchor-proof-headline">
               ✓ Anchored to Bitcoin — entries #1–{confirmedAnchor.anchored_seq}{" "}
               provably existed as of{" "}
@@ -137,24 +141,30 @@ export default async function PublicProofPage({
               system that timestamps data in a way nobody, including us, can
               rewrite.
             </p>
+            </div>
           </section>
         ) : pendingAnchor ? (
           <section className="anchor-proof anchor-proof-pending">
-            <p className="anchor-proof-headline">
-              Anchor submitted {formatDateTime(pendingAnchor.created_at)},
-              awaiting Bitcoin confirmation.
-            </p>
-            <a
-              className="anchor-download"
-              href={`/api/anchor/${pendingAnchor.id}/proof`}
-            >
-              Download proof (.ots)
-            </a>
-            <p className="anchor-proof-fine muted">
-              Bitcoin&apos;s blockchain is not owned by Beleg. It&apos;s a public
-              system that timestamps data in a way nobody, including us, can
-              rewrite.
-            </p>
+            <span className="anchor-glyph" aria-hidden="true">
+              ◐
+            </span>
+            <div className="anchor-proof-body">
+              <p className="anchor-proof-headline">
+                Anchor submitted {formatDateTime(pendingAnchor.created_at)},
+                awaiting Bitcoin confirmation.
+              </p>
+              <a
+                className="anchor-download"
+                href={`/api/anchor/${pendingAnchor.id}/proof`}
+              >
+                Download proof (.ots)
+              </a>
+              <p className="anchor-proof-fine muted">
+                Bitcoin&apos;s blockchain is not owned by Beleg. It&apos;s a
+                public system that timestamps data in a way nobody, including us,
+                can rewrite.
+              </p>
+            </div>
           </section>
         ) : null}
 

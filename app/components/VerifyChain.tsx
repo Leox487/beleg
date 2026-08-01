@@ -169,7 +169,7 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
       <div className="verify-head">
         <button
           type="button"
-          className="btn btn-ghost"
+          className="btn btn-secondary"
           onClick={() => void verify()}
           disabled={status.state === "running"}
         >

@@ -86,7 +86,7 @@ export function AttestForm({
 
       <button
         type="submit"
-        className="btn btn-primary"
+        className="btn btn-primary btn-block"
         disabled={submitting || !confirmed}
       >
         {submitting ? "Confirming…" : "Confirm"}

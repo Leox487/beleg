@@ -64,7 +64,7 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
     return (
       <button
         type="button"
-        className="btn btn-ghost btn-small"
+        className="btn btn-secondary btn-small"
         onClick={() => setOpen(true)}
       >
         Request attestation
