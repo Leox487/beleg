@@ -342,6 +342,7 @@ a {
 .strip-section {
   max-width: 1080px;
   margin: 0 auto;
+  padding-bottom: 24px;
 }
 
 /* ——— scroll reveals ——— */
@@ -483,37 +484,25 @@ a {
   flex-direction: column;
   justify-content: center;
   gap: 10px;
-  min-height: 124px;
-}
-
-.viz-bar {
-  display: block;
-  height: 7px;
-  border-radius: 999px;
-  background: var(--border-strong);
-}
-
-.viz-bar-lg {
-  width: 78%;
-}
-
-.viz-bar-md {
-  width: 54%;
-}
-
-.viz-bar-sm {
-  width: 42%;
+  min-height: 168px;
 }
 
 .viz-entry {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   padding: 12px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
+}
+
+.viz-entry-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .viz-seq {
@@ -523,6 +512,68 @@ a {
   color: var(--muted);
 }
 
+.viz-kind {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand);
+  background: var(--brand-tint);
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.viz-title {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 18px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.viz-title-text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 0;
+}
+
+.viz-caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 13px;
+  background: var(--brand);
+  opacity: 0;
+  flex: 0 0 auto;
+}
+
+.viz-detail {
+  font-size: 11px;
+  color: var(--muted);
+  opacity: 0;
+}
+
+.viz-sealed {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand);
+  opacity: 0;
+}
+
+.viz-sealed-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--brand);
+}
+
 .viz-hash {
   display: flex;
   align-items: center;
@@ -530,10 +581,35 @@ a {
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   font-size: 11px;
   color: var(--brand);
+  opacity: 0;
 }
 
 .viz-lock {
   font-size: 12px;
+}
+
+.viz-ref {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  background: rgba(13, 150, 104, 0.06);
+  border: 1px dashed rgba(13, 150, 104, 0.28);
+  border-radius: 8px;
+}
+
+.viz-ref-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.viz-ref-title {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--ink);
 }
 
 .viz-person {
@@ -548,15 +624,46 @@ a {
 }
 
 .viz-avatar {
-  flex: 0 0 22px;
-  width: 22px;
-  height: 22px;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
   border-radius: 999px;
   background: linear-gradient(135deg, var(--border-strong), var(--muted));
 }
 
-.viz-person .viz-bar {
+.viz-avatar-org {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0d9668, #0a7a54);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.viz-person-meta {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.viz-person-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.viz-person-role {
+  font-size: 10.5px;
+  color: var(--muted);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* The tick and the pending dial share one slot so they can cross-fade in
@@ -587,6 +694,22 @@ a {
 .viz-pending {
   font-size: 12px;
   color: var(--muted);
+}
+
+.viz-quote {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink-soft);
+  line-height: 1.4;
+  opacity: 0;
+  padding: 0 2px;
+}
+
+.viz-proof-url {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: -0.01em;
 }
 
 .viz-verified {
@@ -635,71 +758,131 @@ a {
 }
 
 /* ——— illustration motion ———
-   Each card plays a short loop of the thing it describes: an entry being
-   typed then sealed, two witnesses confirming in turn, a chain verifying.
-   Everything is gated behind .is-visible so nothing animates off-screen. */
-.reveal-stagger.is-visible .viz-record .viz-bar-lg,
-.reveal-stagger.is-visible .viz-record .viz-bar-sm {
-  transform-origin: left center;
+   Record: types "Grant received — $12,000", shows fund detail, seals, hash.
+   Witness: links to that same grant; Maya Chen (CIF) confirms with a quote.
+   Share: proof URL + verified banner + flowing chain.
+   Gated behind .is-visible so nothing animates off-screen. */
+.reveal-stagger.is-visible .viz-record .viz-title-text {
+  animation: viz-type-title 6.5s steps(24, end) infinite;
 }
 
-.reveal-stagger.is-visible .viz-record .viz-bar-lg {
-  animation: viz-type-a 5s ease-in-out infinite;
+.reveal-stagger.is-visible .viz-record .viz-caret {
+  animation: viz-caret 6.5s ease-in-out infinite;
 }
 
-.reveal-stagger.is-visible .viz-record .viz-bar-sm {
-  animation: viz-type-b 5s ease-in-out infinite;
+.reveal-stagger.is-visible .viz-record .viz-detail {
+  animation: viz-fade-late 6.5s ease-in-out infinite;
 }
 
-.reveal-stagger.is-visible .viz-entry {
-  animation: viz-seal 5s ease-in-out infinite;
+.reveal-stagger.is-visible .viz-record .viz-sealed {
+  animation: viz-seal-badge 6.5s ease-in-out infinite;
 }
 
-.reveal-stagger.is-visible .viz-hash {
-  animation: viz-hash-in 5s ease-in-out infinite;
+.reveal-stagger.is-visible .viz-record .viz-entry {
+  animation: viz-seal-border 6.5s ease-in-out infinite;
 }
 
-@keyframes viz-type-a {
+.reveal-stagger.is-visible .viz-record .viz-hash {
+  animation: viz-hash-in 6.5s ease-in-out infinite;
+}
+
+@keyframes viz-type-title {
   0%,
-  4% {
-    transform: scaleX(0);
+  6% {
+    max-width: 0;
   }
-  20%,
-  90% {
-    transform: scaleX(1);
+  32%,
+  88% {
+    max-width: 220px;
   }
   96%,
   100% {
-    transform: scaleX(0);
+    max-width: 0;
   }
 }
 
-@keyframes viz-type-b {
+@keyframes viz-caret {
   0%,
-  16% {
-    transform: scaleX(0);
+  5% {
+    opacity: 0;
+  }
+  6%,
+  10% {
+    opacity: 1;
+  }
+  11%,
+  15% {
+    opacity: 0;
+  }
+  16%,
+  20% {
+    opacity: 1;
+  }
+  21%,
+  25% {
+    opacity: 0;
+  }
+  26%,
+  31% {
+    opacity: 1;
   }
   32%,
   90% {
-    transform: scaleX(1);
+    opacity: 0;
   }
-  96%,
+  94%,
   100% {
-    transform: scaleX(0);
+    opacity: 1;
   }
 }
 
-@keyframes viz-seal {
+@keyframes viz-fade-late {
   0%,
-  34% {
+  30% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  40%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  96%,
+  100% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes viz-seal-badge {
+  0%,
+  48% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  56%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  96%,
+  100% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes viz-seal-border {
+  0%,
+  46% {
     border-color: var(--border);
     box-shadow: var(--shadow-sm);
   }
-  44% {
+  54% {
     border-color: var(--brand);
     box-shadow: 0 0 0 4px rgba(13, 150, 104, 0.14);
   }
-  62%,
+  70%,
   100% {
     border-color: var(--border);
     box-shadow: var(--shadow-sm);
@@ -708,12 +891,12 @@ a {
 
 @keyframes viz-hash-in {
   0%,
-  40% {
+  52% {
     opacity: 0;
     transform: translateY(5px);
   }
-  54%,
-  90% {
+  62%,
+  88% {
     opacity: 1;
     transform: none;
   }
@@ -724,51 +907,51 @@ a {
   }
 }
 
-.reveal-stagger.is-visible .viz-person-b {
-  animation: viz-wait 5s ease-in-out infinite;
+.reveal-stagger.is-visible .viz-witness .viz-ref {
+  animation: viz-ref-pulse 6.5s ease-in-out infinite;
 }
 
-.reveal-stagger.is-visible .viz-person-a .viz-pending {
-  animation: viz-pending-a 5s ease-in-out infinite;
+.reveal-stagger.is-visible .viz-witness .viz-pending {
+  animation: viz-pending-a 6.5s ease-in-out infinite;
 }
 
-.reveal-stagger.is-visible .viz-person-a .viz-check {
-  animation: viz-confirm-a 5s ease-in-out infinite;
+.reveal-stagger.is-visible .viz-witness .viz-check {
+  animation: viz-confirm-a 6.5s ease-in-out infinite;
 }
 
-.reveal-stagger.is-visible .viz-person-b .viz-pending {
-  animation: viz-pending-b 5s ease-in-out infinite;
+.reveal-stagger.is-visible .viz-witness .viz-person {
+  animation: viz-person-glow 6.5s ease-in-out infinite;
 }
 
-.reveal-stagger.is-visible .viz-person-b .viz-check {
-  animation: viz-confirm-b 5s ease-in-out infinite;
+.reveal-stagger.is-visible .viz-witness .viz-quote {
+  animation: viz-quote-in 6.5s ease-in-out infinite;
 }
 
-@keyframes viz-wait {
+@keyframes viz-ref-pulse {
   0%,
-  45% {
-    opacity: 0.5;
+  12% {
+    opacity: 0.45;
   }
-  56%,
-  92% {
+  22%,
+  88% {
     opacity: 1;
   }
-  98%,
+  96%,
   100% {
-    opacity: 0.5;
+    opacity: 0.45;
   }
 }
 
 @keyframes viz-pending-a {
   0%,
-  20% {
+  28% {
     opacity: 1;
   }
-  30%,
-  92% {
+  38%,
+  88% {
     opacity: 0;
   }
-  98%,
+  96%,
   100% {
     opacity: 1;
   }
@@ -776,97 +959,114 @@ a {
 
 @keyframes viz-confirm-a {
   0%,
-  20% {
+  28% {
     opacity: 0;
     transform: scale(0.4);
   }
-  32% {
+  40% {
     opacity: 1;
-    transform: scale(1.4);
+    transform: scale(1.35);
   }
-  40%,
-  92% {
+  48%,
+  88% {
     opacity: 1;
     transform: scale(1);
   }
-  98%,
+  96%,
   100% {
     opacity: 0;
     transform: scale(0.4);
   }
 }
 
-@keyframes viz-pending-b {
+@keyframes viz-person-glow {
   0%,
-  50% {
-    opacity: 1;
+  34% {
+    border-color: var(--border);
+    box-shadow: var(--shadow-sm);
   }
-  60%,
-  92% {
-    opacity: 0;
+  44% {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 4px rgba(13, 150, 104, 0.12);
   }
-  98%,
+  62%,
   100% {
-    opacity: 1;
+    border-color: var(--border);
+    box-shadow: var(--shadow-sm);
   }
 }
 
-@keyframes viz-confirm-b {
+@keyframes viz-quote-in {
   0%,
-  50% {
+  42% {
     opacity: 0;
-    transform: scale(0.4);
+    transform: translateY(6px);
   }
-  62% {
+  54%,
+  88% {
     opacity: 1;
-    transform: scale(1.4);
+    transform: none;
   }
-  70%,
-  92% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  98%,
+  96%,
   100% {
     opacity: 0;
-    transform: scale(0.4);
+    transform: translateY(6px);
   }
 }
 
-.reveal-stagger.is-visible .viz-verified {
-  animation: viz-verified-in 5s ease-in-out infinite;
+.reveal-stagger.is-visible .viz-share .viz-proof-url {
+  animation: viz-url-in 6.5s ease-in-out infinite;
 }
 
-.reveal-stagger.is-visible .viz-node {
-  animation: viz-node-pop 5s ease-in-out infinite;
+.reveal-stagger.is-visible .viz-share .viz-verified {
+  animation: viz-verified-in 6.5s ease-in-out infinite;
 }
 
-.reveal-stagger.is-visible .viz-node:nth-child(3) {
+.reveal-stagger.is-visible .viz-share .viz-node {
+  animation: viz-node-pop 6.5s ease-in-out infinite;
+}
+
+.reveal-stagger.is-visible .viz-share .viz-node:nth-child(3) {
   animation-delay: 0.35s;
 }
 
-.reveal-stagger.is-visible .viz-node:nth-child(5) {
+.reveal-stagger.is-visible .viz-share .viz-node:nth-child(5) {
   animation-delay: 0.7s;
 }
 
-.reveal-stagger.is-visible .viz-line {
+.reveal-stagger.is-visible .viz-share .viz-line {
   animation: viz-flow 0.9s linear infinite;
+}
+
+@keyframes viz-url-in {
+  0%,
+  8% {
+    opacity: 0.3;
+  }
+  20%,
+  88% {
+    opacity: 1;
+  }
+  96%,
+  100% {
+    opacity: 0.3;
+  }
 }
 
 @keyframes viz-verified-in {
   0%,
-  42% {
-    opacity: 0.3;
+  28% {
+    opacity: 0.25;
     transform: translateY(4px);
   }
-  56%,
-  92% {
+  42%,
+  88% {
     opacity: 1;
     transform: none;
   }
-  98%,
+  96%,
   100% {
-    opacity: 0.3;
+    opacity: 0.25;
     transform: translateY(4px);
   }
 }
@@ -878,7 +1078,7 @@ a {
     opacity: 0.25;
   }
   20%,
-  90% {
+  88% {
     transform: scale(1);
     opacity: 1;
   }
@@ -899,18 +1099,196 @@ a {
 }
 
 .landing-fine {
-  margin-top: 48px;
+  margin-top: 40px;
   text-align: center;
   letter-spacing: 0.01em;
 }
 
+/* ——— longer landing sections ——— */
+.land-section {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 72px 0 8px;
+}
+
+.section-eyebrow {
+  display: block;
+  margin-bottom: 12px;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--brand);
+  font-weight: 700;
+}
+
+.section-heading {
+  font-family: var(--font-display), "Segoe UI", sans-serif;
+  font-size: clamp(1.65rem, 3.2vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: var(--ink);
+  margin: 0;
+  max-width: 640px;
+}
+
+.section-lead {
+  margin: 16px 0 0;
+  max-width: 580px;
+  font-size: 17px;
+  line-height: 1.6;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.offer-grid {
+  list-style: none;
+  margin: 36px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.offer-card,
+.who-card {
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.offer-title,
+.who-title,
+.scenario-title {
+  font-family: var(--font-display), "Segoe UI", sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+
+.offer-text,
+.who-text,
+.scenario-text {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.scenario-steps {
+  list-style: none;
+  margin: 36px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.scenario-step {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 8px 20px;
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.scenario-step:last-child {
+  border-bottom: none;
+}
+
+.scenario-num {
+  color: var(--brand);
+  letter-spacing: 0.1em;
+  font-size: 12px;
+  font-weight: 700;
+  padding-top: 4px;
+}
+
+.who-grid {
+  list-style: none;
+  margin: 36px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.land-cta {
+  text-align: left;
+  padding-bottom: 24px;
+}
+
+.land-cta .hero-actions {
+  margin-top: 24px;
+}
+
+.land-cta .btn-secondary {
+  height: 50px;
+  padding: 0 22px;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+/* Stagger offer / who / scenario cards the same way as how-items. */
+.reveal-stagger .offer-card,
+.reveal-stagger .who-card,
+.reveal-stagger .scenario-step {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-stagger.is-visible .offer-card,
+.reveal-stagger.is-visible .who-card,
+.reveal-stagger.is-visible .scenario-step {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-stagger.is-visible .offer-card:nth-child(2),
+.reveal-stagger.is-visible .who-card:nth-child(2),
+.reveal-stagger.is-visible .scenario-step:nth-child(2) {
+  transition-delay: 0.1s;
+}
+
+.reveal-stagger.is-visible .offer-card:nth-child(3),
+.reveal-stagger.is-visible .who-card:nth-child(3),
+.reveal-stagger.is-visible .scenario-step:nth-child(3) {
+  transition-delay: 0.2s;
+}
+
+.reveal-stagger.is-visible .offer-card:nth-child(4) {
+  transition-delay: 0.3s;
+}
+
 @media (max-width: 900px) {
-  .how-strip {
+  .how-strip,
+  .offer-grid,
+  .who-grid {
     grid-template-columns: 1fr;
   }
 
   .landing {
     padding: 0 22px 16px;
+  }
+
+  .land-section {
+    padding: 48px 0 8px;
+  }
+
+  .scenario-step {
+    grid-template-columns: 40px 1fr;
+    padding: 20px;
   }
 
   .doc-body {
@@ -932,12 +1310,22 @@ a {
     transition-duration: 0.001ms !important;
   }
 
-  .viz-check {
-    opacity: 1;
+  .viz-title-text {
+    max-width: 220px !important;
   }
 
-  .viz-pending {
-    opacity: 0;
+  .viz-detail,
+  .viz-sealed,
+  .viz-hash,
+  .viz-quote,
+  .viz-check {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .viz-pending,
+  .viz-caret {
+    opacity: 0 !important;
   }
 
   .reveal-fade {
@@ -945,7 +1333,10 @@ a {
     transform: none;
   }
 
-  .reveal-stagger .how-item {
+  .reveal-stagger .how-item,
+  .reveal-stagger .offer-card,
+  .reveal-stagger .who-card,
+  .reveal-stagger .scenario-step {
     opacity: 1;
     transform: none;
   }
