@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 
+import { Reveal } from "@/app/components/Reveal";
+
 const HOW_IT_WORKS = [
   {
     step: "01",
@@ -30,7 +32,7 @@ function StepVisual({ step }: { step: string }) {
         </div>
         <div className="viz-hash">
           <span className="viz-lock">⛓</span>
-          a3f81c…d0e29b
+          <span className="viz-hash-text">a3f81c…d0e29b</span>
         </div>
       </div>
     );
@@ -39,15 +41,21 @@ function StepVisual({ step }: { step: string }) {
   if (step === "02") {
     return (
       <div className="viz viz-witness" aria-hidden="true">
-        <div className="viz-person">
+        <div className="viz-person viz-person-a">
           <span className="viz-avatar" />
           <span className="viz-bar viz-bar-md" />
-          <span className="viz-check">✓</span>
+          <span className="viz-status">
+            <span className="viz-pending">◐</span>
+            <span className="viz-check">✓</span>
+          </span>
         </div>
-        <div className="viz-person viz-person-dim">
+        <div className="viz-person viz-person-b">
           <span className="viz-avatar" />
           <span className="viz-bar viz-bar-sm" />
-          <span className="viz-pending">◐</span>
+          <span className="viz-status">
+            <span className="viz-pending">◐</span>
+            <span className="viz-check">✓</span>
+          </span>
         </div>
       </div>
     );
@@ -79,50 +87,58 @@ export default async function Home() {
 
   return (
     <main className="landing">
-      <div className="landing-inner">
-        <section className="hero">
-          <div className="hero-left">
-            <h1 className="headline">
-              <span className="headline-ink">Proof,</span>{" "}
-              <span className="headline-accent">not prose.</span>
-            </h1>
+      {/* ——— full-screen brand hero ——— */}
+      <section className="stage">
+        <div className="stage-inner">
+          <h1 className="brand-mark">Beleg</h1>
 
-            <div className="hero-actions">
-              <Link className="cta" href={signedIn ? "/dashboard" : "/sign-up"}>
-                {signedIn ? "Go to your ledger" : "Start your ledger"}
-              </Link>
-            </div>
+          <p className="brand-tagline">
+            <span className="headline-ink">Proof,</span>{" "}
+            <span className="headline-accent">not prose.</span>
+          </p>
 
-            <p className="cta-note">
-              Free while in beta. No credit card. 60 seconds to start.
-            </p>
+          <p className="subline">
+            Applications, pitches, and grant essays are drowning in AI-polished
+            claims reviewers can&apos;t verify. Beleg gives your traction a
+            cryptographically sealed timeline — recorded as it happens,
+            witnessed by real people, and provable to anyone reading.
+          </p>
+
+          <div className="hero-actions">
+            <Link className="cta" href={signedIn ? "/dashboard" : "/sign-up"}>
+              {signedIn ? "Go to your ledger" : "Start your ledger"}
+            </Link>
           </div>
 
-          <div className="hero-right">
-            <p className="subline">
-              Applications, pitches, and grant essays are drowning in AI-polished
-              claims reviewers can&apos;t verify. Beleg gives your traction a
-              cryptographically sealed timeline — recorded as it happens,
-              witnessed by real people, and provable to anyone reading.
-            </p>
-          </div>
-        </section>
+          <p className="cta-note">
+            Free while in beta. No credit card. 60 seconds to start.
+          </p>
+        </div>
 
-        <ul className="how-strip">
-          {HOW_IT_WORKS.map((item) => (
-            <li key={item.label} className="how-item">
-              <span className="how-step mono">{item.step}</span>
-              <span className="how-label">{item.label}</span>
-              <span className="how-text">{item.text}</span>
-              <StepVisual step={item.step} />
-            </li>
-          ))}
-        </ul>
+        <span className="scroll-cue" aria-hidden="true" />
+      </section>
 
-        <p className="landing-fine">
-          Anchored to Bitcoin. Verifiable without trusting this website.
-        </p>
-      </div>
+      {/* ——— how it works ——— */}
+      <section className="strip-section">
+        <Reveal className="reveal-stagger">
+          <ul className="how-strip">
+            {HOW_IT_WORKS.map((item) => (
+              <li key={item.label} className="how-item">
+                <span className="how-step mono">{item.step}</span>
+                <span className="how-label">{item.label}</span>
+                <span className="how-text">{item.text}</span>
+                <StepVisual step={item.step} />
+              </li>
+            ))}
+          </ul>
+        </Reveal>
+
+        <Reveal className="reveal-fade">
+          <p className="landing-fine">
+            Anchored to Bitcoin. Verifiable without trusting this website.
+          </p>
+        </Reveal>
+      </section>
     </main>
   );
 }
