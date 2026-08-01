@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 
+import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
 import { Reveal } from "@/app/components/Reveal";
 import { Showcase } from "@/app/components/Showcase";
+import { UseExplorer } from "@/app/components/UseExplorer";
 
 const OFFERINGS = [
   {
@@ -21,21 +23,6 @@ const OFFERINGS = [
   {
     title: "Bitcoin anchoring",
     text: "Your chain tip is periodically timestamped against the Bitcoin blockchain via OpenTimestamps. Even if Beleg disappeared, the .ots proof would still stand.",
-  },
-];
-
-const WHO_FOR = [
-  {
-    title: "Grant applicants",
-    text: "Show reviewers a sealed record of milestones — not another AI-polished essay about them.",
-  },
-  {
-    title: "Founders raising",
-    text: "Hand investors a timeline they can verify independently, with witnesses attached to the claims that matter.",
-  },
-  {
-    title: "Accelerator cohorts",
-    text: "Prove what you shipped and when — with mentors and partners who can confirm it in one click.",
   },
 ];
 
@@ -70,9 +57,7 @@ export default async function Home() {
           <div className="hero-actions">
             <Link className="cta" href={ctaHref}>
               <span className="cta-label">{ctaLabel}</span>
-              <span className="cta-badge" aria-hidden="true">
-                <span className="cta-arrow">→</span>
-              </span>
+              <CtaBadge />
             </Link>
           </div>
 
@@ -210,19 +195,18 @@ export default async function Home() {
         <Reveal className="reveal-fade">
           <p className="section-eyebrow mono">Who it&apos;s for</p>
           <h2 className="section-heading">
-            Built for people who get asked to prove traction.
+            If someone can ask you to prove it, you can use Beleg.
           </h2>
+          <p className="section-lead">
+            Founders, small business owners, tradespeople, freelancers,
+            students, clinicians, creators — anyone whose track record lives in
+            claims other people are supposed to take on faith. Pick your work
+            and see exactly how it applies.
+          </p>
         </Reveal>
 
-        <Reveal className="reveal-stagger">
-          <ul className="who-grid">
-            {WHO_FOR.map((item) => (
-              <li key={item.title} className="who-card">
-                <h3 className="who-title">{item.title}</h3>
-                <p className="who-text">{item.text}</p>
-              </li>
-            ))}
-          </ul>
+        <Reveal className="reveal-fade">
+          <UseExplorer />
         </Reveal>
       </section>
 
@@ -238,9 +222,7 @@ export default async function Home() {
           <div className="hero-actions">
             <Link className="cta cta-invert" href={ctaHref}>
               <span className="cta-label">{ctaLabel}</span>
-              <span className="cta-badge" aria-hidden="true">
-                <span className="cta-arrow">→</span>
-              </span>
+              <CtaBadge />
             </Link>
             <Link className="ghost-link" href="/how-it-works">
               How the cryptography works

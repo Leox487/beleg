@@ -2,6 +2,8 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { UserButton } from "@clerk/nextjs";
 
+import { LinkPending } from "@/app/components/CtaBadge";
+
 export async function Navbar() {
   const { userId } = await auth();
   const signedIn = Boolean(userId);
@@ -13,6 +15,9 @@ export async function Navbar() {
       </Link>
 
       <nav className="navbar-actions" aria-label="Main">
+        <Link href="/uses" className="navbar-link navbar-link-info">
+          Who it&apos;s for
+        </Link>
         <Link href="/how-it-works" className="navbar-link navbar-link-info">
           How it works
         </Link>
@@ -24,6 +29,7 @@ export async function Navbar() {
           <>
             <Link href="/dashboard" className="navbar-link">
               Ledgers
+              <LinkPending />
             </Link>
             <UserButton />
           </>
