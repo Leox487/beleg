@@ -2022,6 +2022,55 @@ a {
   color: var(--ink-soft);
 }
 
+.uses-limits {
+  margin-top: 56px;
+  padding: 28px 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+  border-radius: 18px;
+}
+
+.uses-limits-lead {
+  margin: 10px 0 18px;
+  max-width: 66ch;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.uses-limits-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.uses-limits-list li {
+  max-width: 72ch;
+  padding-left: 18px;
+  border-left: 2px solid var(--border);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.uses-limits-list strong {
+  display: block;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.uses-limits-close {
+  margin: 22px 0 0;
+  max-width: 66ch;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
 .uses-outro {
   margin-top: 56px;
   text-align: center;

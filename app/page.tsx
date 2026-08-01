@@ -198,10 +198,10 @@ export default async function Home() {
             If someone can ask you to prove it, you can use Beleg.
           </h2>
           <p className="section-lead">
-            Founders, small business owners, tradespeople, freelancers,
-            students, clinicians, creators — anyone whose track record lives in
-            claims other people are supposed to take on faith. Pick your work
-            and see exactly how it applies.
+            Founders, small business owners, contractors, freelancers,
+            researchers, students, consultants — anyone whose best work is real
+            but invisible to the stranger evaluating them. Pick your work and
+            see exactly how it applies.
           </p>
         </Reveal>
 
