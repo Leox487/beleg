@@ -3,24 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 
 import { Footer } from "@/app/components/Footer";
 import { Reveal } from "@/app/components/Reveal";
-
-const HOW_IT_WORKS = [
-  {
-    step: "01",
-    label: "Record.",
-    text: "Add a milestone — the system seals it with a cryptographic timestamp.",
-  },
-  {
-    step: "02",
-    label: "Witness.",
-    text: "Send a one-click link to whoever was there. Their confirmation is sealed into the same chain.",
-  },
-  {
-    step: "03",
-    label: "Share.",
-    text: "Send anyone your public proof page. They verify the chain independently — in their own browser.",
-  },
-];
+import { Showcase } from "@/app/components/Showcase";
 
 const OFFERINGS = [
   {
@@ -56,76 +39,6 @@ const WHO_FOR = [
   },
 ];
 
-function StepVisual({ step }: { step: string }) {
-  if (step === "01") {
-    return (
-      <div className="viz viz-record" aria-hidden="true">
-        <div className="viz-entry">
-          <div className="viz-entry-top">
-            <span className="viz-seq">#07</span>
-            <span className="viz-kind">grant</span>
-          </div>
-          <span className="viz-title">
-            <span className="viz-title-text">Grant received — $12,000</span>
-            <span className="viz-caret" />
-          </span>
-          <span className="viz-detail">Civic Innovation Fund · Mar 12</span>
-          <span className="viz-sealed">
-            <span className="viz-sealed-dot" />
-            Sealed
-          </span>
-        </div>
-        <div className="viz-hash">
-          <span className="viz-lock">⛓</span>
-          <span className="viz-hash-text">a3f81c…d0e29b</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (step === "02") {
-    return (
-      <div className="viz viz-witness" aria-hidden="true">
-        <div className="viz-ref">
-          <span className="viz-ref-label">Confirming</span>
-          <span className="viz-ref-title">Grant received — $12,000</span>
-        </div>
-        <div className="viz-person viz-person-a">
-          <span className="viz-avatar viz-avatar-org">CIF</span>
-          <div className="viz-person-meta">
-            <span className="viz-person-name">Maya Chen</span>
-            <span className="viz-person-role">Program Officer, Civic Innovation Fund</span>
-          </div>
-          <span className="viz-status">
-            <span className="viz-pending">◐</span>
-            <span className="viz-check">✓</span>
-          </span>
-        </div>
-        <div className="viz-quote">
-          &ldquo;We awarded this grant on March 12.&rdquo;
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="viz viz-share" aria-hidden="true">
-      <div className="viz-proof-url">beleg.app/p/northstar</div>
-      <div className="viz-verified">
-        <span className="viz-check-lg">✓</span>
-        Chain verified · 7 entries
-      </div>
-      <div className="viz-links">
-        <span className="viz-node" />
-        <span className="viz-line" />
-        <span className="viz-node" />
-        <span className="viz-line" />
-        <span className="viz-node" />
-      </div>
-    </div>
-  );
-}
-
 export default async function Home() {
   // Branch the CTA on auth state. A signed-in visitor sent to /sign-up gets
   // bounced back to / by Clerk (active session), which looked like the button
@@ -156,7 +69,10 @@ export default async function Home() {
 
           <div className="hero-actions">
             <Link className="cta" href={ctaHref}>
-              {ctaLabel}
+              <span className="cta-label">{ctaLabel}</span>
+              <span className="cta-badge" aria-hidden="true">
+                <span className="cta-arrow">→</span>
+              </span>
             </Link>
           </div>
 
@@ -175,19 +91,14 @@ export default async function Home() {
           <h2 className="section-heading">
             Record it. Get it witnessed. Share the proof.
           </h2>
+          <p className="section-lead">
+            Hover a step to watch it happen — the same grant, followed all the
+            way through.
+          </p>
         </Reveal>
 
-        <Reveal className="reveal-stagger">
-          <ul className="how-strip">
-            {HOW_IT_WORKS.map((item) => (
-              <li key={item.label} className="how-item">
-                <span className="how-step mono">{item.step}</span>
-                <span className="how-label">{item.label}</span>
-                <span className="how-text">{item.text}</span>
-                <StepVisual step={item.step} />
-              </li>
-            ))}
-          </ul>
+        <Reveal className="reveal-fade">
+          <Showcase />
         </Reveal>
 
         <Reveal className="reveal-fade">
@@ -215,7 +126,7 @@ export default async function Home() {
       </section>
 
       {/* ——— what you get ——— */}
-      <section className="land-section">
+      <section className="land-section land-panel">
         <Reveal className="reveal-fade">
           <p className="section-eyebrow mono">What Beleg offers</p>
           <h2 className="section-heading">
@@ -225,8 +136,9 @@ export default async function Home() {
 
         <Reveal className="reveal-stagger">
           <ul className="offer-grid">
-            {OFFERINGS.map((item) => (
-              <li key={item.title} className="offer-card">
+            {OFFERINGS.map((item, i) => (
+              <li key={item.title} className={`offer-card offer-${i + 1}`}>
+                <span className="offer-rule" aria-hidden="true" />
                 <h3 className="offer-title">{item.title}</h3>
                 <p className="offer-text">{item.text}</p>
               </li>
@@ -294,7 +206,7 @@ export default async function Home() {
       </section>
 
       {/* ——— who it's for ——— */}
-      <section className="land-section">
+      <section className="land-section land-panel">
         <Reveal className="reveal-fade">
           <p className="section-eyebrow mono">Who it&apos;s for</p>
           <h2 className="section-heading">
@@ -317,16 +229,20 @@ export default async function Home() {
       {/* ——— closing CTA ——— */}
       <section className="land-section land-cta">
         <Reveal className="reveal-fade">
+          <p className="section-eyebrow mono">Get started</p>
           <h2 className="section-heading">Start sealing what you ship.</h2>
           <p className="section-lead">
             Free while in beta. No credit card. Your first entry takes about a
             minute — and from then on, the chain speaks for itself.
           </p>
           <div className="hero-actions">
-            <Link className="cta" href={ctaHref}>
-              {ctaLabel}
+            <Link className="cta cta-invert" href={ctaHref}>
+              <span className="cta-label">{ctaLabel}</span>
+              <span className="cta-badge" aria-hidden="true">
+                <span className="cta-arrow">→</span>
+              </span>
             </Link>
-            <Link className="btn btn-secondary" href="/how-it-works">
+            <Link className="ghost-link" href="/how-it-works">
               How the cryptography works
             </Link>
           </div>

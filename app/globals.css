@@ -1,19 +1,27 @@
 /* ——— design tokens ——— */
 :root {
-  --bg: #eef1f3;
-  --surface: #fbfcfd;
-  --ink: #0c1219;
-  --ink-soft: #3a4553;
-  --muted: #6b7684;
-  --border: #d7dde4;
-  --border-strong: #c2cad4;
-  --accent: #0c1219;
-  --accent-hover: #1e2936;
+  --bg: #eaf0ed;
+  --surface: #ffffff;
+  --ink: #0b1512;
+  --ink-soft: #3b4a44;
+  --muted: #69796f;
+  --border: #dbe4df;
+  --border-strong: #c3cec8;
+  --accent: #0b1512;
+  --accent-hover: #1c2b25;
   /* Signature colour. Green reads as "verified" and is already the language
      the app uses for attestations and passing chain checks. */
   --brand: #0d9668;
   --brand-bright: #10b981;
   --brand-tint: #e6f6f0;
+  /* Each step of the story owns a hue so the three demos read as distinct
+     stages rather than three of the same card. */
+  --c-record: #0d9668;
+  --c-record-tint: #e6f6f0;
+  --c-witness: #d97a2b;
+  --c-witness-tint: #fdf0e3;
+  --c-share: #3866cf;
+  --c-share-tint: #e9eefb;
   --success: #15803d;
   --danger: #b91c1c;
   --radius: 10px;
@@ -43,16 +51,21 @@ body {
   background-color: var(--bg);
   background-image:
     radial-gradient(
-      ellipse 85% 50% at 50% -15%,
-      rgba(140, 170, 200, 0.22),
-      transparent 58%
+      ellipse 60% 45% at 8% -8%,
+      rgba(13, 150, 104, 0.16),
+      transparent 62%
     ),
     radial-gradient(
-      ellipse 55% 40% at 100% 100%,
-      rgba(90, 120, 140, 0.1),
-      transparent 55%
+      ellipse 55% 40% at 95% 2%,
+      rgba(56, 102, 207, 0.13),
+      transparent 60%
     ),
-    linear-gradient(180deg, #f4f6f8 0%, #eef1f3 45%, #e8ecef 100%);
+    radial-gradient(
+      ellipse 60% 45% at 85% 88%,
+      rgba(217, 122, 43, 0.12),
+      transparent 60%
+    ),
+    linear-gradient(180deg, #f2f7f4 0%, #ebf1ee 45%, #e6edea 100%);
   background-attachment: fixed;
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
@@ -99,19 +112,11 @@ a {
 .entry-title,
 .section-title,
 .proof-footer-title,
-.entry-empty-title,
-.how-label {
+.entry-empty-title {
   font-size: 18px;
   line-height: 1.3;
   font-weight: 700;
   letter-spacing: -0.01em;
-}
-
-.how-label {
-  font-family: var(--font-display), "Segoe UI", sans-serif;
-  font-size: 23px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
 }
 
 .lead,
@@ -146,8 +151,7 @@ a {
 .entry-hash,
 .entry-seq,
 .verify-row-seq,
-.verify-row-hashes,
-.how-step {
+.verify-row-hashes {
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   font-size: 12px;
   color: var(--muted);
@@ -358,25 +362,6 @@ a {
   transform: none;
 }
 
-.reveal-stagger .how-item {
-  opacity: 0;
-  transform: translateY(26px);
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.reveal-stagger.is-visible .how-item {
-  opacity: 1;
-  transform: none;
-}
-
-.reveal-stagger.is-visible .how-item:nth-child(2) {
-  transition-delay: 0.12s;
-}
-
-.reveal-stagger.is-visible .how-item:nth-child(3) {
-  transition-delay: 0.24s;
-}
 
 .headline {
   color: var(--ink);
@@ -393,7 +378,8 @@ a {
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  align-items: center;
+  gap: 18px;
   margin-top: 28px;
 }
 
@@ -402,699 +388,991 @@ a {
   max-width: 560px;
 }
 
+/* Deliberately not a plain filled rectangle: a dark capsule carrying a
+   coloured arrow token that slides on hover. */
 .cta {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  height: 50px;
-  padding: 0 26px;
-  background: var(--brand);
+  gap: 16px;
+  height: 58px;
+  padding: 0 8px 0 26px;
+  background: var(--ink);
   color: #ffffff;
-  border-radius: var(--radius);
+  border-radius: 999px;
+  font-family: var(--font-display), "Segoe UI", sans-serif;
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  box-shadow: 0 1px 2px rgba(13, 150, 104, 0.2),
-    0 6px 16px rgba(13, 150, 104, 0.22);
-}
-
-.cta:hover {
-  background: var(--brand-bright);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(13, 150, 104, 0.24),
-    0 10px 24px rgba(13, 150, 104, 0.26);
-}
-
-.cta-note {
-  margin-top: 14px;
-}
-
-.how-strip {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  text-align: left;
-}
-
-.how-item {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  padding: 22px 22px 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
-  color: var(--ink-soft);
+  box-shadow: 0 2px 6px rgba(11, 21, 18, 0.18),
+    0 14px 34px rgba(11, 21, 18, 0.24);
   overflow: hidden;
 }
 
-.how-step {
-  display: block;
-  margin-bottom: 12px;
-  letter-spacing: 0.12em;
-  font-size: 11px;
-  text-transform: uppercase;
-  color: var(--brand);
+/* Green wash that wipes across on hover instead of a flat colour swap. */
+.cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, var(--brand), #0b7f58);
+  transform: translateX(-101%);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.how-label {
-  display: block;
+.cta:hover::before {
+  transform: translateX(0);
+}
+
+.cta-label,
+.cta-badge {
+  position: relative;
+  z-index: 1;
+}
+
+.cta-badge {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: var(--brand);
+  transition: background 0.35s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cta-arrow {
+  font-size: 17px;
+  line-height: 1;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cta:hover .cta-badge {
+  background: #ffffff;
   color: var(--ink);
-  margin-bottom: 8px;
+  transform: scale(1.06);
 }
 
-.how-text {
-  font-size: 14.5px;
-  line-height: 1.5;
+.cta:hover .cta-arrow {
+  transform: translateX(3px);
 }
 
-/* ——— card illustrations ——— */
-/* margin-top:auto pins every illustration to the bottom of its card so the
-   three line up regardless of how long the sentence above wraps. */
-.viz {
-  margin: auto -22px 0;
-  padding: 18px 22px 20px;
-  border-top: 1px solid var(--border);
-  background: linear-gradient(180deg, rgba(13, 150, 104, 0.05), transparent);
+.cta-invert {
+  background: #ffffff;
+  color: var(--ink);
+  box-shadow: 0 2px 6px rgba(11, 21, 18, 0.14),
+    0 14px 34px rgba(11, 21, 18, 0.2);
+}
+
+.cta-invert .cta-badge {
+  background: var(--brand);
+  color: #ffffff;
+}
+
+.cta-invert:hover {
+  color: #ffffff;
+}
+
+.ghost-link {
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border-strong);
+  padding-bottom: 2px;
+}
+
+.ghost-link:hover {
+  color: var(--ink);
+  border-bottom-color: var(--brand);
+}
+
+.cta-note {
+  margin-top: 16px;
+}
+
+/* ——— showcase: three panels, the hovered one expands ——— */
+.showcase {
+  display: flex;
+  gap: 14px;
+  margin-top: 36px;
+  height: 545px;
+}
+
+.showcase-panel {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-  min-height: 168px;
-}
-
-.viz-entry {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 12px;
-  background: var(--surface);
+  padding: 26px 24px;
+  border-radius: 22px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  background: var(--surface);
   box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  cursor: pointer;
+  transition: flex-grow 0.62s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.5s, border-color 0.5s, box-shadow 0.5s;
 }
 
-.viz-entry-top {
+.showcase-panel.is-active {
+  flex-grow: 4.4;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Each stage owns a hue, applied only while it is the open panel. */
+.showcase-record.is-active {
+  background: linear-gradient(170deg, var(--c-record-tint), var(--surface) 46%);
+  border-color: rgba(13, 150, 104, 0.35);
+}
+
+.showcase-witness.is-active {
+  background: linear-gradient(170deg, var(--c-witness-tint), var(--surface) 46%);
+  border-color: rgba(217, 122, 43, 0.35);
+}
+
+.showcase-share.is-active {
+  background: linear-gradient(170deg, var(--c-share-tint), var(--surface) 46%);
+  border-color: rgba(56, 102, 207, 0.35);
+}
+
+.panel-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.panel-head:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 6px;
+  border-radius: 6px;
+}
+
+.panel-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  background: rgba(11, 21, 18, 0.05);
+  transition: background 0.4s, color 0.4s;
+}
+
+.showcase-record.is-active .panel-step {
+  background: var(--c-record);
+  color: #fff;
+}
+
+.showcase-witness.is-active .panel-step {
+  background: var(--c-witness);
+  color: #fff;
+}
+
+.showcase-share.is-active .panel-step {
+  background: var(--c-share);
+  color: #fff;
+}
+
+.panel-label {
+  font-family: var(--font-display), "Segoe UI", sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* Collapsed panels keep only their number and label; the body is clipped
+   away rather than unmounted so expanding stays smooth. */
+.panel-reveal {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.35s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.showcase-panel.is-active .panel-reveal {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.14s;
+}
+
+.panel-text {
+  margin: 14px 0 16px;
+  max-width: 540px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  min-width: 340px;
+}
+
+.panel-mock {
+  flex: 1;
+  min-height: 0;
+  min-width: 520px;
+}
+
+/* ——— demo window ——— */
+.mock {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 12px 32px rgba(11, 21, 18, 0.1);
+  overflow: hidden;
+}
+
+.mock-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(11, 21, 18, 0.025);
 }
 
-.viz-seq {
-  font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  font-size: 10px;
-  letter-spacing: 0.1em;
+.mock-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--border-strong);
+}
+
+.mock-bar-title {
+  margin-left: 10px;
+  font-size: 11.5px;
+  font-weight: 650;
   color: var(--muted);
 }
 
-.viz-kind {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--brand);
-  background: var(--brand-tint);
-  padding: 2px 7px;
-  border-radius: 999px;
+.mock-body {
+  position: relative;
+  flex: 1;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.viz-title {
+.mock-row {
   display: flex;
   align-items: center;
-  gap: 2px;
-  min-height: 18px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: -0.01em;
+  gap: 14px;
 }
 
-.viz-title-text {
+.mock-lbl {
+  flex: 0 0 54px;
+  font-size: 11.5px;
+  font-weight: 650;
+  color: var(--muted);
+}
+
+.mock-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(11, 21, 18, 0.02);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.mock-field-typing {
+  border-color: rgba(13, 150, 104, 0.4);
+  background: #fff;
+}
+
+.mock-typed {
   display: inline-block;
   overflow: hidden;
   white-space: nowrap;
   max-width: 0;
 }
 
-.viz-caret {
-  display: inline-block;
-  width: 1.5px;
-  height: 13px;
-  background: var(--brand);
-  opacity: 0;
+.mock-caret {
   flex: 0 0 auto;
-}
-
-.viz-detail {
-  font-size: 11px;
-  color: var(--muted);
+  width: 1.5px;
+  height: 15px;
+  margin-left: 1px;
+  background: var(--c-record);
   opacity: 0;
 }
 
-.viz-sealed {
+.mock-row-detail,
+.mock-actions,
+.mock-result {
+  opacity: 0;
+}
+
+.mock-pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  margin-top: 2px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--c-record-tint);
+  color: var(--c-record);
   font-size: 11px;
   font-weight: 700;
-  color: var(--brand);
-  opacity: 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-.viz-sealed-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--brand);
+.mock-actions {
+  margin-top: 2px;
+  padding-left: 68px;
 }
 
-.viz-hash {
+.mock-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 8px;
+  background: var(--c-record);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mock-btn-witness {
+  background: var(--c-witness);
+}
+
+.mock-btn-share {
+  background: var(--c-share);
+}
+
+.mock-result {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: auto;
+  padding: 11px 13px;
+  border-radius: 9px;
+  background: var(--c-record-tint);
+  border: 1px solid rgba(13, 150, 104, 0.28);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--c-record);
+}
+
+.mock-result-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--c-record);
+}
+
+.mock-hash {
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  font-size: 11px;
-  color: var(--brand);
-  opacity: 0;
+  font-weight: 500;
+  font-size: 11.5px;
 }
 
-.viz-lock {
-  font-size: 12px;
+.mock-check {
+  font-size: 13px;
 }
 
-.viz-ref {
+/* witness demo */
+.mock-ref {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 8px 10px;
-  background: rgba(13, 150, 104, 0.06);
-  border: 1px dashed rgba(13, 150, 104, 0.28);
-  border-radius: 8px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  border: 1px dashed rgba(217, 122, 43, 0.45);
+  background: rgba(217, 122, 43, 0.07);
 }
 
-.viz-ref-label {
+.mock-ref-label {
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: var(--brand);
+  color: var(--c-witness);
 }
 
-.viz-ref-title {
-  font-size: 12px;
-  font-weight: 650;
+.mock-ref-title {
+  font-size: 13px;
+  font-weight: 700;
   color: var(--ink);
 }
 
-.viz-person {
+.mock-who {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+
+.mock-avatar {
+  flex: 0 0 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #d97a2b, #b45f18);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.mock-who-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mock-who-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.mock-who-role {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+.mock-quote {
+  padding: 0 2px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.mock-witness .mock-actions {
+  padding-left: 0;
+}
+
+.mock-result-witness {
+  background: var(--c-witness-tint);
+  border-color: rgba(217, 122, 43, 0.32);
+  color: #a4571a;
+}
+
+/* share demo */
+.mock-urlbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(11, 21, 18, 0.03);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+
+.mock-url-lock {
+  font-size: 9px;
+}
+
+.mock-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.mock-entry {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: var(--surface);
+  border-radius: 9px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: var(--shadow-sm);
-}
-
-.viz-avatar {
-  flex: 0 0 28px;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--border-strong), var(--muted));
-}
-
-.viz-avatar-org {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #0d9668, #0a7a54);
-  color: #fff;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-
-.viz-person-meta {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.viz-person-name {
+  background: #fff;
   font-size: 12.5px;
-  font-weight: 700;
-  color: var(--ink);
-  line-height: 1.2;
-}
-
-.viz-person-role {
-  font-size: 10.5px;
-  color: var(--muted);
-  line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* The tick and the pending dial share one slot so they can cross-fade in
-   place without the row jumping. */
-.viz-status {
-  position: relative;
-  flex: 0 0 14px;
-  width: 14px;
-  height: 14px;
-}
-
-.viz-status > * {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-
-.viz-check {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--brand);
-  opacity: 0;
-}
-
-.viz-pending {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.viz-quote {
-  font-size: 12px;
-  font-style: italic;
   color: var(--ink-soft);
-  line-height: 1.4;
-  opacity: 0;
-  padding: 0 2px;
 }
 
-.viz-proof-url {
+.mock-entry b {
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   font-size: 11px;
   color: var(--muted);
-  letter-spacing: -0.01em;
+  font-weight: 500;
 }
 
-.viz-verified {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  align-self: flex-start;
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: var(--brand-tint);
-  border: 1px solid rgba(13, 150, 104, 0.28);
-  color: var(--brand);
-  font-size: 12px;
-  font-weight: 650;
+.mock-share .mock-actions {
+  padding-left: 0;
 }
 
-.viz-check-lg {
-  font-size: 13px;
+.mock-result-share {
+  background: var(--c-share-tint);
+  border-color: rgba(56, 102, 207, 0.3);
+  color: var(--c-share);
 }
 
-.viz-links {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  padding-top: 4px;
+/* ——— animated pointer ——— */
+.mock-cursor {
+  position: absolute;
+  z-index: 5;
+  width: 19px;
+  height: 19px;
+  margin: -3px 0 0 -3px;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 2.5 L5 18.5 L9.2 14.4 L12 20.5 L14.4 19.4 L11.6 13.5 L17.4 13.2 Z' fill='%230b1512' stroke='%23ffffff' stroke-width='1.4' stroke-linejoin='round'/></svg>");
+  filter: drop-shadow(0 2px 4px rgba(11, 21, 18, 0.28));
+  opacity: 0;
 }
 
-.viz-node {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  border: 2px solid var(--brand);
-  background: var(--surface);
-  flex: 0 0 auto;
+/* Only the open panel animates, so off-screen demos stay idle. */
+.showcase-panel.is-active .mock-cursor {
+  opacity: 1;
 }
 
-.viz-line {
-  height: 2px;
-  flex: 1;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--brand) 0 5px,
-    transparent 5px 10px
-  );
-  opacity: 0.5;
+.showcase-record.is-active .mock-cursor {
+  animation: cursor-record 8s cubic-bezier(0.5, 0, 0.2, 1) infinite;
 }
 
-/* ——— illustration motion ———
-   Record: types "Grant received — $12,000", shows fund detail, seals, hash.
-   Witness: links to that same grant; Maya Chen (CIF) confirms with a quote.
-   Share: proof URL + verified banner + flowing chain.
-   Gated behind .is-visible so nothing animates off-screen. */
-.reveal-stagger.is-visible .viz-record .viz-title-text {
-  animation: viz-type-title 6.5s steps(24, end) infinite;
+.showcase-witness.is-active .mock-cursor {
+  animation: cursor-witness 8s cubic-bezier(0.5, 0, 0.2, 1) infinite;
 }
 
-.reveal-stagger.is-visible .viz-record .viz-caret {
-  animation: viz-caret 6.5s ease-in-out infinite;
+.showcase-share.is-active .mock-cursor {
+  animation: cursor-share 8s cubic-bezier(0.5, 0, 0.2, 1) infinite;
 }
 
-.reveal-stagger.is-visible .viz-record .viz-detail {
-  animation: viz-fade-late 6.5s ease-in-out infinite;
-}
-
-.reveal-stagger.is-visible .viz-record .viz-sealed {
-  animation: viz-seal-badge 6.5s ease-in-out infinite;
-}
-
-.reveal-stagger.is-visible .viz-record .viz-entry {
-  animation: viz-seal-border 6.5s ease-in-out infinite;
-}
-
-.reveal-stagger.is-visible .viz-record .viz-hash {
-  animation: viz-hash-in 6.5s ease-in-out infinite;
-}
-
-@keyframes viz-type-title {
+@keyframes cursor-record {
   0%,
   6% {
-    max-width: 0;
+    left: 62%;
+    top: 20%;
   }
-  32%,
-  88% {
-    max-width: 220px;
-  }
-  96%,
-  100% {
-    max-width: 0;
-  }
-}
-
-@keyframes viz-caret {
-  0%,
-  5% {
-    opacity: 0;
-  }
-  6%,
-  10% {
-    opacity: 1;
-  }
-  11%,
-  15% {
-    opacity: 0;
-  }
-  16%,
-  20% {
-    opacity: 1;
-  }
-  21%,
-  25% {
-    opacity: 0;
-  }
-  26%,
-  31% {
-    opacity: 1;
-  }
-  32%,
-  90% {
-    opacity: 0;
-  }
-  94%,
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes viz-fade-late {
-  0%,
   30% {
-    opacity: 0;
-    transform: translateY(4px);
+    left: 46%;
+    top: 32%;
   }
-  40%,
-  88% {
-    opacity: 1;
-    transform: none;
+  46%,
+  52% {
+    left: 20%;
+    top: 63%;
   }
-  96%,
-  100% {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-}
-
-@keyframes viz-seal-badge {
-  0%,
-  48% {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  56%,
-  88% {
-    opacity: 1;
-    transform: none;
-  }
-  96%,
-  100% {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-}
-
-@keyframes viz-seal-border {
-  0%,
-  46% {
-    border-color: var(--border);
-    box-shadow: var(--shadow-sm);
-  }
-  54% {
-    border-color: var(--brand);
-    box-shadow: 0 0 0 4px rgba(13, 150, 104, 0.14);
+  53% {
+    left: 20.5%;
+    top: 63.6%;
   }
   70%,
   100% {
-    border-color: var(--border);
-    box-shadow: var(--shadow-sm);
+    left: 34%;
+    top: 82%;
   }
 }
 
-@keyframes viz-hash-in {
+@keyframes cursor-witness {
   0%,
-  52% {
-    opacity: 0;
-    transform: translateY(5px);
+  10% {
+    left: 70%;
+    top: 18%;
   }
-  62%,
-  88% {
-    opacity: 1;
-    transform: none;
-  }
-  96%,
-  100% {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-}
-
-.reveal-stagger.is-visible .viz-witness .viz-ref {
-  animation: viz-ref-pulse 6.5s ease-in-out infinite;
-}
-
-.reveal-stagger.is-visible .viz-witness .viz-pending {
-  animation: viz-pending-a 6.5s ease-in-out infinite;
-}
-
-.reveal-stagger.is-visible .viz-witness .viz-check {
-  animation: viz-confirm-a 6.5s ease-in-out infinite;
-}
-
-.reveal-stagger.is-visible .viz-witness .viz-person {
-  animation: viz-person-glow 6.5s ease-in-out infinite;
-}
-
-.reveal-stagger.is-visible .viz-witness .viz-quote {
-  animation: viz-quote-in 6.5s ease-in-out infinite;
-}
-
-@keyframes viz-ref-pulse {
-  0%,
-  12% {
-    opacity: 0.45;
-  }
-  22%,
-  88% {
-    opacity: 1;
-  }
-  96%,
-  100% {
-    opacity: 0.45;
-  }
-}
-
-@keyframes viz-pending-a {
-  0%,
-  28% {
-    opacity: 1;
-  }
-  38%,
-  88% {
-    opacity: 0;
-  }
-  96%,
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes viz-confirm-a {
-  0%,
-  28% {
-    opacity: 0;
-    transform: scale(0.4);
-  }
-  40% {
-    opacity: 1;
-    transform: scale(1.35);
+  32% {
+    left: 52%;
+    top: 42%;
   }
   48%,
-  88% {
-    opacity: 1;
-    transform: scale(1);
+  54% {
+    left: 12%;
+    top: 68%;
   }
-  96%,
+  55% {
+    left: 12.5%;
+    top: 68.6%;
+  }
+  72%,
   100% {
-    opacity: 0;
-    transform: scale(0.4);
+    left: 30%;
+    top: 86%;
   }
 }
 
-@keyframes viz-person-glow {
+@keyframes cursor-share {
   0%,
+  10% {
+    left: 74%;
+    top: 16%;
+  }
   34% {
-    border-color: var(--border);
-    box-shadow: var(--shadow-sm);
+    left: 50%;
+    top: 44%;
   }
-  44% {
-    border-color: var(--brand);
-    box-shadow: 0 0 0 4px rgba(13, 150, 104, 0.12);
+  50%,
+  56% {
+    left: 16%;
+    top: 68%;
   }
-  62%,
+  57% {
+    left: 16.5%;
+    top: 68.6%;
+  }
+  74%,
   100% {
-    border-color: var(--border);
-    box-shadow: var(--shadow-sm);
+    left: 32%;
+    top: 86%;
   }
 }
 
-@keyframes viz-quote-in {
+/* ——— demo choreography ———
+   One 8s loop per panel: type the entry, click the button, show the result. */
+.showcase-record.is-active .mock-typed {
+  animation: mock-type 8s steps(26, end) infinite;
+}
+
+.showcase-record.is-active .mock-caret {
+  animation: mock-caret 8s steps(1, end) infinite;
+}
+
+.showcase-record.is-active .mock-row-detail {
+  animation: mock-appear-30 8s ease-out infinite;
+}
+
+.showcase-record.is-active .mock-actions {
+  animation: mock-appear-36 8s ease-out infinite;
+}
+
+.showcase-record.is-active .mock-btn {
+  animation: mock-press-52 8s ease-out infinite;
+}
+
+.showcase-record.is-active .mock-result {
+  animation: mock-appear-58 8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.showcase-witness.is-active .mock-ref {
+  animation: mock-appear-08 8s ease-out infinite;
+}
+
+.showcase-witness.is-active .mock-who {
+  animation: mock-appear-18 8s ease-out infinite;
+}
+
+.showcase-witness.is-active .mock-quote {
+  animation: mock-appear-30 8s ease-out infinite;
+}
+
+.showcase-witness.is-active .mock-actions {
+  animation: mock-appear-40 8s ease-out infinite;
+}
+
+.showcase-witness.is-active .mock-btn {
+  animation: mock-press-54 8s ease-out infinite;
+}
+
+.showcase-witness.is-active .mock-result {
+  animation: mock-appear-60 8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.showcase-share.is-active .mock-urlbar {
+  animation: mock-appear-08 8s ease-out infinite;
+}
+
+.showcase-share.is-active .mock-entries {
+  animation: mock-appear-20 8s ease-out infinite;
+}
+
+.showcase-share.is-active .mock-actions {
+  animation: mock-appear-40 8s ease-out infinite;
+}
+
+.showcase-share.is-active .mock-btn {
+  animation: mock-press-56 8s ease-out infinite;
+}
+
+.showcase-share.is-active .mock-result {
+  animation: mock-appear-62 8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes mock-type {
   0%,
-  42% {
-    opacity: 0;
-    transform: translateY(6px);
+  4% {
+    max-width: 0;
   }
-  54%,
-  88% {
-    opacity: 1;
-    transform: none;
-  }
-  96%,
-  100% {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-}
-
-.reveal-stagger.is-visible .viz-share .viz-proof-url {
-  animation: viz-url-in 6.5s ease-in-out infinite;
-}
-
-.reveal-stagger.is-visible .viz-share .viz-verified {
-  animation: viz-verified-in 6.5s ease-in-out infinite;
-}
-
-.reveal-stagger.is-visible .viz-share .viz-node {
-  animation: viz-node-pop 6.5s ease-in-out infinite;
-}
-
-.reveal-stagger.is-visible .viz-share .viz-node:nth-child(3) {
-  animation-delay: 0.35s;
-}
-
-.reveal-stagger.is-visible .viz-share .viz-node:nth-child(5) {
-  animation-delay: 0.7s;
-}
-
-.reveal-stagger.is-visible .viz-share .viz-line {
-  animation: viz-flow 0.9s linear infinite;
-}
-
-@keyframes viz-url-in {
-  0%,
-  8% {
-    opacity: 0.3;
-  }
-  20%,
-  88% {
-    opacity: 1;
-  }
-  96%,
-  100% {
-    opacity: 0.3;
-  }
-}
-
-@keyframes viz-verified-in {
-  0%,
-  28% {
-    opacity: 0.25;
-    transform: translateY(4px);
-  }
-  42%,
-  88% {
-    opacity: 1;
-    transform: none;
-  }
-  96%,
-  100% {
-    opacity: 0.25;
-    transform: translateY(4px);
-  }
-}
-
-@keyframes viz-node-pop {
-  0%,
-  8% {
-    transform: scale(0.5);
-    opacity: 0.25;
-  }
-  20%,
-  88% {
-    transform: scale(1);
-    opacity: 1;
+  28%,
+  92% {
+    max-width: 210px;
   }
   97%,
   100% {
-    transform: scale(0.5);
-    opacity: 0.25;
+    max-width: 0;
   }
 }
 
-@keyframes viz-flow {
-  from {
-    background-position: 0 0;
+@keyframes mock-caret {
+  0%,
+  3% {
+    opacity: 0;
   }
-  to {
-    background-position: 10px 0;
+  4%,
+  8% {
+    opacity: 1;
+  }
+  9%,
+  13% {
+    opacity: 0;
+  }
+  14%,
+  18% {
+    opacity: 1;
+  }
+  19%,
+  23% {
+    opacity: 0;
+  }
+  24%,
+  28% {
+    opacity: 1;
+  }
+  29%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Staggered entrances share one shape; the number is the reveal point. */
+@keyframes mock-appear-08 {
+  0%,
+  6% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  14%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  98%,
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes mock-appear-18 {
+  0%,
+  16% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  25%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  98%,
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes mock-appear-20 {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  28%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  98%,
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes mock-appear-30 {
+  0%,
+  28% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  37%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  98%,
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes mock-appear-36 {
+  0%,
+  34% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  42%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  98%,
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes mock-appear-40 {
+  0%,
+  36% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  45%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  98%,
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes mock-appear-58 {
+  0%,
+  55% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  64%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  98%,
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes mock-appear-60 {
+  0%,
+  57% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  66%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  98%,
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes mock-appear-62 {
+  0%,
+  59% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  68%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  98%,
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* Button dips exactly when the pointer lands on it. */
+@keyframes mock-press-52 {
+  0%,
+  50% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(13, 150, 104, 0);
+  }
+  53% {
+    transform: scale(0.94);
+    box-shadow: 0 0 0 7px rgba(13, 150, 104, 0.18);
+  }
+  60%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(13, 150, 104, 0);
+  }
+}
+
+@keyframes mock-press-54 {
+  0%,
+  52% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(217, 122, 43, 0);
+  }
+  55% {
+    transform: scale(0.94);
+    box-shadow: 0 0 0 7px rgba(217, 122, 43, 0.2);
+  }
+  62%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(217, 122, 43, 0);
+  }
+}
+
+@keyframes mock-press-56 {
+  0%,
+  54% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(56, 102, 207, 0);
+  }
+  57% {
+    transform: scale(0.94);
+    box-shadow: 0 0 0 7px rgba(56, 102, 207, 0.2);
+  }
+  64%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(56, 102, 207, 0);
   }
 }
 
@@ -1109,6 +1387,58 @@ a {
   max-width: 1080px;
   margin: 0 auto;
   padding: 72px 0 8px;
+}
+
+/* Lifting alternating sections onto a white sheet breaks the page into
+   readable bands instead of one long wash. */
+.land-panel {
+  padding: 56px 52px 60px;
+  margin-top: 48px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+}
+
+.land-cta {
+  margin-top: 56px;
+  padding: 60px 52px 64px;
+  border-radius: 28px;
+  background:
+    radial-gradient(
+      ellipse 50% 70% at 88% 10%,
+      rgba(13, 150, 104, 0.32),
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 45% 60% at 5% 95%,
+      rgba(56, 102, 207, 0.22),
+      transparent 60%
+    ),
+    #0b1512;
+  box-shadow: 0 20px 60px rgba(11, 21, 18, 0.28);
+}
+
+.land-cta .section-heading {
+  color: #ffffff;
+}
+
+.land-cta .section-lead {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.land-cta .section-eyebrow {
+  color: #3ddba0;
+}
+
+.land-cta .ghost-link {
+  color: rgba(255, 255, 255, 0.66);
+  border-bottom-color: rgba(255, 255, 255, 0.28);
+}
+
+.land-cta .ghost-link:hover {
+  color: #ffffff;
+  border-bottom-color: #3ddba0;
 }
 
 .section-eyebrow {
@@ -1155,8 +1485,53 @@ a {
   padding: 24px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: 18px;
   box-shadow: var(--shadow-sm);
+}
+
+.offer-card {
+  position: relative;
+  padding-top: 28px;
+  overflow: hidden;
+}
+
+/* A short coloured rule per card keeps the grid from reading as four
+   identical boxes. */
+.offer-rule {
+  position: absolute;
+  top: 0;
+  left: 24px;
+  width: 46px;
+  height: 4px;
+  border-radius: 0 0 4px 4px;
+}
+
+.offer-1 .offer-rule {
+  background: var(--c-record);
+}
+
+.offer-2 .offer-rule {
+  background: var(--c-witness);
+}
+
+.offer-3 .offer-rule {
+  background: var(--c-share);
+}
+
+.offer-4 .offer-rule {
+  background: #8b5cf6;
+}
+
+.who-card {
+  border-top: 3px solid var(--brand);
+}
+
+.who-grid li:nth-child(2).who-card {
+  border-top-color: var(--c-witness);
+}
+
+.who-grid li:nth-child(3).who-card {
+  border-top-color: var(--c-share);
 }
 
 .offer-title,
@@ -1271,8 +1646,35 @@ a {
   transition-delay: 0.3s;
 }
 
+@media (max-width: 1000px) {
+  /* Side-by-side expansion needs width; below this the panels stack and each
+     one shows its demo in full. */
+  .showcase {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .showcase-panel {
+    flex: none;
+  }
+
+  .panel-reveal {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .panel-mock {
+    min-width: 0;
+    height: 330px;
+  }
+
+  .panel-text {
+    min-width: 0;
+  }
+}
+
 @media (max-width: 900px) {
-  .how-strip,
   .offer-grid,
   .who-grid {
     grid-template-columns: 1fr;
@@ -1284,6 +1686,12 @@ a {
 
   .land-section {
     padding: 48px 0 8px;
+  }
+
+  .land-panel,
+  .land-cta {
+    padding: 36px 24px 40px;
+    border-radius: 22px;
   }
 
   .scenario-step {
@@ -1310,21 +1718,24 @@ a {
     transition-duration: 0.001ms !important;
   }
 
-  .viz-title-text {
-    max-width: 220px !important;
+  .mock-typed {
+    max-width: 210px !important;
   }
 
-  .viz-detail,
-  .viz-sealed,
-  .viz-hash,
-  .viz-quote,
-  .viz-check {
+  .mock-row-detail,
+  .mock-actions,
+  .mock-result,
+  .mock-ref,
+  .mock-who,
+  .mock-quote,
+  .mock-urlbar,
+  .mock-entries {
     opacity: 1 !important;
     transform: none !important;
   }
 
-  .viz-pending,
-  .viz-caret {
+  .mock-caret,
+  .mock-cursor {
     opacity: 0 !important;
   }
 
@@ -1333,7 +1744,6 @@ a {
     transform: none;
   }
 
-  .reveal-stagger .how-item,
   .reveal-stagger .offer-card,
   .reveal-stagger .who-card,
   .reveal-stagger .scenario-step {
