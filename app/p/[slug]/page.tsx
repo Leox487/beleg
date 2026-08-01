@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import type { Anchor, Entry, Venture } from "@/lib/types";
+import { Footer } from "@/app/components/Footer";
 import { VerifyChain } from "@/app/components/VerifyChain";
 
 function formatDateTime(iso: string): string {
@@ -251,6 +252,8 @@ export default async function PublicProofPage({
           </p>
         </footer>
       </div>
+
+      <Footer />
     </main>
   );
 }

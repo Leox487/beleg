@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 
+import { Footer } from "@/app/components/Footer";
 import { Reveal } from "@/app/components/Reveal";
 
 const HOW_IT_WORKS = [
@@ -139,6 +140,8 @@ export default async function Home() {
           </p>
         </Reveal>
       </section>
+
+      <Footer />
     </main>
   );
 }
