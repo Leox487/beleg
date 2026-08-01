@@ -1018,6 +1018,23 @@ a {
   gap: 16px;
 }
 
+/* Informational links are secondary to the account actions next to them. */
+.navbar-link-info {
+  color: var(--muted);
+}
+
+.navbar-link-info:hover {
+  color: var(--ink);
+}
+
+/* On narrow screens these would crowd the wordmark; the footer still lists
+   every informational page. */
+@media (max-width: 640px) {
+  .navbar-link-info {
+    display: none;
+  }
+}
+
 .navbar-link {
   font-size: 13px;
   font-weight: 500;

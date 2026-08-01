@@ -13,6 +13,13 @@ export async function Navbar() {
       </Link>
 
       <nav className="navbar-actions" aria-label="Main">
+        <Link href="/how-it-works" className="navbar-link navbar-link-info">
+          How it works
+        </Link>
+        <Link href="/about" className="navbar-link navbar-link-info">
+          About
+        </Link>
+
         {signedIn ? (
           <>
             <Link href="/dashboard" className="navbar-link">
