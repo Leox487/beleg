@@ -130,8 +130,16 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
       {error ? <p className="form-error">{error}</p> : null}
 
       <div className="form-actions">
-        <button type="submit" className="btn btn-primary" disabled={submitting}>
-          {submitting ? "Creating…" : "Create request"}
+        <button
+          type="submit"
+          className={`btn btn-primary${submitting ? " btn-loading" : ""}`}
+          disabled={submitting}
+        >
+          {submitting ? (
+            <span className="btn-ellipsis">…</span>
+          ) : (
+            "Create request"
+          )}
         </button>
         <button
           type="button"

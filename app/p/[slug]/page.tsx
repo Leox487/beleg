@@ -107,8 +107,8 @@ export default async function PublicProofPage({
 
         {confirmedAnchor ? (
           <section className="anchor-proof anchor-proof-confirmed">
-            <span className="anchor-glyph" aria-hidden="true">
-              ✓
+            <span className="anchor-glyph anchor-pulse" aria-hidden="true">
+              ⚓
             </span>
             <div className="anchor-proof-body">
             <p className="anchor-proof-headline">
@@ -179,7 +179,7 @@ export default async function PublicProofPage({
               entry.kind === "attestation" ? (
                 <article
                   key={entry.id}
-                  className="entry-card entry-attestation"
+                  className="entry-card entry-attestation attest-confirmed"
                 >
                   <div className="entry-top">
                     <span className="entry-seq">#{entry.seq}</span>

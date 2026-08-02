@@ -128,8 +128,12 @@ export function NewEntryForm({ ventureId }: { ventureId: string }) {
 
       {error ? <p className="form-error">{error}</p> : null}
 
-      <button type="submit" className="btn btn-primary" disabled={submitting}>
-        {submitting ? "Recording…" : "Record entry"}
+      <button
+        type="submit"
+        className={`btn btn-primary${submitting ? " btn-loading" : ""}`}
+        disabled={submitting}
+      >
+        {submitting ? <span className="btn-ellipsis">…</span> : "Record entry"}
       </button>
     </form>
   );

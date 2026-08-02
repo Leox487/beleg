@@ -15,13 +15,13 @@ export async function Navbar() {
       </Link>
 
       <nav className="navbar-actions" aria-label="Main">
-        <Link href="/uses" className="navbar-link navbar-link-info">
+        <Link href="/uses" className="navbar-link navbar-link-info nav-link">
           Who it&apos;s for
         </Link>
-        <Link href="/how-it-works" className="navbar-link navbar-link-info">
+        <Link href="/how-it-works" className="navbar-link navbar-link-info nav-link">
           How it works
         </Link>
-        <Link href="/about" className="navbar-link navbar-link-info">
+        <Link href="/about" className="navbar-link navbar-link-info nav-link">
           About
         </Link>
 

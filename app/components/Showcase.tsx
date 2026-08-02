@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import AnimateIn from "@/app/components/AnimateIn";
+
 const PANELS = [
   {
     id: "record",
@@ -157,29 +159,30 @@ export function Showcase() {
       {PANELS.map((panel, i) => {
         const isActive = i === active;
         return (
-          <div
-            key={panel.id}
-            className={`showcase-panel showcase-${panel.id}${
-              isActive ? " is-active" : ""
-            }`}
-            onMouseEnter={() => setActive(i)}
-          >
-            <button
-              type="button"
-              className="panel-head"
-              aria-expanded={isActive}
-              onFocus={() => setActive(i)}
-              onClick={() => setActive(i)}
+          <AnimateIn key={panel.id} direction="up" delay={i * 150} className="showcase-panel-wrap">
+            <div
+              className={`showcase-panel showcase-${panel.id} step-card${
+                isActive ? " is-active" : ""
+              }`}
+              onMouseEnter={() => setActive(i)}
             >
-              <span className="panel-step mono">{panel.step}</span>
-              <span className="panel-label">{panel.label}</span>
-            </button>
+              <button
+                type="button"
+                className="panel-head"
+                aria-expanded={isActive}
+                onFocus={() => setActive(i)}
+                onClick={() => setActive(i)}
+              >
+                <span className="panel-step mono">{panel.step}</span>
+                <span className="panel-label">{panel.label}</span>
+              </button>
 
-            <div className="panel-reveal">
-              <p className="panel-text">{panel.text}</p>
-              <div className="panel-mock">{MOCKS[i]}</div>
+              <div className="panel-reveal">
+                <p className="panel-text">{panel.text}</p>
+                <div className="panel-mock">{MOCKS[i]}</div>
+              </div>
             </div>
-          </div>
+          </AnimateIn>
         );
       })}
     </div>

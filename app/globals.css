@@ -1,4 +1,4 @@
-/* ——— design tokens ——— */
+/* --- design tokens --- */
 :root {
   /* Privacy.com-inspired calm canvas: mostly white, soft stone ink, one
      green brand accent. Less tinted-gradient "AI slop", more human air. */
@@ -68,13 +68,13 @@ a {
   text-decoration: none;
 }
 
-/* ——— motion ——— */
+/* --- motion --- */
 button,
 a {
   transition: color 120ms, background 120ms, transform 120ms, box-shadow 120ms;
 }
 
-/* ——— typography scale ——— */
+/* --- typography scale --- */
 .h1,
 .headline {
   font-family: var(--font-display), "Segoe UI", sans-serif;
@@ -147,7 +147,7 @@ a {
   color: var(--muted);
 }
 
-/* ——— card system ——— */
+/* --- card system --- */
 .card,
 .venture-card,
 .entry-card,
@@ -162,7 +162,7 @@ a {
   box-shadow: var(--shadow-sm);
 }
 
-/* ——— buttons ——— */
+/* --- buttons --- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -225,7 +225,7 @@ a {
   height: 48px;
 }
 
-/* ——— landing ——— */
+/* --- landing --- */
 .landing {
   padding: 0 0 16px;
 }
@@ -236,7 +236,7 @@ a {
   padding-right: 32px;
 }
 
-/* Centered, airy hero — Privacy.com's human pattern: one benefit line,
+/* Centered, airy hero ? Privacy.com's human pattern: one benefit line,
    one CTA, then quiet trust signals. */
 .stage {
   position: relative;
@@ -249,9 +249,12 @@ a {
   max-width: 920px;
   margin: 0 auto;
   padding: 48px 32px 40px;
+  overflow: hidden;
 }
 
 .stage-inner {
+  position: relative;
+  z-index: 1;
   max-width: 720px;
   display: flex;
   flex-direction: column;
@@ -289,30 +292,14 @@ a {
   color: var(--ink);
 }
 
-/* Entrance: brand first, then each line trails in behind it. */
+/* Entrance is handled by AnimateIn on the landing page. */
 .stage-eyebrow,
 .brand-tagline,
 .stage .subline,
 .stage .hero-actions,
 .stage .cta-note,
 .trust-strip {
-  animation: rise-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.brand-tagline {
-  animation-delay: 0.08s;
-}
-.stage .subline {
-  animation-delay: 0.16s;
-}
-.stage .hero-actions {
-  animation-delay: 0.24s;
-}
-.stage .cta-note {
-  animation-delay: 0.3s;
-}
-.trust-strip {
-  animation-delay: 0.4s;
+  animation: none;
 }
 
 @keyframes rise-in {
@@ -365,7 +352,7 @@ a {
   color: var(--ink-soft);
 }
 
-/* Soft brand pill — closer to Privacy.com's friendly solid CTA than the
+/* Soft brand pill ? closer to Privacy.com's friendly solid CTA than the
    earlier dark capsule with wipe animation. Spinner still lives in CtaBadge. */
 .cta {
   position: relative;
@@ -385,10 +372,6 @@ a {
     0 10px 28px rgba(13, 150, 104, 0.22);
   overflow: hidden;
   transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-}
-
-.cta::before {
-  display: none;
 }
 
 .cta:hover {
@@ -480,7 +463,7 @@ a {
   }
 }
 
-/* ——— loading skeletons ——— */
+/* --- loading skeletons --- */
 .skel {
   display: block;
   border-radius: 6px;
@@ -586,9 +569,11 @@ a {
   color: var(--muted);
 }
 
-/* Quiet trust row under the hero — Privacy.com's social-proof energy
+/* Quiet trust row under the hero ? Privacy.com's social-proof energy
    without inventing fake user counts. */
 .trust-strip {
+  position: relative;
+  z-index: 1;
   list-style: none;
   margin: 48px 0 0;
   padding: 14px 22px;
@@ -615,7 +600,7 @@ a {
   vertical-align: 1px;
 }
 
-/* ——— human voice cards ——— */
+/* --- human voice cards --- */
 .voices-section {
   text-align: center;
 }
@@ -695,7 +680,7 @@ a {
   color: var(--muted);
 }
 
-/* ——— dark calm pillars band ——— */
+/* --- dark calm pillars band --- */
 .pillar-band {
   margin: 56px 0 8px;
   padding: 72px 32px;
@@ -756,7 +741,7 @@ a {
   color: rgba(255, 255, 255, 0.68);
 }
 
-/* ——— split human scenario card ——— */
+/* --- split human scenario card --- */
 .split-card {
   margin-top: 36px;
   display: grid;
@@ -904,12 +889,24 @@ a {
   font-weight: 700;
 }
 
-/* ——— showcase: three panels, the hovered one expands ——— */
+/* --- showcase: three panels, the hovered one expands --- */
 .showcase {
   display: flex;
   gap: 14px;
   margin-top: 36px;
   height: 545px;
+}
+
+.showcase-panel-wrap {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  height: 100%;
+}
+
+.showcase-panel-wrap .showcase-panel {
+  flex: 1;
+  width: 100%;
 }
 
 .showcase-panel {
@@ -927,6 +924,16 @@ a {
   cursor: pointer;
   transition: flex-grow 0.62s cubic-bezier(0.16, 1, 0.3, 1),
     background 0.5s, border-color 0.5s, box-shadow 0.5s;
+}
+
+/* Active / hovered panel: mock scales up slightly. */
+.showcase-panel.is-active .mock,
+.showcase-panel:hover .mock {
+  transform: scale(1.02);
+}
+
+.mock {
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .showcase-panel.is-active {
@@ -983,6 +990,10 @@ a {
   color: var(--muted);
   background: rgba(11, 21, 18, 0.05);
   transition: background 0.4s, color 0.4s;
+}
+
+.showcase-panel:hover .panel-step {
+  color: var(--brand);
 }
 
 .showcase-record.is-active .panel-step {
@@ -1043,7 +1054,7 @@ a {
   min-width: 520px;
 }
 
-/* ——— demo window ——— */
+/* --- demo window --- */
 .mock {
   position: relative;
   height: 100%;
@@ -1351,7 +1362,7 @@ a {
   color: var(--c-share);
 }
 
-/* ——— animated pointer ——— */
+/* --- animated pointer --- */
 .mock-cursor {
   position: absolute;
   z-index: 5;
@@ -1461,7 +1472,7 @@ a {
   }
 }
 
-/* ——— demo choreography ———
+/* --- demo choreography ---
    One 8s loop per panel: type the entry, click the button, show the result. */
 .showcase-record.is-active .mock-typed {
   animation: mock-type 8s steps(26, end) infinite;
@@ -1798,7 +1809,7 @@ a {
   letter-spacing: 0.01em;
 }
 
-/* ——— longer landing sections ——— */
+/* --- longer landing sections --- */
 .land-section {
   max-width: 1080px;
   margin: 0 auto;
@@ -1986,7 +1997,7 @@ a {
   padding-top: 4px;
 }
 
-/* ——— who it's for: profession explorer ——— */
+/* --- who it's for: profession explorer --- */
 .uses {
   margin-top: 36px;
 }
@@ -2194,10 +2205,16 @@ a {
   position: relative;
   min-height: 320px;
   background: #dfe8e3;
+  overflow: hidden;
 }
 
 .uses-detail-img {
   object-fit: cover;
+  transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.uses-detail:hover .uses-detail-img {
+  transform: scale(1.04);
 }
 
 .uses-detail-copy {
@@ -2283,7 +2300,7 @@ a {
   color: var(--muted);
 }
 
-/* ——— /uses page ——— */
+/* --- /uses page --- */
 .doc-wide {
   max-width: 1020px;
 }
@@ -2407,7 +2424,7 @@ a {
   font-weight: 650;
 }
 
-/* ——— scroll reveals ——— */
+/* --- scroll reveals --- */
 .reveal-fade {
   opacity: 0;
   transform: translateY(20px);
@@ -2467,6 +2484,15 @@ a {
   .showcase {
     flex-direction: column;
     height: auto;
+  }
+
+  .showcase-panel-wrap {
+    flex: none;
+    height: auto;
+  }
+
+  .showcase-panel-wrap:not(:first-child)::before {
+    display: none;
   }
 
   .showcase-panel {
@@ -2602,12 +2628,12 @@ a {
   }
 }
 
-/* ——— auth pages ——— */
+/* --- auth pages --- */
 .auth-page {
   padding: 24px;
 }
 
-/* Clerk's widget ships its own card chrome — wrapping it in a second card
+/* Clerk's widget ships its own card chrome ? wrapping it in a second card
    nests two bordered boxes and overflows the padding, so this stays a plain
    centered wrapper. */
 .auth-stack {
@@ -2641,7 +2667,7 @@ a {
   }
 }
 
-/* ——— navbar ——— */
+/* --- navbar --- */
 .navbar {
   position: sticky;
   top: 0;
@@ -2770,7 +2796,7 @@ a {
   color: var(--ink);
 }
 
-/* ——— page shell ——— */
+/* --- page shell --- */
 .page {
   padding: 40px 24px;
 }
@@ -2791,7 +2817,7 @@ a {
   margin-bottom: 12px;
 }
 
-/* ——— informational / legal pages ——— */
+/* --- informational / legal pages --- */
 .doc {
   max-width: 760px;
 }
@@ -2850,7 +2876,7 @@ a {
   text-decoration: underline;
 }
 
-/* ——— site footer ——— */
+/* --- site footer --- */
 .site-footer {
   max-width: 900px;
   margin: 0 auto;
@@ -2885,7 +2911,7 @@ a {
   margin: 10px 0 0;
 }
 
-/* ——— empty state ——— */
+/* --- empty state --- */
 .empty-state {
   max-width: 520px;
   margin: 64px auto 0;
@@ -2906,14 +2932,14 @@ a {
   max-width: 46ch;
 }
 
-/* The empty state is already a card — don't nest a second card inside it. */
+/* The empty state is already a card ? don't nest a second card inside it. */
 .empty-state .venture-form {
   border: none;
   box-shadow: none;
   padding: 0;
 }
 
-/* ——— venture cards ——— */
+/* --- venture cards --- */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -2953,7 +2979,7 @@ a {
   margin-top: 32px;
 }
 
-/* ——— forms ——— */
+/* --- forms --- */
 .venture-form,
 .entry-form,
 .request-attest-form {
@@ -3026,7 +3052,7 @@ a {
   margin-top: 6px;
 }
 
-/* ——— ledger ——— */
+/* --- ledger --- */
 .ledger-header {
   border-bottom: 1px solid var(--border);
   padding-bottom: 20px;
@@ -3080,7 +3106,7 @@ a {
   margin-top: 8px;
 }
 
-/* ——— the chain ——— */
+/* --- the chain --- */
 .chain {
   display: flex;
   flex-direction: column;
@@ -3145,7 +3171,7 @@ a {
   word-break: break-all;
 }
 
-/* ——— private header: open public page link ——— */
+/* --- private header: open public page link --- */
 .public-open {
   margin-left: 12px;
   font-size: 13px;
@@ -3157,7 +3183,7 @@ a {
   color: var(--ink);
 }
 
-/* ——— public proof page ——— */
+/* --- public proof page --- */
 .badge-line {
   margin-top: 12px;
   font-size: 13px;
@@ -3279,7 +3305,7 @@ a {
   font-size: 13px;
 }
 
-/* ——— attestations ——— */
+/* --- attestations --- */
 .attest-list {
   margin-top: 14px;
   padding-top: 12px;
@@ -3295,7 +3321,7 @@ a {
   color: var(--success);
 }
 
-/* Attestation entries are sealed chain entries — mark them distinctly. */
+/* Attestation entries are sealed chain entries ? mark them distinctly. */
 .entry-attestation {
   border-left: 3px solid var(--success);
   background: #f0fdf4;
@@ -3315,7 +3341,7 @@ a {
   font-size: 14px;
 }
 
-/* ——— public attestation page ——— */
+/* --- public attestation page --- */
 .attest-inner {
   max-width: 560px;
   margin: 48px auto;
@@ -3379,7 +3405,7 @@ a {
   color: var(--success);
 }
 
-/* ——— empty states & stranger-facing framing ——— */
+/* --- empty states & stranger-facing framing --- */
 .entry-empty {
   margin: 24px 0;
   background: var(--bg);
@@ -3408,7 +3434,7 @@ a {
   color: var(--muted);
 }
 
-/* ——— Bitcoin anchoring ——— */
+/* --- Bitcoin anchoring --- */
 .anchor-section {
   margin: 28px 0;
   padding: 24px;
@@ -3540,4 +3566,370 @@ a {
 
 .anchor-proof-fine {
   font-size: 13px;
+}
+
+/* ===== PREMIUM INTERACTIONS ===== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes heroGlow {
+  0% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.15); }
+  100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+}
+
+.hero-glow {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(13, 150, 104, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: heroGlow 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Card hover ? lift and sharpen shadow */
+.card,
+.venture-card,
+.entry-card,
+.voice-card,
+.testimonial-card,
+.step-card,
+.peace-card,
+.pillar-card,
+.offer-card,
+.split-card,
+.uses-detail {
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 280ms ease;
+}
+
+.card:hover,
+.venture-card:hover,
+.voice-card:hover,
+.testimonial-card:hover,
+.peace-card:hover,
+.pillar-card:hover,
+.offer-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  border-color: var(--border-strong);
+}
+
+/* Showcase panels already expand ? don't fight that with lift */
+.step-card:hover {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  border-color: var(--border-strong);
+}
+
+/* Connecting dashed rules between showcase steps on desktop */
+@media (min-width: 1001px) {
+  .showcase-panel-wrap:not(:first-child) {
+    position: relative;
+  }
+
+  .showcase-panel-wrap:not(:first-child)::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    top: 18%;
+    bottom: 18%;
+    width: 0;
+    border-left: 1px dashed var(--border);
+    pointer-events: none;
+    z-index: 2;
+  }
+}
+
+/* Button press */
+button:active,
+a.btn:active,
+a.cta:active {
+  transform: scale(0.97) !important;
+  transition-duration: 80ms !important;
+}
+
+/* Link underline grow */
+.nav-link,
+.footer-link {
+  position: relative;
+}
+
+.nav-link::after,
+.footer-link::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 1.5px;
+  background: currentColor;
+  transition: width 250ms cubic-bezier(0.16, 1, 0.3, 1),
+              left 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-link:hover::after,
+.footer-link:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+/* Hash strings ? subtle highlight on hover */
+.mono:hover,
+.entry-hash:hover,
+[class*="hash"]:hover {
+  background: rgba(0,0,0,0.03);
+  border-radius: 4px;
+  transition: background 200ms;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+input,
+textarea,
+select {
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+@keyframes verifyPulse {
+  0% { box-shadow: 0 0 0 0 rgba(21, 128, 61, 0.2); }
+  70% { box-shadow: 0 0 0 10px rgba(21, 128, 61, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(21, 128, 61, 0); }
+}
+
+.verify-success,
+.verify-ok {
+  animation: verifyPulse 1.5s ease-out 1;
+}
+
+@keyframes attestSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.entry-kind-attestation,
+.attest-confirmed {
+  animation: attestSlideIn 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.badge,
+.mock-pill,
+.uses-chip {
+  transition: background 200ms, color 200ms, transform 200ms, border-color 200ms;
+}
+
+.badge:hover,
+.mock-pill:hover,
+.uses-chip:hover {
+  transform: scale(1.05);
+}
+
+::selection {
+  background: rgba(10, 10, 10, 0.08);
+  color: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.25);
+}
+
+/* Avatar ring on testimonial hover */
+.voice-avatar {
+  transition: box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.voice-card:hover .voice-avatar,
+.testimonial-card:hover .voice-avatar {
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--border-strong);
+}
+
+/* Chain pulse after successful verification */
+@keyframes chainPulse {
+  0% {
+    border-left-color: var(--border-strong);
+    box-shadow: inset 2px 0 0 0 transparent;
+  }
+  40% {
+    border-left-color: var(--success);
+  }
+  100% {
+    border-left-color: var(--success);
+  }
+}
+
+.chain.chain-verified {
+  animation: chainPulse 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  border-left-color: var(--success);
+}
+
+@keyframes anchorPulse {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.25); }
+  70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+.anchor-pulse,
+.anchor-proof-confirmed .anchor-glyph {
+  animation: anchorPulse 1.6s ease-out 1;
+}
+
+/* Navbar scroll shadow */
+.nav-scrolled .navbar {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border-bottom-color: transparent;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+main {
+  animation: fadeIn 300ms ease forwards;
+}
+
+/* CTA / primary button shimmer */
+.cta,
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.cta::before,
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+  transition: left 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cta:hover::before,
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.cta-label,
+.cta-badge,
+.btn-primary > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Form submit loading */
+.btn-loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.btn-ellipsis {
+  display: inline-block;
+  letter-spacing: 0.08em;
+  animation: ellipsisPulse 1s ease-in-out infinite;
+}
+
+@keyframes ellipsisPulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+button,
+[role="button"],
+a,
+summary {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media print {
+  nav,
+  .navbar,
+  footer,
+  .site-footer,
+  button,
+  .cta,
+  .btn,
+  form,
+  .new-entry-section,
+  .anchor-action,
+  .verify-head,
+  .hero-glow {
+    display: none !important;
+  }
+
+  .card,
+  .entry-card,
+  .anchor-proof {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+    break-inside: avoid;
+  }
+
+  body {
+    color: black;
+    background: white;
+  }
+
+  .mono {
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero-glow,
+  .cta::before,
+  .btn-primary::before,
+  .btn-ellipsis,
+  .verify-success,
+  .verify-ok,
+  .anchor-pulse,
+  .chain.chain-verified,
+  main {
+    animation: none !important;
+  }
 }

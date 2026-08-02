@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Plus_Jakarta_Sans, Source_Sans_3 } from "next/font/google";
 
 import { Navbar } from "./components/Navbar";
+import { ScrollNav } from "./components/ScrollNav";
 import "./globals.css";
 
 const display = Plus_Jakarta_Sans({
@@ -32,7 +33,9 @@ export default function RootLayout({
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
       <body>
         <ClerkProvider>
-          <Navbar />
+          <ScrollNav>
+            <Navbar />
+          </ScrollNav>
           {children}
         </ClerkProvider>
       </body>

@@ -161,6 +161,18 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
     void verify();
   }, [verify]);
 
+  // After a green verification, pulse the proof-page chain connectors once.
+  useEffect(() => {
+    const chain = document.querySelector(".chain");
+    if (!chain) return;
+    if (status.state === "ok" && status.count > 0) {
+      chain.classList.add("chain-verified");
+    } else {
+      chain.classList.remove("chain-verified");
+    }
+    return () => chain.classList.remove("chain-verified");
+  }, [status]);
+
   const rows =
     status.state === "ok" || status.state === "broken" ? status.rows : [];
 
@@ -173,7 +185,11 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
           onClick={() => void verify()}
           disabled={status.state === "running"}
         >
-          Verify chain
+          {status.state === "running" ? (
+            <span className="btn-ellipsis">…</span>
+          ) : (
+            "Verify chain"
+          )}
         </button>
         <p className="verify-note">
           Your browser will independently recompute every hash and check the
@@ -189,7 +205,7 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
       ) : null}
 
       {status.state === "ok" ? (
-        <div className="verify-banner verify-ok">
+        <div className="verify-banner verify-ok verify-success">
           {status.count === 0
             ? "✓ Nothing to verify yet — this ledger has no entries."
             : `✓ Chain verified — ${status.count} ${

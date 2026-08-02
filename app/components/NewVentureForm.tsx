@@ -99,8 +99,16 @@ export function NewVentureForm({ collapsible = false }: { collapsible?: boolean 
       {error ? <p className="form-error">{error}</p> : null}
 
       <div className="form-actions">
-        <button type="submit" className="btn btn-primary" disabled={submitting}>
-          {submitting ? "Creating…" : "Create venture"}
+        <button
+          type="submit"
+          className={`btn btn-primary${submitting ? " btn-loading" : ""}`}
+          disabled={submitting}
+        >
+          {submitting ? (
+            <span className="btn-ellipsis">…</span>
+          ) : (
+            "Create venture"
+          )}
         </button>
         {collapsible ? (
           <button

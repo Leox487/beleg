@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 
+import AnimateIn from "@/app/components/AnimateIn";
 import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
-import { Reveal } from "@/app/components/Reveal";
 import { Showcase } from "@/app/components/Showcase";
 import { UseExplorer } from "@/app/components/UseExplorer";
 
@@ -56,52 +56,60 @@ export default async function Home() {
     <main className="landing">
       {/* ——— centered human hero ——— */}
       <section className="stage">
+        <div className="hero-glow" aria-hidden="true" />
+
         <div className="stage-inner">
-          <p className="stage-eyebrow">Beleg</p>
+          <AnimateIn direction="up" delay={0}>
+            <p className="stage-eyebrow">Beleg</p>
 
-          <h1 className="brand-tagline">
-            <span className="headline-accent">Proof</span> and{" "}
-            <span className="headline-accent">trust</span> built into your
-            timeline.
-          </h1>
+            <h1 className="brand-tagline">
+              <span className="headline-accent">Proof</span> and{" "}
+              <span className="headline-accent">trust</span> built into your
+              timeline.
+            </h1>
 
-          <p className="subline">
-            Applications and pitches are drowning in AI-polished claims nobody
-            can check. Beleg gives your traction a sealed record — written as it
-            happens, confirmed by real people, and verifiable by anyone.
-          </p>
+            <p className="subline">
+              Applications and pitches are drowning in AI-polished claims nobody
+              can check. Beleg gives your traction a sealed record — written as
+              it happens, confirmed by real people, and verifiable by anyone.
+            </p>
+          </AnimateIn>
 
-          <div className="hero-actions">
-            <Link className="cta" href={ctaHref}>
-              <span className="cta-label">{ctaLabel}</span>
-              <CtaBadge />
-            </Link>
-          </div>
+          <AnimateIn direction="up" delay={150}>
+            <div className="hero-actions">
+              <Link className="cta" href={ctaHref}>
+                <span className="cta-label">{ctaLabel}</span>
+                <CtaBadge />
+              </Link>
+            </div>
 
-          <p className="cta-note">
-            Free while in beta. No credit card. About a minute to start.
-          </p>
+            <p className="cta-note">
+              Free while in beta. No credit card. About a minute to start.
+            </p>
+          </AnimateIn>
         </div>
 
-        <ul className="trust-strip" aria-label="Why people trust Beleg">
-          <li>
-            <span className="trust-dot" aria-hidden="true" />
-            Free in beta
-          </li>
-          <li>
-            <span className="trust-dot" aria-hidden="true" />
-            Verifiable in your browser
-          </li>
-          <li>
-            <span className="trust-dot" aria-hidden="true" />
-            Anchored to Bitcoin
-          </li>
-        </ul>
+        <AnimateIn direction="up" delay={250}>
+          <ul className="trust-strip" aria-label="Why people trust Beleg">
+            <li>
+              <span className="trust-dot" aria-hidden="true" />
+              Free in beta
+            </li>
+            <li>
+              <span className="trust-dot" aria-hidden="true" />
+              Verifiable in your browser
+            </li>
+            <li>
+              <span className="trust-dot" aria-hidden="true" />
+              Anchored to Bitcoin
+            </li>
+          </ul>
+        </AnimateIn>
       </section>
 
       {/* ——— human voices ——— */}
       <section className="land-section voices-section">
-        <Reveal className="reveal-fade">
+        <AnimateIn direction="up" delay={0}>
           <p className="section-eyebrow">What it feels like</p>
           <h2 className="section-heading section-heading-center">
             Finally — a way to show what happened without hoping they believe
@@ -111,31 +119,33 @@ export default async function Home() {
             The voices Beleg is built for — not polished reviews, just the
             situations people keep running into.
           </p>
-        </Reveal>
+        </AnimateIn>
 
-        <Reveal className="reveal-stagger">
-          <ul className="voice-grid">
-            {VOICES.map((v) => (
-              <li key={v.who} className="voice-card">
-                <p className="voice-quote">&ldquo;{v.quote}&rdquo;</p>
-                <div className="voice-meta">
-                  <span className="voice-avatar" aria-hidden="true">
-                    {v.who.charAt(0)}
-                  </span>
-                  <div>
-                    <p className="voice-who">{v.who}</p>
-                    <p className="voice-context">{v.context}</p>
+        <ul className="voice-grid">
+          {VOICES.map((v, i) => (
+            <li key={v.who}>
+              <AnimateIn direction="up" delay={i * 120}>
+                <div className="voice-card testimonial-card">
+                  <p className="voice-quote">&ldquo;{v.quote}&rdquo;</p>
+                  <div className="voice-meta">
+                    <span className="voice-avatar" aria-hidden="true">
+                      {v.who.charAt(0)}
+                    </span>
+                    <div>
+                      <p className="voice-who">{v.who}</p>
+                      <p className="voice-context">{v.context}</p>
+                    </div>
                   </div>
                 </div>
-              </li>
-            ))}
-          </ul>
-        </Reveal>
+              </AnimateIn>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* ——— how it works ——— */}
       <section className="strip-section">
-        <Reveal className="reveal-fade">
+        <AnimateIn direction="up">
           <p className="section-eyebrow">How it works</p>
           <h2 className="section-heading">
             Record it. Get it witnessed. Share the proof.
@@ -144,46 +154,46 @@ export default async function Home() {
             Hover a step to watch it happen — the same grant, followed all the
             way through.
           </p>
-        </Reveal>
+        </AnimateIn>
 
-        <Reveal className="reveal-fade">
-          <Showcase />
-        </Reveal>
+        <Showcase />
       </section>
 
       {/* ——— pillars on a calm dark band ——— */}
       <section className="pillar-band">
         <div className="pillar-band-inner">
-          <Reveal className="reveal-fade">
+          <AnimateIn direction="up">
             <p className="section-eyebrow pillar-eyebrow">Peace of mind</p>
             <h2 className="section-heading pillar-heading">
               More clarity. Less asking people to take your word for it.
             </h2>
-          </Reveal>
+          </AnimateIn>
 
-          <Reveal className="reveal-stagger">
-            <ul className="pillar-grid">
-              {PILLARS.map((item) => (
-                <li key={item.title} className="pillar-card">
-                  <h3 className="pillar-title">{item.title}</h3>
-                  <p className="pillar-text">{item.text}</p>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
+          <ul className="pillar-grid">
+            {PILLARS.map((item, i) => (
+              <li key={item.title}>
+                <AnimateIn direction="up" delay={i * 120}>
+                  <div className="pillar-card peace-card">
+                    <h3 className="pillar-title">{item.title}</h3>
+                    <p className="pillar-text">{item.text}</p>
+                  </div>
+                </AnimateIn>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
       {/* ——— split human scenario ——— */}
       <section className="land-section">
-        <Reveal className="reveal-fade">
+        <AnimateIn direction="up">
           <p className="section-eyebrow">A real scenario</p>
           <h2 className="section-heading">
             From grant award to something a stranger can check.
           </h2>
-        </Reveal>
+        </AnimateIn>
 
-        <Reveal className="reveal-fade">
+        <AnimateIn direction="up" delay={120}>
           <div className="split-card">
             <div className="split-visual" aria-hidden="true">
               <div className="split-scene">
@@ -228,12 +238,12 @@ export default async function Home() {
               </ol>
             </div>
           </div>
-        </Reveal>
+        </AnimateIn>
       </section>
 
       {/* ——— who it's for ——— */}
       <section className="land-section land-panel">
-        <Reveal className="reveal-fade">
+        <AnimateIn direction="up">
           <p className="section-eyebrow">Who it&apos;s for</p>
           <h2 className="section-heading">
             If someone can ask you to prove it, you can use Beleg.
@@ -243,16 +253,16 @@ export default async function Home() {
             researchers, students, consultants — anyone whose best work is real
             but invisible to the stranger evaluating them.
           </p>
-        </Reveal>
+        </AnimateIn>
 
-        <Reveal className="reveal-fade">
+        <AnimateIn direction="up" delay={100}>
           <UseExplorer />
-        </Reveal>
+        </AnimateIn>
       </section>
 
       {/* ——— closing CTA ——— */}
       <section className="land-section land-cta">
-        <Reveal className="reveal-fade">
+        <AnimateIn direction="up">
           <p className="section-eyebrow">Get started</p>
           <h2 className="section-heading">Start sealing what you ship.</h2>
           <p className="section-lead">
@@ -268,7 +278,7 @@ export default async function Home() {
               How the cryptography works
             </Link>
           </div>
-        </Reveal>
+        </AnimateIn>
       </section>
 
       <Footer />

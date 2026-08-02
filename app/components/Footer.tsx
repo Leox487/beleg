@@ -19,7 +19,9 @@ export function Footer() {
                 ·
               </span>
             ) : null}
-            <Link href={link.href}>{link.label}</Link>
+            <Link href={link.href} className="footer-link">
+              {link.label}
+            </Link>
           </span>
         ))}
       </nav>

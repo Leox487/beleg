@@ -36,11 +36,15 @@ export function AnchorButton({ ventureId }: { ventureId: string }) {
     <div className="anchor-action">
       <button
         type="button"
-        className="btn btn-primary"
+        className={`btn btn-primary${submitting ? " btn-loading" : ""}`}
         onClick={onClick}
         disabled={submitting}
       >
-        {submitting ? "Submitting to Bitcoin…" : "Anchor this ledger to Bitcoin"}
+        {submitting ? (
+          <span className="btn-ellipsis">…</span>
+        ) : (
+          "Anchor this ledger to Bitcoin"
+        )}
       </button>
       {error ? <p className="form-error">{error}</p> : null}
     </div>

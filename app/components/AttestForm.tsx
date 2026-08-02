@@ -86,10 +86,10 @@ export function AttestForm({
 
       <button
         type="submit"
-        className="btn btn-primary btn-block"
+        className={`btn btn-primary btn-block${submitting ? " btn-loading" : ""}`}
         disabled={submitting || !confirmed}
       >
-        {submitting ? "Confirming…" : "Confirm"}
+        {submitting ? <span className="btn-ellipsis">…</span> : "Confirm"}
       </button>
 
       <p className="field-help">
