@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import Accordion from "@/app/components/Accordion";
 import AnimateIn from "@/app/components/AnimateIn";
 import ChainLab from "@/app/components/ChainLab";
 import { Footer } from "@/app/components/Footer";
@@ -13,46 +14,51 @@ export const metadata: Metadata = {
 
 export default function HowItWorksPage() {
   return (
-    <main className="page">
-      <div className="page-inner doc">
-        <header className="doc-header">
-          <h1 className="h1 doc-title">How Beleg Works</h1>
-          <p className="doc-lead">
-            The short version first, with the full explanation underneath if you
-            want it.
+    <main className="page how-page">
+      <div className="page-inner doc doc-how">
+        <header className="doc-header how-header">
+          <h1 className="h1 doc-title how-title">How Beleg Works</h1>
+          <p className="how-desc">
+            Beleg is a running record of what you have actually done. Each
+            milestone you add is sealed with a cryptographic fingerprint and
+            linked to the one before it, so nothing in the past can be quietly
+            rewritten. The people who were there can confirm entries themselves,
+            and anyone you share the record with can check every seal in their
+            own browser &mdash; without taking your word for it, or ours.
           </p>
         </header>
 
         <AnimateIn direction="up">
-          <section className="how-fast">
-            <p className="section-eyebrow">The 20-second version</p>
+          <section className="how-section">
+            <p className="how-eyebrow">The 20-second version</p>
             <HowBeats />
           </section>
         </AnimateIn>
 
-        <AnimateIn direction="up" delay={100}>
-          <section className="card how-lab-card">
-            <p className="section-eyebrow">Try it</p>
-            <h2 className="h2 how-lab-title">Break the chain yourself.</h2>
-            <p className="how-lab-lead">
+        <AnimateIn direction="up">
+          <section className="how-section">
+            <p className="how-eyebrow">Try it</p>
+            <h2 className="how-heading">Break the chain yourself.</h2>
+            <p className="how-sub">
               These are real SHA-256 seals, computed in your browser right now.
               Change a single character in entry #1 and watch what happens to
               everything after it.
             </p>
-            <ChainLab />
+            <div className="card how-lab-card">
+              <ChainLab />
+            </div>
           </section>
         </AnimateIn>
 
-        <AnimateIn direction="up" delay={100}>
-          <section className="how-long">
-            <p className="section-eyebrow">The long version</p>
-            <h2 className="h2 how-long-title">
+        <AnimateIn direction="up">
+          <section className="how-section">
+            <p className="how-eyebrow">The long version</p>
+            <h2 className="how-heading">
               Every detail, if you want to check our work.
             </h2>
 
-            <div className="doc-body how-accordion">
-              <details className="how-detail">
-                <summary>The chain</summary>
+            <div className="how-accordion">
+              <Accordion title="The chain">
                 <p>
                   Every entry you add gets a &quot;hash&quot; — a digital
                   fingerprint created by running the entry&apos;s contents
@@ -76,10 +82,9 @@ export default function HowItWorksPage() {
                   That&apos;s why it&apos;s called &quot;append-only&quot; — you
                   can only add to the end, never change the past.
                 </p>
-              </details>
+              </Accordion>
 
-              <details className="how-detail">
-                <summary>The verifier</summary>
+              <Accordion title="The verifier">
                 <p>
                   When you open a public proof page, the &quot;Verify chain&quot;
                   button runs entirely in your browser. It downloads every
@@ -97,10 +102,9 @@ export default function HowItWorksPage() {
                   hash in the chain to make a forgery pass, and the anchoring
                   (below) makes even that impossible.
                 </p>
-              </details>
+              </Accordion>
 
-              <details className="how-detail">
-                <summary>Attestations</summary>
+              <Accordion title="Attestations">
                 <p>
                   When a third party confirms an entry, their confirmation is
                   itself added to the chain as a new sealed entry. It gets its
@@ -108,10 +112,9 @@ export default function HowItWorksPage() {
                   carry the same tamper-evidence as everything else — they
                   can&apos;t be edited, backdated, or removed after the fact.
                 </p>
-              </details>
+              </Accordion>
 
-              <details className="how-detail">
-                <summary>Bitcoin anchoring</summary>
+              <Accordion title="Bitcoin anchoring">
                 <p>
                   Periodically, the latest hash in your chain is submitted to the
                   Bitcoin blockchain via OpenTimestamps — a free, open protocol.
@@ -127,10 +130,9 @@ export default function HowItWorksPage() {
                   existed at that date, using only open-source tools and the
                   public Bitcoin blockchain. No trust in any company required.
                 </p>
-              </details>
+              </Accordion>
 
-              <details className="how-detail">
-                <summary>What this doesn&apos;t do</summary>
+              <Accordion title="What this doesn't do">
                 <p>
                   Beleg proves integrity (nothing changed) and timing (when it
                   was recorded). It does not prove truth (whether the claim is
@@ -140,10 +142,9 @@ export default function HowItWorksPage() {
                   (attestations) and evidence (which future versions will support
                   through verified email ingestion and payment connectors).
                 </p>
-              </details>
+              </Accordion>
 
-              <details className="how-detail">
-                <summary>Open verification</summary>
+              <Accordion title="Open verification">
                 <p>
                   The SHA-256 hash function is a public standard — anyone can
                   implement it. The chain structure is a standard Merkle-style
@@ -151,7 +152,7 @@ export default function HowItWorksPage() {
                   Beleg&apos;s verification requires proprietary software or
                   trusting a third party. That&apos;s the point.
                 </p>
-              </details>
+              </Accordion>
             </div>
           </section>
         </AnimateIn>

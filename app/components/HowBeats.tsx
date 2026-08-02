@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 
 const BEATS = [
   {
@@ -26,9 +26,9 @@ const BEATS = [
 ];
 
 const BRICKS = [
-  { seq: "#01", title: "Grant received", hash: "a3f81c\u2026d0e29b" },
-  { seq: "#02", title: "Confirmed by Maya", hash: "7b02e9\u20264fc118" },
-  { seq: "#03", title: "Pilot launched", hash: "c14d6a\u202699e07f" },
+  { seq: "#01", title: "Grant received", hash: "a3f81c94b7\u2026d0e29b" },
+  { seq: "#02", title: "Confirmed by Maya", hash: "7b02e9f331\u20264fc118" },
+  { seq: "#03", title: "Pilot launched", hash: "c14d6a2e80\u202699e07f" },
 ];
 
 const BEAT_MS = 4200;
@@ -70,20 +70,24 @@ export default function HowBeats() {
 
         <div className="beat-slot">
           <span className="beat-bubble beat-broken">
+            <span className="beat-bubble-glyph">&#9888;</span>
             Chain broken at #01 &mdash; and everything after it
           </span>
           <span className="beat-bubble beat-anchor">
-            <span className="beat-anchor-glyph">&#9875;</span>
+            <span className="beat-bubble-glyph">&#9875;</span>
             Sealed into Bitcoin block 883,214
           </span>
           <span className="beat-bubble beat-verdict">
-            <span className="beat-check">&#10003;</span>
+            <span className="beat-bubble-glyph">&#10003;</span>
             Chain verified &middot; 3 entries intact
           </span>
         </div>
       </div>
 
-      <div className="beat-bar">
+      <div
+        className="beat-bar"
+        style={{ "--active": active } as CSSProperties}
+      >
         {BEATS.map((beat, i) => {
           const isActive = i === active;
           return (
@@ -99,22 +103,21 @@ export default function HowBeats() {
               }}
               onBlur={() => setPaused(false)}
             >
-              <span className="beat-track">
-                {isActive ? (
-                  <span
-                    className="beat-fill"
-                    key={active}
-                    style={{
-                      animationDuration: `${BEAT_MS}ms`,
-                      animationPlayState: paused ? "paused" : "running",
-                    }}
-                  />
-                ) : null}
-              </span>
               <span className="beat-label">{beat.label}</span>
             </button>
           );
         })}
+
+        <span className="beat-indicator" aria-hidden="true">
+          <span
+            className="beat-fill"
+            key={active}
+            style={{
+              animationDuration: `${BEAT_MS}ms`,
+              animationPlayState: paused ? "paused" : "running",
+            }}
+          />
+        </span>
       </div>
 
       <p className="beat-copy" key={active}>

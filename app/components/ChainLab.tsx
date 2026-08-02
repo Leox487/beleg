@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { GENESIS_HASH, sha256HexBrowser } from "@/lib/hash-browser";
 
@@ -29,10 +29,6 @@ async function computeChain(titles: string[]): Promise<string[]> {
   return out;
 }
 
-function shorten(hash: string): string {
-  return `${hash.slice(0, 10)}\u2026${hash.slice(-8)}`;
-}
-
 /**
  * A real hash chain the reader can break. Editing entry #1 recomputes every
  * link with actual SHA-256, so the cascade of red is the genuine behaviour of
@@ -42,6 +38,8 @@ export default function ChainLab() {
   const [titles, setTitles] = useState(ORIGINAL_TITLES);
   const [sealed, setSealed] = useState<string[]>([]);
   const [live, setLive] = useState<string[]>([]);
+  const [seen, setSeen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -63,7 +61,25 @@ export default function ChainLab() {
     };
   }, [titles]);
 
-  const ready = sealed.length === ENTRIES.length && live.length === ENTRIES.length;
+  // One-time attention pulse the first time the demo scrolls into view.
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setSeen(true);
+          obs.unobserve(el);
+        }
+      },
+      { threshold: 0.25 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const ready =
+    sealed.length === ENTRIES.length && live.length === ENTRIES.length;
   const brokenFrom = ready ? live.findIndex((h, i) => h !== sealed[i]) : -1;
   const isBroken = brokenFrom !== -1;
 
@@ -72,11 +88,14 @@ export default function ChainLab() {
   }
 
   return (
-    <div className={`lab${isBroken ? " is-broken" : ""}`}>
+    <div
+      ref={rootRef}
+      className={`lab${isBroken ? " is-broken" : ""}${seen ? " is-live" : ""}`}
+    >
       <div className="lab-controls">
         <button
           type="button"
-          className="btn btn-secondary"
+          className="btn btn-danger lab-tamper"
           onClick={() => setFirstTitle(TAMPERED_TITLE)}
           disabled={!ready || titles[0] === TAMPERED_TITLE}
         >
@@ -84,13 +103,13 @@ export default function ChainLab() {
         </button>
         <button
           type="button"
-          className="btn btn-ghost"
+          className="btn btn-quiet"
           onClick={() => setTitles(ORIGINAL_TITLES)}
           disabled={!isBroken}
         >
           Reset
         </button>
-        <span className="lab-hint small">
+        <span className="lab-hint">
           &hellip; or just type in the field below.
         </span>
       </div>
@@ -102,7 +121,9 @@ export default function ChainLab() {
             <li
               key={entry.kind}
               className={`lab-entry${broken ? " is-broken" : ""}`}
-              style={{ transitionDelay: `${(i - Math.max(brokenFrom, 0)) * 140}ms` }}
+              style={{
+                transitionDelay: `${(i - Math.max(brokenFrom, 0)) * 140}ms`,
+              }}
             >
               <div className="lab-entry-head">
                 <span className="lab-entry-seq mono">#{i + 1}</span>
@@ -111,7 +132,9 @@ export default function ChainLab() {
 
               {i === 0 ? (
                 <label className="lab-edit">
-                  <span className="lab-edit-label">Editable &mdash; try changing it</span>
+                  <span className="lab-edit-label">
+                    Editable &mdash; try changing it
+                  </span>
                   <input
                     className="lab-input"
                     value={titles[0]}
@@ -124,10 +147,21 @@ export default function ChainLab() {
               )}
 
               <div className="lab-entry-hash">
-                <span className="lab-hash-label">seal</span>
-                <span className="mono lab-hash-value">
-                  {ready ? shorten(live[i]) : "computing\u2026"}
-                </span>
+                <span className="lab-hash-label">Seal</span>
+                {ready ? (
+                  <span
+                    key={live[i]}
+                    className={`mono lab-hash-value${
+                      broken ? " lab-hash-flash" : ""
+                    }`}
+                  >
+                    {live[i]}
+                  </span>
+                ) : (
+                  <span className="mono lab-hash-value">
+                    computing&hellip;
+                  </span>
+                )}
               </div>
 
               {broken ? (
@@ -141,17 +175,22 @@ export default function ChainLab() {
       </ol>
 
       <div className={`lab-verdict${isBroken ? " is-broken" : ""}`}>
-        {isBroken ? (
-          <>
-            <strong>Chain broken at entry #{brokenFrom + 1}</strong>
-            {" \u2014 and every entry after it. This is exactly what a reader would see."}
-          </>
-        ) : (
-          <>
-            <strong>Chain verified</strong>
-            {" \u00b7 3 entries intact. Every seal matches the entry it was made from."}
-          </>
-        )}
+        <span className="lab-verdict-glyph" aria-hidden="true">
+          {isBroken ? "\u2715" : "\u2713"}
+        </span>
+        <span className="lab-verdict-copy">
+          {isBroken ? (
+            <>
+              <strong>Chain broken at entry #{brokenFrom + 1}</strong>
+              {" \u2014 and every entry after it. This is exactly what a reader would see."}
+            </>
+          ) : (
+            <>
+              <strong>Chain verified</strong>
+              {" \u00b7 3 entries intact. Every seal matches the entry it was made from."}
+            </>
+          )}
+        </span>
       </div>
     </div>
   );
