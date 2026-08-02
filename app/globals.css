@@ -207,6 +207,7 @@ a {
 
 .btn-ghost:hover:not(:disabled) {
   color: var(--ink);
+  background: rgba(17, 24, 22, 0.045);
 }
 
 .btn:disabled {
@@ -993,7 +994,7 @@ a {
 }
 
 .showcase-panel:hover .panel-step {
-  color: var(--brand);
+  color: var(--ink);
 }
 
 .showcase-record.is-active .panel-step {
@@ -3612,6 +3613,7 @@ html {
 
 .card:hover,
 .venture-card:hover,
+.entry-card:hover,
 .voice-card:hover,
 .testimonial-card:hover,
 .peace-card:hover,
@@ -3741,7 +3743,7 @@ select {
 }
 
 ::selection {
-  background: rgba(10, 10, 10, 0.08);
+  background: rgba(150, 140, 128, 0.24);
   color: inherit;
 }
 
@@ -3763,14 +3765,61 @@ select {
   background: rgba(0,0,0,0.25);
 }
 
-/* Avatar ring on testimonial hover */
+/* Avatar ring on testimonial hover ? two rings expanding outward */
 .voice-avatar {
+  position: relative;
   transition: box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.voice-avatar::before,
+.voice-avatar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 1.5px solid var(--brand);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .voice-card:hover .voice-avatar,
 .testimonial-card:hover .voice-avatar {
   box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--border-strong);
+}
+
+.voice-card:hover .voice-avatar::before,
+.testimonial-card:hover .voice-avatar::before {
+  animation: avatarRing 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.voice-card:hover .voice-avatar::after,
+.testimonial-card:hover .voice-avatar::after {
+  animation: avatarRing 900ms cubic-bezier(0.16, 1, 0.3, 1) 160ms;
+}
+
+@keyframes avatarRing {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.85);
+  }
+}
+
+/* Failed verification ? short shake, once */
+@keyframes verifyShake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-5px); }
+  30% { transform: translateX(4px); }
+  45% { transform: translateX(-3px); }
+  60% { transform: translateX(2px); }
+  75% { transform: translateX(-1px); }
+}
+
+.verify-broken {
+  animation: verifyShake 520ms cubic-bezier(0.36, 0.07, 0.19, 0.97) 1;
 }
 
 /* Chain pulse after successful verification */
@@ -3927,6 +3976,9 @@ button:disabled,
   .btn-ellipsis,
   .verify-success,
   .verify-ok,
+  .verify-broken,
+  .voice-avatar::before,
+  .voice-avatar::after,
   .anchor-pulse,
   .chain.chain-verified,
   main {
