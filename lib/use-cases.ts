@@ -10,6 +10,10 @@ export type UseCase = {
   witness: string;
   /** Where the public proof link ends up. */
   useIt: string;
+  /** Workplace photo under /public/uses/{id}.webp */
+  image: string;
+  /** Short alt text for the workplace photo. */
+  imageAlt: string;
 };
 
 /**
@@ -54,6 +58,8 @@ export const USE_CASES: UseCase[] = [
     witness: "The customer's operations lead who signed the pilot agreement.",
     useIt:
       "Paste the proof link in your data room so investors can check the traction slide themselves.",
+    image: "/uses/startup-founder.webp",
+    imageAlt: "Startup founder reviewing a product dashboard at a shared office desk",
   },
   {
     id: "solo-founder",
@@ -68,6 +74,8 @@ export const USE_CASES: UseCase[] = [
       "An accountant or a long-time customer willing to confirm the revenue is real.",
     useIt:
       "Attach it to accelerator applications where solo founders get extra scrutiny.",
+    image: "/uses/solo-founder.webp",
+    imageAlt: "Solo founder working alone at a home desk",
   },
   {
     id: "accelerator-applicant",
@@ -81,6 +89,8 @@ export const USE_CASES: UseCase[] = [
     witness: "A mentor or advisor who watched the launch happen.",
     useIt:
       "Drop the link in the application field that asks for traction evidence.",
+    image: "/uses/accelerator-applicant.webp",
+    imageAlt: "Founder demoing a product to mentors in an accelerator space",
   },
   {
     id: "hardware-founder",
@@ -95,6 +105,8 @@ export const USE_CASES: UseCase[] = [
     witness: "The lab or test facility engineer who ran the test.",
     useIt:
       "Include it in grant reports and diligence where technical progress must be dated.",
+    image: "/uses/hardware-founder.webp",
+    imageAlt: "Hardware engineer adjusting a prototype on a lab bench",
   },
 
   // ——— Small business & trades ———
@@ -111,6 +123,8 @@ export const USE_CASES: UseCase[] = [
     witness: "Your landlord, your accountant, or your commercial loan officer.",
     useIt:
       "Share it with a lender reviewing a working-capital loan, or with a buyer during a sale.",
+    image: "/uses/small-business-owner.webp",
+    imageAlt: "Small business owner reviewing papers at a shop counter",
   },
   {
     id: "general-contractor",
@@ -124,6 +138,8 @@ export const USE_CASES: UseCase[] = [
     },
     witness: "The property owner or the architect who signed off.",
     useIt: "Attach the link to bid packets and prequalification forms.",
+    image: "/uses/general-contractor.webp",
+    imageAlt: "General contractor reviewing blueprints on a job site",
   },
 
   // ——— Grants, nonprofits & research ———
@@ -139,6 +155,8 @@ export const USE_CASES: UseCase[] = [
     },
     witness: "The program officer who administered the award.",
     useIt: "Paste the link in the next application's supporting-evidence field.",
+    image: "/uses/grant-applicant.webp",
+    imageAlt: "Grant applicant reviewing an application packet at a cafe",
   },
   {
     id: "nonprofit-director",
@@ -152,6 +170,8 @@ export const USE_CASES: UseCase[] = [
     },
     witness: "A partner agency or the board chair.",
     useIt: "Attach it to renewal applications and annual reports to funders.",
+    image: "/uses/nonprofit-director.webp",
+    imageAlt: "Nonprofit director reviewing program materials in an office",
   },
   {
     id: "grant-writer",
@@ -165,6 +185,8 @@ export const USE_CASES: UseCase[] = [
     },
     witness: "The program manager who ran the cohort.",
     useIt: "Cite it in the narrative so reviewers can check any claim directly.",
+    image: "/uses/grant-writer.webp",
+    imageAlt: "Grant writer working through reports at a desk",
   },
   {
     id: "academic-researcher",
@@ -179,6 +201,8 @@ export const USE_CASES: UseCase[] = [
     witness: "Your co-author or the lab director.",
     useIt:
       "Reference it in priority disputes and grant progress reports where dating matters.",
+    image: "/uses/academic-researcher.webp",
+    imageAlt: "Academic researcher reviewing results in a lab",
   },
   {
     id: "phd-student",
@@ -192,6 +216,8 @@ export const USE_CASES: UseCase[] = [
     witness: "Your advisor.",
     useIt:
       "Use it for fellowship applications and the academic job market packet.",
+    image: "/uses/phd-student.webp",
+    imageAlt: "PhD student studying in a library carrel",
   },
   {
     id: "community-organizer",
@@ -204,6 +230,8 @@ export const USE_CASES: UseCase[] = [
     },
     witness: "A coalition partner or a council staffer who received it.",
     useIt: "Show funders and press a record they can independently check.",
+    image: "/uses/community-organizer.webp",
+    imageAlt: "Community organizer speaking with neighbors outdoors",
   },
   {
     id: "oss-maintainer",
@@ -217,6 +245,8 @@ export const USE_CASES: UseCase[] = [
     },
     witness: "The engineering lead at the adopting company.",
     useIt: "Include it in sponsorship and foundation grant applications.",
+    image: "/uses/oss-maintainer.webp",
+    imageAlt: "Open-source maintainer at a dual-monitor desk",
   },
 
   // ——— Freelance & client work ———
@@ -233,6 +263,8 @@ export const USE_CASES: UseCase[] = [
     witness: "The client's CTO or product owner.",
     useIt:
       "Send the proof link with proposals when your portfolio is under NDA.",
+    image: "/uses/freelance-developer.webp",
+    imageAlt: "Freelance developer reviewing work with a client",
   },
   {
     id: "freelance-designer",
@@ -246,6 +278,8 @@ export const USE_CASES: UseCase[] = [
     },
     witness: "The client's marketing director.",
     useIt: "Attach it to proposals when the portfolio piece stays confidential.",
+    image: "/uses/freelance-designer.webp",
+    imageAlt: "Freelance designer reviewing brand mockups at a desk",
   },
   {
     id: "freelance-writer",
@@ -258,6 +292,8 @@ export const USE_CASES: UseCase[] = [
     },
     witness: "The editor or the communications lead who commissioned it.",
     useIt: "Show it to future clients who ask what you've actually written.",
+    image: "/uses/freelance-writer.webp",
+    imageAlt: "Freelance writer working in a notebook at a desk",
   },
 
   // ——— Students & new graduates ———
@@ -274,6 +310,8 @@ export const USE_CASES: UseCase[] = [
     witness: "Your faculty advisor or the competition organizer.",
     useIt:
       "Add the proof link to the additional-information section of your applications.",
+    image: "/uses/high-school-student.webp",
+    imageAlt: "High school student building a robotics project in a classroom",
   },
   {
     id: "undergraduate",
@@ -286,6 +324,8 @@ export const USE_CASES: UseCase[] = [
     },
     witness: "A professor or the student-life office.",
     useIt: "Share it with recruiters and graduate admissions committees.",
+    image: "/uses/undergraduate.webp",
+    imageAlt: "Undergraduate student on a campus walkway with a laptop bag",
   },
   {
     id: "bootcamp-grad",
@@ -299,6 +339,8 @@ export const USE_CASES: UseCase[] = [
     },
     witness: "The client using the system.",
     useIt: "Send it with job applications instead of a link-only portfolio.",
+    image: "/uses/bootcamp-grad.webp",
+    imageAlt: "Bootcamp graduate demoing software to a client",
   },
 
   // ——— Professional services ———
@@ -314,6 +356,8 @@ export const USE_CASES: UseCase[] = [
     },
     witness: "The client executive who sponsored the project.",
     useIt: "Send it with proposals where references are slow to arrange.",
+    image: "/uses/consultant.webp",
+    imageAlt: "Consultant meeting with a client in a glass conference room",
   },
   {
     id: "coach",
@@ -328,6 +372,8 @@ export const USE_CASES: UseCase[] = [
     witness: "The client themselves.",
     useIt:
       "Show prospective clients evidence instead of anonymous testimonials.",
+    image: "/uses/coach.webp",
+    imageAlt: "Executive coach talking with a founder in a cafe",
   },
 
   // ——— Inside a company ———
@@ -342,6 +388,8 @@ export const USE_CASES: UseCase[] = [
     },
     witness: "Your engineering lead or your manager.",
     useIt: "Bring it to performance reviews and future interviews.",
+    image: "/uses/product-manager.webp",
+    imageAlt: "Product manager standing at a whiteboard with sticky notes",
   },
   {
     id: "sales-rep",
@@ -355,6 +403,8 @@ export const USE_CASES: UseCase[] = [
     witness: "Your VP of Sales.",
     useIt:
       "Show it to hiring managers who've learned to discount résumé numbers.",
+    image: "/uses/sales-rep.webp",
+    imageAlt: "Sales representative shaking hands with a client",
   },
 ];
 
