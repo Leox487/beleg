@@ -34,9 +34,14 @@ export async function Navbar() {
             <UserButton />
           </>
         ) : (
-          <Link href="/sign-in" className="navbar-link">
-            Sign in
-          </Link>
+          <>
+            <Link href="/sign-in" className="navbar-link navbar-login">
+              Log in
+            </Link>
+            <Link href="/sign-up" className="navbar-signup">
+              Sign up
+            </Link>
+          </>
         )}
       </nav>
     </header>
