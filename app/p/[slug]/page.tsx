@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import type { Anchor, Entry, Venture } from "@/lib/types";
 import { Footer } from "@/app/components/Footer";
+import { Seal } from "@/app/components/Seal";
 import { VerifyChain } from "@/app/components/VerifyChain";
 
 function formatDateTime(iso: string): string {
@@ -84,15 +85,16 @@ export default async function PublicProofPage({
     confirmedAnchor && latestSeq > confirmedAnchor.anchored_seq;
 
   return (
-    <main className="page">
-      <div className="page-inner ledger">
+    <main className="page proof-page">
+      <div className="page-inner ledger certificate">
         <p className="proof-preamble">
           This is a public proof page from Beleg. The person who created it does
           not control what you&apos;re about to verify.
         </p>
 
-        <header className="ledger-header">
-          <h1 className="page-title">{venture.name}</h1>
+        <header className="ledger-header certificate-header">
+          <Seal size="lg" label="Sealed record" />
+          <h1 className="page-title certificate-title">{venture.name}</h1>
           {venture.tagline ? (
             <p className="ledger-tagline">{venture.tagline}</p>
           ) : null}
@@ -107,7 +109,10 @@ export default async function PublicProofPage({
 
         {confirmedAnchor ? (
           <section className="anchor-proof anchor-proof-confirmed">
-            <span className="anchor-glyph anchor-pulse" aria-hidden="true">
+            <span
+              className="anchor-glyph anchor-pulse seal seal-gold seal-lg"
+              aria-hidden="true"
+            >
               ⚓
             </span>
             <div className="anchor-proof-body">
@@ -146,7 +151,7 @@ export default async function PublicProofPage({
           </section>
         ) : pendingAnchor ? (
           <section className="anchor-proof anchor-proof-pending">
-            <span className="anchor-glyph" aria-hidden="true">
+            <span className="anchor-glyph seal seal-gold seal-lg" aria-hidden="true">
               ◐
             </span>
             <div className="anchor-proof-body">
@@ -194,9 +199,11 @@ export default async function PublicProofPage({
                   <p className="entry-recorded muted">
                     Recorded {formatDateTime(entry.recorded_at)}
                   </p>
-                  <p className="entry-hash">
-                    hash: {entry.chain_hash.slice(0, 16)}… ← prev:{" "}
-                    {entry.prev_hash.slice(0, 16)}…
+                  <p className="seal-line">
+                    <span className="seal-label">SEAL</span>
+                    <span className="seal-hash">
+                      {entry.chain_hash.slice(0, 24)}…
+                    </span>
                   </p>
                 </article>
               ) : (
@@ -217,9 +224,11 @@ export default async function PublicProofPage({
                   <p className="entry-recorded muted">
                     Recorded {formatDateTime(entry.recorded_at)}
                   </p>
-                  <p className="entry-hash">
-                    hash: {entry.chain_hash.slice(0, 16)}… ← prev:{" "}
-                    {entry.prev_hash.slice(0, 16)}…
+                  <p className="seal-line">
+                    <span className="seal-label">SEAL</span>
+                    <span className="seal-hash">
+                      {entry.chain_hash.slice(0, 24)}…
+                    </span>
                   </p>
                 </article>
               ),

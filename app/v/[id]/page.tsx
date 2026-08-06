@@ -235,9 +235,11 @@ export default async function LedgerPage({
                   <p className="entry-recorded muted">
                     Recorded {formatDateTime(entry.recorded_at)}
                   </p>
-                  <p className="entry-hash">
-                    hash: {entry.chain_hash.slice(0, 16)}… ← prev:{" "}
-                    {entry.prev_hash.slice(0, 16)}…
+                  <p className="seal-line">
+                    <span className="seal-label">SEAL</span>
+                    <span className="seal-hash">
+                      {entry.chain_hash.slice(0, 24)}…
+                    </span>
                   </p>
 
                   {/* Attestation entries are themselves evidence — you don't

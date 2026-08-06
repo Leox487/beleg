@@ -38,7 +38,7 @@ export async function Navbar() {
             <Link href="/sign-in" className="navbar-link navbar-login">
               Log in
             </Link>
-            <Link href="/sign-up" className="navbar-signup">
+            <Link href="/sign-up" className="btn btn-primary navbar-signup">
               Sign up
             </Link>
           </>

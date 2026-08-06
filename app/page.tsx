@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import AnimateIn from "@/app/components/AnimateIn";
 import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
+import { HeroProofMock } from "@/app/components/HeroProofMock";
 import { Showcase } from "@/app/components/Showcase";
 import { UseExplorer } from "@/app/components/UseExplorer";
 
@@ -11,14 +12,17 @@ const PILLARS = [
   {
     title: "Your past, sealed.",
     text: "Every milestone you add is hashed and linked to the one before it. Editing, deleting, or reordering anything would break every seal after it — so the past stays as you recorded it.",
+    flagship: true,
   },
   {
     title: "Witnessed by someone who was there.",
     text: "Invite the person who saw it happen — a grant officer, a mentor, a client — with one link. Their confirmation is sealed into the same chain, with the same protection.",
+    flagship: false,
   },
   {
     title: "Checked by anyone, anywhere.",
     text: "One shareable URL. Anyone evaluating you can open it, hit Verify, and check the whole ledger in their own browser — without trusting Beleg or trusting you.",
+    flagship: false,
   },
 ];
 
@@ -54,68 +58,72 @@ export default async function Home() {
 
   return (
     <main className="landing">
-      {/* ——— centered human hero ——— */}
+      {/* ——— product-first hero ——— */}
       <section className="stage">
-        <div className="hero-glow" aria-hidden="true" />
+        <div className="stage-grid">
+          <div className="stage-copy">
+            <AnimateIn direction="up" delay={0}>
+              <p className="stage-eyebrow">Beleg</p>
 
-        <div className="stage-inner">
-          <AnimateIn direction="up" delay={0}>
-            <p className="stage-eyebrow">Beleg</p>
+              <h1 className="brand-tagline">
+                Proof and trust built into your timeline.
+              </h1>
 
-            <h1 className="brand-tagline">
-              <span className="headline-accent">Proof</span> and{" "}
-              <span className="headline-accent">trust</span> built into your
-              timeline.
-            </h1>
+              <p className="subline">
+                Applications and pitches are drowning in AI-polished claims
+                nobody can check. Beleg gives your traction a sealed record —
+                written as it happens, confirmed by real people, and verifiable
+                by anyone.
+              </p>
+            </AnimateIn>
 
-            <p className="subline">
-              Applications and pitches are drowning in AI-polished claims nobody
-              can check. Beleg gives your traction a sealed record — written as
-              it happens, confirmed by real people, and verifiable by anyone.
-            </p>
-          </AnimateIn>
+            <AnimateIn direction="up" delay={70}>
+              <div className="hero-actions">
+                <Link className="cta" href={ctaHref}>
+                  <span className="cta-label">{ctaLabel}</span>
+                  <CtaBadge />
+                </Link>
+                <Link className="ghost-link" href="/how-it-works">
+                  See how it works →
+                </Link>
+              </div>
 
-          <AnimateIn direction="up" delay={150}>
-            <div className="hero-actions">
-              <Link className="cta" href={ctaHref}>
-                <span className="cta-label">{ctaLabel}</span>
-                <CtaBadge />
-              </Link>
-            </div>
+              <p className="cta-note">
+                Free while in beta. No credit card. About a minute to start.
+              </p>
 
-            <p className="cta-note">
-              Free while in beta. No credit card. About a minute to start.
-            </p>
+              <ul className="trust-strip" aria-label="Why people trust Beleg">
+                <li>
+                  <span className="trust-dot" aria-hidden="true" />
+                  Free in beta
+                </li>
+                <li>
+                  <span className="trust-dot" aria-hidden="true" />
+                  Verifiable in your browser
+                </li>
+                <li>
+                  <span className="trust-dot" aria-hidden="true" />
+                  Anchored to Bitcoin
+                </li>
+              </ul>
+            </AnimateIn>
+          </div>
+
+          <AnimateIn direction="up" delay={140} className="stage-visual">
+            <HeroProofMock />
           </AnimateIn>
         </div>
-
-        <AnimateIn direction="up" delay={250}>
-          <ul className="trust-strip" aria-label="Why people trust Beleg">
-            <li>
-              <span className="trust-dot" aria-hidden="true" />
-              Free in beta
-            </li>
-            <li>
-              <span className="trust-dot" aria-hidden="true" />
-              Verifiable in your browser
-            </li>
-            <li>
-              <span className="trust-dot" aria-hidden="true" />
-              Anchored to Bitcoin
-            </li>
-          </ul>
-        </AnimateIn>
       </section>
 
       {/* ——— human voices ——— */}
       <section className="land-section voices-section">
         <AnimateIn direction="up" delay={0}>
           <p className="section-eyebrow">What it feels like</p>
-          <h2 className="section-heading section-heading-center">
+          <h2 className="section-heading">
             Finally — a way to show what happened without hoping they believe
             you.
           </h2>
-          <p className="section-lead section-lead-center">
+          <p className="section-lead">
             The voices Beleg is built for — not polished reviews, just the
             situations people keep running into.
           </p>
@@ -124,7 +132,7 @@ export default async function Home() {
         <ul className="voice-grid">
           {VOICES.map((v, i) => (
             <li key={v.who}>
-              <AnimateIn direction="up" delay={i * 120}>
+              <AnimateIn direction="up" delay={i * 70}>
                 <div className="voice-card testimonial-card">
                   <p className="voice-quote">&ldquo;{v.quote}&rdquo;</p>
                   <div className="voice-meta">
@@ -144,48 +152,101 @@ export default async function Home() {
       </section>
 
       {/* ——— how it works ——— */}
-      <section className="strip-section">
-        <AnimateIn direction="up">
-          <p className="section-eyebrow">How it works</p>
-          <h2 className="section-heading">
-            Record it. Get it witnessed. Share the proof.
-          </h2>
-          <p className="section-lead">
-            Hover a step to watch it happen — the same grant, followed all the
-            way through.
-          </p>
-        </AnimateIn>
-
-        <Showcase />
-      </section>
-
-      {/* ——— pillars on a calm dark band ——— */}
-      <section className="pillar-band">
-        <div className="pillar-band-inner">
+      <section className="strip-section land-band">
+        <div className="land-band-inner">
           <AnimateIn direction="up">
-            <p className="section-eyebrow pillar-eyebrow">Peace of mind</p>
-            <h2 className="section-heading pillar-heading">
-              More clarity. Less asking people to take your word for it.
+            <p className="section-eyebrow">How it works</p>
+            <h2 className="section-heading">
+              Record it. Get it witnessed. Share the proof.
             </h2>
+            <p className="section-lead">
+              Hover a step to watch it happen — the same grant, followed all the
+              way through.
+            </p>
           </AnimateIn>
 
-          <ul className="pillar-grid">
-            {PILLARS.map((item, i) => (
-              <li key={item.title}>
-                <AnimateIn direction="up" delay={i * 120}>
-                  <div className="pillar-card peace-card">
-                    <h3 className="pillar-title">{item.title}</h3>
-                    <p className="pillar-text">{item.text}</p>
-                  </div>
-                </AnimateIn>
-              </li>
-            ))}
-          </ul>
+          <Showcase />
         </div>
       </section>
 
-      {/* ——— split human scenario ——— */}
-      <section className="land-section">
+      {/* ——— peace of mind as bento ——— */}
+      <section className="land-section pillar-band">
+        <AnimateIn direction="up">
+          <p className="section-eyebrow">Peace of mind</p>
+          <h2 className="section-heading">
+            More clarity. Less asking people to take your word for it.
+          </h2>
+        </AnimateIn>
+
+        <ul className="bento">
+          {PILLARS.map((item, i) => (
+            <li
+              key={item.title}
+              className={item.flagship ? "bento-flagship" : "bento-tile"}
+            >
+              <AnimateIn direction="up" delay={i * 70}>
+                <div className="pillar-card peace-card">
+                  {item.flagship ? (
+                    <div className="bento-mini" aria-hidden="true">
+                      <div className="bento-mini-chain">
+                        <span className="bento-mini-row">
+                          <span className="bento-mini-seq">#01</span>
+                          <span className="bento-mini-hash">
+                            a3f81c94b7d0e29b…
+                          </span>
+                        </span>
+                        <span className="bento-mini-row">
+                          <span className="bento-mini-seq">#02</span>
+                          <span className="bento-mini-hash">
+                            7b02e9f3314fc118…
+                          </span>
+                        </span>
+                        <span className="bento-mini-row">
+                          <span className="bento-mini-seq">#03</span>
+                          <span className="bento-mini-hash">
+                            c14d6a2e8099e07f…
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="bento-seal" aria-hidden="true">
+                      ✓
+                    </span>
+                  )}
+                  <h3 className="pillar-title">{item.title}</h3>
+                  <p className="pillar-text">{item.text}</p>
+                </div>
+              </AnimateIn>
+            </li>
+          ))}
+
+          <li className="bento-metric">
+            <AnimateIn direction="up" delay={210}>
+              <div className="pillar-card peace-card metric-card">
+                <p className="metric-value mono">SHA-256</p>
+                <p className="metric-label">
+                  the standard your browser already uses
+                </p>
+              </div>
+            </AnimateIn>
+          </li>
+
+          <li className="bento-metric">
+            <AnimateIn direction="up" delay={280}>
+              <div className="pillar-card peace-card metric-card">
+                <p className="metric-value mono">0</p>
+                <p className="metric-label">
+                  entries that can be edited after recording
+                </p>
+              </div>
+            </AnimateIn>
+          </li>
+        </ul>
+      </section>
+
+      {/* ——— split human scenario (the one light section) ——— */}
+      <section className="land-section land-light">
         <AnimateIn direction="up">
           <p className="section-eyebrow">A real scenario</p>
           <h2 className="section-heading">
@@ -193,7 +254,7 @@ export default async function Home() {
           </h2>
         </AnimateIn>
 
-        <AnimateIn direction="up" delay={120}>
+        <AnimateIn direction="up" delay={70}>
           <div className="split-card">
             <div className="split-visual" aria-hidden="true">
               <div className="split-scene">
@@ -242,7 +303,7 @@ export default async function Home() {
       </section>
 
       {/* ——— who it's for ——— */}
-      <section className="land-section land-panel">
+      <section className="land-section">
         <AnimateIn direction="up">
           <p className="section-eyebrow">Who it&apos;s for</p>
           <h2 className="section-heading">
@@ -255,30 +316,32 @@ export default async function Home() {
           </p>
         </AnimateIn>
 
-        <AnimateIn direction="up" delay={100}>
+        <AnimateIn direction="up" delay={70}>
           <UseExplorer />
         </AnimateIn>
       </section>
 
       {/* ——— closing CTA ——— */}
-      <section className="land-section land-cta">
-        <AnimateIn direction="up">
-          <p className="section-eyebrow">Get started</p>
-          <h2 className="section-heading">Start sealing what you ship.</h2>
-          <p className="section-lead">
-            Free while in beta. No credit card. Your first entry takes about a
-            minute — and from then on, the chain speaks for itself.
-          </p>
-          <div className="hero-actions">
-            <Link className="cta cta-invert" href={ctaHref}>
-              <span className="cta-label">{ctaLabel}</span>
-              <CtaBadge />
-            </Link>
-            <Link className="ghost-link" href="/how-it-works">
-              How the cryptography works
-            </Link>
-          </div>
-        </AnimateIn>
+      <section className="land-section land-cta land-band">
+        <div className="land-band-inner land-cta-inner">
+          <AnimateIn direction="up">
+            <p className="section-eyebrow">Get started</p>
+            <h2 className="section-heading">Start sealing what you ship.</h2>
+            <p className="section-lead">
+              Free while in beta. No credit card. Your first entry takes about a
+              minute — and from then on, the chain speaks for itself.
+            </p>
+            <div className="hero-actions">
+              <Link className="cta" href={ctaHref}>
+                <span className="cta-label">{ctaLabel}</span>
+                <CtaBadge />
+              </Link>
+              <Link className="ghost-link" href="/how-it-works">
+                How the cryptography works
+              </Link>
+            </div>
+          </AnimateIn>
+        </div>
       </section>
 
       <Footer />

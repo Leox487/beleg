@@ -8,8 +8,8 @@ export default function AnimateIn({
   children,
   direction = "up",
   delay = 0,
-  duration = 600,
-  distance = 24,
+  duration = 650,
+  distance = 14,
   threshold = 0.15,
   className = "",
 }: {
@@ -57,7 +57,7 @@ export default function AnimateIn({
   return (
     <div
       ref={ref}
-      className={className}
+      className={`${className}${visible ? " is-revealed" : ""}`}
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? "none" : translateMap[direction],

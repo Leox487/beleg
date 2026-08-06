@@ -1,20 +1,23 @@
+import type { ComponentProps } from "react";
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Plus_Jakarta_Sans, Source_Sans_3 } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 
 import { Navbar } from "./components/Navbar";
 import { ScrollNav } from "./components/ScrollNav";
 import "./globals.css";
 
-const display = Plus_Jakarta_Sans({
+const sans = Inter({
   subsets: ["latin"],
-  variable: "--font-display",
+  weight: ["400", "500", "600"],
+  variable: "--font-sans",
   display: "swap",
 });
 
-const sans = Source_Sans_3({
+const mono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-sans",
+  weight: ["400", "500"],
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -30,9 +33,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable}`}>
+    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <body>
-        <ClerkProvider>
+        <ClerkProvider
+          appearance={
+            {
+              variables: {
+                colorBackground: "#12141A",
+                colorText: "#F2F3F5",
+                colorPrimary: "#2DD4A0",
+                colorInputBackground: "#191C24",
+                colorInputText: "#F2F3F5",
+                borderRadius: "8px",
+              },
+            } as ComponentProps<typeof ClerkProvider>["appearance"]
+          }
+        >
           <ScrollNav>
             <Navbar />
           </ScrollNav>

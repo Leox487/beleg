@@ -40,7 +40,7 @@ type Status =
   | { state: "broken"; seq: number; reason: string; rows: RowResult[] };
 
 function trunc(hash: string): string {
-  return `${hash.slice(0, 16)}…`;
+  return `${hash.slice(0, 24)}…`;
 }
 
 export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
