@@ -25,7 +25,7 @@ export function Footer() {
           </span>
         ))}
       </nav>
-      <p className="site-footer-fine small">© 2026 Beleg · Built by Leo Sun</p>
+      <p className="site-footer-fine small">© 2026 Beleg</p>
     </footer>
   );
 }

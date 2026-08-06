@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Instrument_Serif, Inter, JetBrains_Mono } from "next/font/google";
 
 import { Navbar } from "./components/Navbar";
 import { ScrollNav } from "./components/ScrollNav";
@@ -11,6 +11,14 @@ const sans = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-sans",
+  display: "swap",
+});
+
+const display = Instrument_Serif({
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -33,7 +41,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
+    <html
+      lang="en"
+      className={`${sans.variable} ${display.variable} ${mono.variable}`}
+    >
       <body>
         <ClerkProvider
           appearance={

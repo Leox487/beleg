@@ -59,18 +59,17 @@ export default function AboutPage() {
 
           <h2>Who built this</h2>
           <p>
-            Beleg was built by Leo Sun, a high school student at The Shipley
-            School in Philadelphia. It started as a question: in a world where
-            AI makes every application sound perfect, what would a trust layer
-            for founders actually look like?
+            Beleg started as a question: in a world where AI makes every
+            application sound perfect, what would a trust layer for founders
+            actually look like?
           </p>
           <p>The answer wasn&apos;t another AI tool. It was math.</p>
 
           <h2>Status</h2>
           <p>
             Beleg is in beta. It is free to use. The codebase is real, the
-            cryptography is real, the Bitcoin anchoring is real. It is also
-            built by one person and may break. If it does, email{" "}
+            cryptography is real, the Bitcoin anchoring is real. If something
+            breaks, email{" "}
             <a href="mailto:beleg@proton.me">beleg@proton.me</a>.
           </p>
         </div>

@@ -66,7 +66,8 @@ export default async function Home() {
               <p className="stage-eyebrow">Beleg</p>
 
               <h1 className="brand-tagline">
-                Proof and trust built into your timeline.
+                Proof and trust built into{" "}
+                <span className="headline-accent">your timeline</span>.
               </h1>
 
               <p className="subline">

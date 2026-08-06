@@ -101,7 +101,7 @@ export default function TermsPage() {
 
           <h2>Contact</h2>
           <p>
-            Leo Sun — <a href="mailto:beleg@proton.me">beleg@proton.me</a>
+            <a href="mailto:beleg@proton.me">beleg@proton.me</a>
           </p>
         </div>
       </div>

@@ -19,7 +19,6 @@ export default function PrivacyPage() {
 
         <div className="card doc-body">
           <p>
-            Beleg is built by Leo Sun, a student developer in Philadelphia, PA.
             This policy explains what data Beleg collects, why, and how
             it&apos;s handled.
           </p>
@@ -112,7 +111,7 @@ export default function PrivacyPage() {
 
           <h2>Contact</h2>
           <p>
-            Leo Sun — <a href="mailto:beleg@proton.me">beleg@proton.me</a>
+            <a href="mailto:beleg@proton.me">beleg@proton.me</a>
           </p>
         </div>
       </div>

@@ -6016,17 +6016,17 @@ select:focus {
 .how-title,
 .page-title,
 .certificate-title {
-  font-family: var(--font-sans), Inter, sans-serif;
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.03;
+  font-family: var(--font-display), "Iowan Old Style", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
   color: var(--text);
 }
 
 .h1,
 .headline,
 .brand-tagline {
-  font-size: clamp(40px, 5.5vw, 68px);
+  font-size: clamp(42px, 5.8vw, 72px);
 }
 
 .h2,
@@ -6035,11 +6035,11 @@ select:focus {
 .section-heading,
 .how-heading,
 .pillar-heading {
-  font-family: var(--font-sans), Inter, sans-serif;
-  font-size: clamp(28px, 3.5vw, 42px);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  font-family: var(--font-display), "Iowan Old Style", Georgia, serif;
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.12;
   color: var(--text) !important;
 }
 
@@ -6069,8 +6069,8 @@ select:focus {
 }
 
 .headline-accent {
-  color: inherit;
-  font-style: normal;
+  color: var(--accent);
+  font-style: inherit;
 }
 
 .eyebrow,
@@ -6309,10 +6309,10 @@ select:focus {
   border-radius: 0 !important;
   padding: 0 !important;
   color: var(--text) !important;
-  font-family: var(--font-sans), Inter, sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 .navbar-link,
@@ -7033,9 +7033,10 @@ select:focus {
 
 .certificate-title,
 .certificate .page-title {
+  font-family: var(--font-display), Georgia, serif;
   font-size: 40px;
-  font-weight: 600;
-  letter-spacing: -0.03em;
+  font-weight: 400;
+  letter-spacing: -0.02em;
 }
 
 .certificate .ledger-tagline {
