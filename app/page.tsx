@@ -6,7 +6,6 @@ import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
 import { HeroProofMock } from "@/app/components/HeroProofMock";
 import { Showcase } from "@/app/components/Showcase";
-import { UseExplorer } from "@/app/components/UseExplorer";
 
 const PILLARS = [
   {
@@ -16,12 +15,12 @@ const PILLARS = [
   },
   {
     title: "Witnessed by someone who was there.",
-    text: "Invite the person who saw it happen — a grant officer, a mentor, a client — with one link. Their confirmation is sealed into the same chain, with the same protection.",
+    text: "A grant officer, a mentor, a client — whoever actually saw it happen can confirm an entry without creating an account. Their word becomes part of the record, not a screenshot you pasted in.",
     flagship: false,
   },
   {
     title: "Checked by anyone, anywhere.",
-    text: "One shareable URL. Anyone evaluating you can open it, hit Verify, and check the whole ledger in their own browser — without trusting Beleg or trusting you.",
+    text: "Verification is math, not a badge we issue. A reviewer can confirm your record is intact without taking our word for it — or yours.",
     flagship: false,
   },
 ];
@@ -161,12 +160,20 @@ export default async function Home() {
               Record it. Get it witnessed. Share the proof.
             </h2>
             <p className="section-lead">
-              Hover a step to watch it happen — the same grant, followed all the
-              way through.
+              Hover a step to watch it happen — one $12,000 grant, followed from
+              the day it landed to the link a reviewer can check.
             </p>
           </AnimateIn>
 
           <Showcase />
+
+          <AnimateIn direction="up" delay={70}>
+            <p className="section-outlink">
+              <Link className="ghost-link ghost-link-accent" href="/how-it-works">
+                See the cryptography in detail →
+              </Link>
+            </p>
+          </AnimateIn>
         </div>
       </section>
 
@@ -246,82 +253,6 @@ export default async function Home() {
         </ul>
       </section>
 
-      {/* ——— split human scenario (the one light section) ——— */}
-      <section className="land-section land-light">
-        <AnimateIn direction="up">
-          <p className="section-eyebrow">A real scenario</p>
-          <h2 className="section-heading">
-            From grant award to something a stranger can check.
-          </h2>
-        </AnimateIn>
-
-        <AnimateIn direction="up" delay={70}>
-          <div className="split-card">
-            <div className="split-visual" aria-hidden="true">
-              <div className="split-scene">
-                <span className="split-scene-label">Public proof page</span>
-                <div className="split-scene-entry">
-                  <span className="split-scene-seq">#4</span>
-                  <div>
-                    <p className="split-scene-title">Grant received — $12,000</p>
-                    <p className="split-scene-detail">
-                      Civic Innovation Fund · confirmed by Maya Chen
-                    </p>
-                  </div>
-                </div>
-                <div className="split-scene-verify">
-                  <span className="split-scene-check">✓</span>
-                  Chain verified · 7 entries intact
-                </div>
-              </div>
-            </div>
-            <div className="split-copy">
-              <h3 className="split-title">
-                Take control of the story you&apos;re asked to prove.
-              </h3>
-              <p className="split-text">
-                You record the grant the day it lands. Maya Chen, the program
-                officer, confirms it with one click. Next time a reviewer asks,
-                you send one link — and their browser checks the seals
-                themselves.
-              </p>
-              <ol className="split-steps">
-                <li>
-                  <strong>You record it</strong> — sealed with a timestamp.
-                </li>
-                <li>
-                  <strong>Someone who was there confirms</strong> — sealed into
-                  the same chain.
-                </li>
-                <li>
-                  <strong>Anyone can verify</strong> — without trusting this
-                  website.
-                </li>
-              </ol>
-            </div>
-          </div>
-        </AnimateIn>
-      </section>
-
-      {/* ——— who it's for ——— */}
-      <section className="land-section">
-        <AnimateIn direction="up">
-          <p className="section-eyebrow">Who it&apos;s for</p>
-          <h2 className="section-heading">
-            If someone can ask you to prove it, you can use Beleg.
-          </h2>
-          <p className="section-lead">
-            Founders, small business owners, contractors, freelancers,
-            researchers, students, consultants — anyone whose best work is real
-            but invisible to the stranger evaluating them.
-          </p>
-        </AnimateIn>
-
-        <AnimateIn direction="up" delay={70}>
-          <UseExplorer />
-        </AnimateIn>
-      </section>
-
       {/* ——— closing CTA ——— */}
       <section className="land-section land-cta land-band">
         <div className="land-band-inner land-cta-inner">
@@ -336,9 +267,6 @@ export default async function Home() {
               <Link className="cta" href={ctaHref}>
                 <span className="cta-label">{ctaLabel}</span>
                 <CtaBadge />
-              </Link>
-              <Link className="ghost-link" href="/how-it-works">
-                How the cryptography works
               </Link>
             </div>
           </AnimateIn>

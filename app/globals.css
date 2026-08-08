@@ -7273,3 +7273,404 @@ select:focus {
   }
 }
 
+
+/* =========================================================================
+   MULTI-COLUMN FOOTER + NEW MARKETING PAGES
+   ========================================================================= */
+
+.site-footer {
+  max-width: none;
+  margin: 0;
+  padding: 64px 32px 32px;
+  background: var(--bg-raised);
+  border-top: 1px solid var(--border);
+  text-align: left;
+  color: var(--text-3);
+}
+
+.site-footer-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.site-footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(4, 1fr);
+  gap: 48px;
+}
+
+.site-footer-wordmark {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.site-footer-tagline {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-3);
+  max-width: 30ch;
+}
+
+.site-footer-anchor {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 16px 0 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.site-footer-anchor-glyph {
+  color: var(--gold);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.site-footer-heading {
+  margin: 0 0 16px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.site-footer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-footer .footer-link {
+  font-size: 13.5px;
+  font-weight: 450;
+  color: var(--text-2);
+  transition: color 160ms ease;
+}
+
+.site-footer .footer-link:hover {
+  color: var(--text);
+}
+
+.site-footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.site-footer-bottom p {
+  margin: 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+
+@media (max-width: 900px) {
+  .site-footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+}
+
+@media (max-width: 560px) {
+  .site-footer {
+    padding: 48px 20px 28px;
+  }
+
+  .site-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .site-footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* --- accent ghost link, used to hand off to a deeper page --- */
+.section-outlink {
+  margin: 32px 0 0;
+}
+
+.ghost-link-accent {
+  padding: 0;
+  height: auto;
+  border: 0;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ghost-link-accent:hover {
+  background: none;
+  border: 0;
+  color: var(--accent);
+  filter: brightness(1.15);
+}
+
+/* --- shared shell for the new marketing/doc pages --- */
+.doc-narrow {
+  max-width: 720px;
+}
+
+.doc-eyebrow {
+  margin: 0 0 14px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.doc-lead {
+  margin: 14px 0 0;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.doc-note {
+  margin: 24px 0 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-3);
+}
+
+/* --- changelog, set like the ledger it describes --- */
+.log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.log-item {
+  display: grid;
+  grid-template-columns: 116px 1fr;
+  gap: 20px;
+  padding: 22px 0;
+  border-top: 1px solid var(--border);
+}
+
+.log-item:first-child {
+  border-top: 0;
+}
+
+.log-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+
+.log-seq {
+  color: var(--accent);
+}
+
+.log-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-2);
+}
+
+@media (max-width: 560px) {
+  .log-item {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .log-meta {
+    flex-direction: row;
+    gap: 10px;
+  }
+}
+
+/* --- glossary --- */
+.glossary-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.glossary-item {
+  padding: 22px 0;
+  border-top: 1px solid var(--border);
+}
+
+.glossary-item:first-child {
+  border-top: 0;
+}
+
+.glossary-term {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.glossary-def {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-2);
+}
+
+/* --- the verify tool --- */
+.verify-tool {
+  display: block;
+}
+
+.verify-tool-form {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.verify-tool-input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 14px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 13px;
+}
+
+.verify-tool-form .btn {
+  height: 48px;
+  flex: none;
+}
+
+.verify-tool-error {
+  margin: 16px 0 0;
+  padding: 12px 16px;
+  border: 1px solid rgba(240, 103, 74, 0.35);
+  border-radius: var(--radius);
+  background: var(--danger-glow);
+  font-size: 14px;
+  color: var(--danger);
+}
+
+.verify-tool-result {
+  margin-top: 20px;
+}
+
+.verify-tool-venture {
+  margin: 0 0 12px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+/* --- faq --- */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+/* --- prose elements used by the reference pages --- */
+.doc-body h3 {
+  margin: 34px 0 10px;
+  font-family: var(--font-sans), Inter, sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.doc-body > *:first-child {
+  margin-top: 0;
+}
+
+.doc-body code {
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-raised-2);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12.5px;
+  color: var(--text-2);
+  word-break: break-word;
+}
+
+.code-block {
+  margin: 14px 0 18px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  overflow-x: auto;
+}
+
+.code-block code {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--text-2);
+  white-space: pre;
+  word-break: normal;
+}
+
+.doc-note a {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.doc-note a:hover {
+  text-decoration: underline;
+}
+
+
+/* The footer is a full-bleed band, so it has to escape the horizontal padding
+   of whichever page shell it happens to sit inside. */
+.page > .site-footer {
+  margin: 64px -24px -56px;
+}
+
+.landing .site-footer {
+  margin-top: 0;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+@media (max-width: 560px) {
+  .page > .site-footer {
+    margin: 48px -24px -56px;
+  }
+
+  .landing .site-footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
