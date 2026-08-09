@@ -3,6 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { CopyText } from "@/app/components/CopyText";
+
+interface SentState {
+  to: string;
+  emailed: boolean;
+  confirmUrl: string;
+}
+
 export function RequestAttestForm({ entryId }: { entryId: string }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -11,6 +19,7 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
   const [statement, setStatement] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sent, setSent] = useState<SentState | null>(null);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,12 +52,21 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
           statement: statement.trim(),
         }),
       });
-      const data = (await res.json()) as { url?: string; error?: string };
+      const data = (await res.json()) as {
+        url?: string;
+        confirm_url?: string;
+        emailed?: boolean;
+        error?: string;
+      };
       if (!res.ok || !data.url) {
         setError(data.error ?? "Could not create request.");
         return;
       }
-      setOpen(false);
+      setSent({
+        to: email.trim(),
+        emailed: Boolean(data.emailed),
+        confirmUrl: data.confirm_url ?? data.url,
+      });
       setEmail("");
       setName("");
       setStatement("");
@@ -59,6 +77,47 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
       setSubmitting(false);
     }
   };
+
+  if (sent) {
+    return (
+      <div className="attest-sent">
+        {sent.emailed ? (
+          <>
+            <p className="attest-sent-head">
+              <span className="attest-sent-check" aria-hidden="true">
+                ✓
+              </span>
+              Invitation sent to {sent.to}
+            </p>
+            <p className="attest-sent-note">
+              They can confirm in one click — no account needed. You&apos;ll see
+              their confirmation appear in the chain once they do.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="attest-sent-head attest-sent-warn">
+              Request created, but the email didn&apos;t send.
+            </p>
+            <p className="attest-sent-note">
+              Send {sent.to} this link yourself — it works exactly the same.
+            </p>
+            <CopyText value={sent.confirmUrl} />
+          </>
+        )}
+        <button
+          type="button"
+          className="btn btn-ghost btn-small"
+          onClick={() => {
+            setSent(null);
+            setOpen(false);
+          }}
+        >
+          Done
+        </button>
+      </div>
+    );
+  }
 
   if (!open) {
     return (
@@ -88,7 +147,7 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
           required
         />
         <p className="field-help">
-          They&apos;ll receive a one-click confirmation link. No account needed
+          We&apos;ll email them a one-click confirmation link. No account needed
           on their end.
         </p>
       </div>
@@ -138,7 +197,7 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
           {submitting ? (
             <span className="btn-ellipsis">…</span>
           ) : (
-            "Create request"
+            "Send invitation"
           )}
         </button>
         <button

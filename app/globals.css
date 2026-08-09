@@ -7674,3 +7674,43 @@ select:focus {
   }
 }
 
+
+/* --- attestation invitation result --- */
+.attest-sent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-raised-2);
+}
+
+.attest-sent-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.attest-sent-warn {
+  color: var(--danger);
+}
+
+.attest-sent-check {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.attest-sent-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-3);
+}
+
