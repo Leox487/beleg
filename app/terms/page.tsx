@@ -72,7 +72,7 @@ export default function TermsPage() {
 
           <h2>Service availability</h2>
           <p>
-            Beleg is a beta product built by a student developer. It may have
+            Beleg is a beta product built independently. It may have
             bugs, downtime, or breaking changes. There is no uptime guarantee,
             no SLA, and no warranty of any kind. Use it knowing this.
           </p>
@@ -101,7 +101,7 @@ export default function TermsPage() {
 
           <h2>Contact</h2>
           <p>
-            <a href="mailto:beleg@proton.me">beleg@proton.me</a>
+            <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a>
           </p>
         </div>
       </div>

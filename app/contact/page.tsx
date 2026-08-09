@@ -18,7 +18,7 @@ export default function ContactPage() {
 
         <div className="card doc-body">
           <p>
-            Email <a href="mailto:beleg@proton.me">beleg@proton.me</a> for
+            Email <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a> for
             anything: bugs, security issues, data deletion requests, questions.
           </p>
           <p>

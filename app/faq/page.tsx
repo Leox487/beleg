@@ -79,7 +79,7 @@ export default function FaqPage() {
 
           <Accordion title="Who built this?">
             <p>
-              Leo Sun, a high school student in Philadelphia. See{" "}
+              A small team in Philadelphia. See{" "}
               <Link href="/about">About</Link>.
             </p>
           </Accordion>

@@ -70,7 +70,7 @@ export default function AboutPage() {
             Beleg is in beta. It is free to use. The codebase is real, the
             cryptography is real, the Bitcoin anchoring is real. If something
             breaks, email{" "}
-            <a href="mailto:beleg@proton.me">beleg@proton.me</a>.
+            <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a>.
           </p>
         </div>
       </div>

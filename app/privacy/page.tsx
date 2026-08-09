@@ -111,7 +111,7 @@ export default function PrivacyPage() {
 
           <h2>Contact</h2>
           <p>
-            <a href="mailto:beleg@proton.me">beleg@proton.me</a>
+            <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a>
           </p>
         </div>
       </div>

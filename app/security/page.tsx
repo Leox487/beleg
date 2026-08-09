@@ -61,7 +61,7 @@ export default function SecurityPage() {
           <h3>Reporting a problem</h3>
           <p>
             If you find a security issue, email{" "}
-            <a href="mailto:beleg@proton.me">beleg@proton.me</a>. This is a beta
+            <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a>. This is a beta
             product built by one person; responsible disclosure is genuinely
             appreciated.
           </p>
