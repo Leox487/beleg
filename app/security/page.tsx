@@ -62,8 +62,7 @@ export default function SecurityPage() {
           <p>
             If you find a security issue, email{" "}
             <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a>. This is a beta
-            product built by one person; responsible disclosure is genuinely
-            appreciated.
+            product; responsible disclosure is genuinely appreciated.
           </p>
         </div>
       </div>

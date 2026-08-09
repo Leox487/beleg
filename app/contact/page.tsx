@@ -22,8 +22,8 @@ export default function ContactPage() {
             anything: bugs, security issues, data deletion requests, questions.
           </p>
           <p>
-            Beleg is built by one person, so replies may take a few days. There
-            is no contact form — a real inbox works better.
+            Replies may take a few days. There is no contact form — a real
+            inbox works better.
           </p>
         </div>
       </div>

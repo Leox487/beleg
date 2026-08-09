@@ -75,8 +75,7 @@ export default function ChangelogPage() {
         </div>
 
         <p className="doc-note">
-          Beleg is built by one person. This changelog is the honest version —
-          including the bugs.
+          This changelog is the honest version — including the bugs.
         </p>
       </div>
 
