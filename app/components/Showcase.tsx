@@ -145,9 +145,7 @@ function ShareMock() {
 const MOCKS = [<RecordMock key="r" />, <WitnessMock key="w" />, <ShareMock key="s" />];
 
 /**
- * Three panels side by side; whichever one the pointer is over expands to fill
- * most of the row and plays its demo. Hover drives it on desktop, focus and
- * click cover keyboard and touch.
+ * Vertical accordion: hover/focus/click opens one step and plays its demo.
  */
 export function Showcase() {
   const [active, setActive] = useState(0);

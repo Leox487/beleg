@@ -1114,79 +1114,84 @@ a {
   font-weight: 700;
 }
 
-/* --- showcase: three panels, the hovered one expands --- */
+/* --- showcase: vertical accordion (one open panel at a time) --- */
 .showcase {
-  display: flex;
-  gap: 14px;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  width: 100%;
+  max-width: 900px;
+  height: auto;
   margin-top: 36px;
-  height: 545px;
+  padding-left: 56px;
+}
+
+.showcase::before {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: 10px;
+  bottom: 10px;
+  width: 1px;
+  background: var(--rule, var(--border));
 }
 
 .showcase-panel-wrap {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  height: 100%;
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: auto;
+  position: relative;
 }
 
 .showcase-panel-wrap .showcase-panel {
-  flex: 1;
   width: 100%;
 }
 
 .showcase-panel {
   position: relative;
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  padding: 26px 24px;
-  border-radius: 22px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 26px 0;
+  border: 0;
+  border-top: 1px solid var(--rule, var(--border));
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
   cursor: pointer;
-  transition: flex-grow 0.62s cubic-bezier(0.16, 1, 0.3, 1),
-    background 0.5s, border-color 0.5s, box-shadow 0.5s;
 }
 
-/* Active / hovered panel: mock scales up slightly. */
+.showcase-panel-wrap:first-child .showcase-panel {
+  border-top: 0;
+}
+
+.showcase-panel.is-active,
+.showcase-record.is-active,
+.showcase-witness.is-active,
+.showcase-share.is-active {
+  background: none;
+  box-shadow: none;
+}
+
 .showcase-panel.is-active .mock,
 .showcase-panel:hover .mock {
-  transform: scale(1.02);
+  transform: none;
 }
 
 .mock {
   transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.showcase-panel.is-active {
-  flex-grow: 4.4;
-  box-shadow: var(--shadow-lg);
-}
-
-/* Each stage owns a hue, applied only while it is the open panel. */
-.showcase-record.is-active {
-  background: linear-gradient(170deg, var(--c-record-tint), var(--surface) 46%);
-  border-color: rgba(27, 94, 75, 0.35);
-}
-
-.showcase-witness.is-active {
-  background: linear-gradient(170deg, var(--c-witness-tint), var(--surface) 46%);
-  border-color: rgba(217, 122, 43, 0.35);
-}
-
-.showcase-share.is-active {
-  background: linear-gradient(170deg, var(--c-share-tint), var(--surface) 46%);
-  border-color: rgba(56, 102, 207, 0.35);
-}
-
 .panel-head {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
   background: none;
   border: none;
   padding: 0;
@@ -1203,80 +1208,75 @@ a {
 }
 
 .panel-step {
+  position: absolute;
+  left: -56px;
+  top: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 34px;
   height: 34px;
+  margin-top: -17px;
   border-radius: 999px;
+  border: 1px solid var(--rule, var(--border));
+  font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-  background: rgba(20, 23, 26, 0.05);
-  transition: background 0.4s, color 0.4s;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-3, var(--muted));
+  background: var(--bg, var(--paper, #0b0d0f));
+  transition: border-color 300ms ease, background 300ms ease, color 300ms ease;
 }
 
-.showcase-panel:hover .panel-step {
-  color: var(--ink);
-}
-
-.showcase-record.is-active .panel-step {
-  background: var(--c-record);
-  color: #fff;
-}
-
-.showcase-witness.is-active .panel-step {
-  background: var(--c-witness);
-  color: #fff;
-}
-
+.showcase-panel:hover .panel-step,
+.showcase-panel.is-active .panel-step,
+.showcase-record.is-active .panel-step,
+.showcase-witness.is-active .panel-step,
 .showcase-share.is-active .panel-step {
-  background: var(--c-share);
-  color: #fff;
+  border-color: var(--accent, var(--seal, var(--brand)));
+  background: var(--accent-glow, var(--seal-tint, rgba(45, 212, 160, 0.12)));
+  color: var(--accent, var(--seal, var(--brand)));
 }
 
 .panel-label {
-  font-family: var(--font-display), "Segoe UI", sans-serif;
-  font-size: 24px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--ink);
+  font-family: var(--font-sans), Inter, sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--text, var(--ink));
   white-space: nowrap;
 }
 
-/* Collapsed panels keep only their number and label; the body is clipped
-   away rather than unmounted so expanding stays smooth. */
+/* Collapsed panels clip the body with max-height so the section keeps real height. */
 .panel-reveal {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
+  display: block;
+  max-height: 0;
   opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.35s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
   pointer-events: none;
+  transition: max-height 620ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 350ms ease;
 }
 
 .showcase-panel.is-active .panel-reveal {
+  max-height: 640px;
   opacity: 1;
-  transform: none;
-  transition-delay: 0.14s;
+  pointer-events: auto;
+  transition-delay: 0s, 0.1s;
 }
 
 .panel-text {
-  margin: 14px 0 16px;
-  max-width: 540px;
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--ink-soft);
-  min-width: 340px;
+  margin: 16px 0 18px;
+  max-width: 680px;
+  min-width: 0;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--text-2, var(--ink-soft));
 }
 
 .panel-mock {
-  flex: 1;
-  min-height: 0;
-  min-width: 520px;
+  min-width: 0;
+  height: 360px;
 }
 
 /* --- demo window --- */
@@ -2704,39 +2704,23 @@ a {
 }
 
 @media (max-width: 1000px) {
-  /* Side-by-side expansion needs width; below this the panels stack and each
-     one shows its demo in full. */
   .showcase {
-    flex-direction: column;
-    height: auto;
+    padding-left: 44px;
   }
 
-  .showcase-panel-wrap {
-    flex: none;
-    height: auto;
+  .showcase::before {
+    left: 13px;
   }
 
-  .showcase-panel-wrap:not(:first-child)::before {
-    display: none;
-  }
-
-  .showcase-panel {
-    flex: none;
-  }
-
-  .panel-reveal {
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
+  .panel-step {
+    left: -44px;
+    width: 26px;
+    height: 26px;
+    margin-top: -13px;
   }
 
   .panel-mock {
-    min-width: 0;
     height: 330px;
-  }
-
-  .panel-text {
-    min-width: 0;
   }
 }
 
@@ -3854,24 +3838,7 @@ html {
   border-color: var(--border-strong);
 }
 
-/* Connecting dashed rules between showcase steps on desktop */
-@media (min-width: 1001px) {
-  .showcase-panel-wrap:not(:first-child) {
-    position: relative;
-  }
-
-  .showcase-panel-wrap:not(:first-child)::before {
-    content: "";
-    position: absolute;
-    left: -8px;
-    top: 18%;
-    bottom: 18%;
-    width: 0;
-    border-left: 1px dashed var(--border);
-    pointer-events: none;
-    z-index: 2;
-  }
-}
+/* Horizontal dashed connectors removed — showcase is a vertical accordion. */
 
 /* Button press */
 button:active,
@@ -5329,140 +5296,9 @@ a[class*="btn"]:active,
   color: var(--ink-3);
 }
 
-/* --- how it works: a vertical chain with numbers on the rule --- */
+/* Showcase layout lives in the base accordion rules above; theme colors follow. */
 .showcase {
-  position: relative;
-  flex-direction: column;
-  gap: 0;
-  height: auto;
-  max-width: 900px;
   margin-top: 44px;
-  padding-left: 56px;
-}
-
-.showcase::before {
-  content: "";
-  position: absolute;
-  left: 17px;
-  top: 10px;
-  bottom: 10px;
-  width: 1px;
-  background: var(--rule);
-}
-
-.showcase-panel-wrap {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.showcase-panel,
-.showcase-panel-wrap .showcase-panel {
-  display: block;
-  flex: none;
-  width: 100%;
-  padding: 26px 0;
-  border: 0;
-  border-top: 1px solid var(--rule);
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-}
-
-.showcase-panel-wrap:first-child .showcase-panel {
-  border-top: 0;
-}
-
-.showcase-panel.is-active,
-.showcase-record.is-active,
-.showcase-witness.is-active,
-.showcase-share.is-active {
-  flex-grow: 0;
-  background: none;
-  border-color: var(--rule);
-  box-shadow: none;
-}
-
-.showcase-panel:hover {
-  border-color: var(--rule);
-  box-shadow: none;
-}
-
-.panel-head {
-  position: relative;
-  flex-direction: row;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-}
-
-/* The index number sits on the chain rule itself. */
-.panel-step {
-  position: absolute;
-  left: -56px;
-  top: 50%;
-  width: 34px;
-  height: 34px;
-  margin-top: -17px;
-  border: 1px solid var(--rule);
-  background: var(--paper);
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: var(--ink-3);
-  transition: border-color 300ms ease, background 300ms ease, color 300ms ease;
-}
-
-.showcase-panel:hover .panel-step,
-.showcase-panel.is-active .panel-step,
-.showcase-record.is-active .panel-step,
-.showcase-witness.is-active .panel-step,
-.showcase-share.is-active .panel-step {
-  border-color: var(--seal);
-  background: var(--seal-tint);
-  color: var(--seal);
-}
-
-.panel-label {
-  font-family: var(--font-display);
-  font-size: 26px;
-  font-weight: 400;
-  letter-spacing: -0.015em;
-}
-
-.panel-reveal {
-  display: block;
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-height 620ms cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 350ms ease;
-}
-
-.showcase-panel.is-active .panel-reveal {
-  max-height: 520px;
-  opacity: 1;
-  transition-delay: 0s, 0.1s;
-}
-
-.panel-text {
-  margin: 16px 0 18px;
-  min-width: 0;
-  max-width: 680px;
-  font-size: 16px;
-  line-height: 1.65;
-  color: var(--ink-2);
-}
-
-.panel-mock {
-  min-width: 0;
-  height: 360px;
-}
-
-.showcase-panel.is-active .mock,
-.showcase-panel:hover .mock {
-  transform: none;
 }
 
 /* --- pillars band: sunken paper, not a dark slab --- */
@@ -8146,36 +7982,31 @@ html {
   padding: 22px;
 }
 
-/* How-it-works: vertical accordion must own its full height — never clip */
+/* How-it-works: keep accordion and next section cleanly stacked */
 .section-full.strip-section {
   padding-top: 88px;
   padding-bottom: 88px;
+  overflow: visible;
+  isolation: isolate;
 }
 
 .section-full.strip-section .showcase,
 .section-full .showcase {
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  margin-top: 28px;
-  overflow: visible;
-}
-
-.section-full.strip-section .showcase-panel-wrap,
-.section-full.strip-section .showcase-panel {
   height: auto;
-  min-height: 0;
-  overflow: visible;
-}
-
-.section-full.strip-section .panel-reveal {
-  overflow: hidden;
+  max-height: none;
+  margin-top: 28px;
 }
 
 .section-full.strip-section .section-outlink {
   margin-top: 28px;
   position: relative;
   z-index: 1;
+}
+
+.section-full.pillar-band {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
 }
 
 .section-full.land-cta {
@@ -8318,19 +8149,13 @@ html {
   }
 }
 
-/* =========================================================================
-   SHOWCASE LAYOUT FIX
-   Old horizontal panels used flex: 1 1 0. In the vertical accordion that
-   collapses every wrap to height 0, so content paints over the next section.
-   ========================================================================= */
+/* Final guard: showcase must stay a height-owning vertical grid accordion. */
 .landing .showcase,
 .section-full .showcase,
 .strip-section .showcase {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
   height: auto !important;
-  min-height: 0 !important;
   max-height: none !important;
   overflow: visible !important;
 }
@@ -8339,25 +8164,10 @@ html {
 .section-full .showcase-panel-wrap,
 .strip-section .showcase-panel-wrap {
   display: block !important;
-  flex: none !important;
-  flex-grow: 0 !important;
-  flex-shrink: 0 !important;
-  flex-basis: auto !important;
   width: 100% !important;
   height: auto !important;
-  min-height: 0 !important;
-  position: relative;
-  overflow: visible;
-}
-
-.landing .showcase-panel,
-.section-full .showcase-panel,
-.strip-section .showcase-panel {
-  display: block !important;
-  flex: none !important;
-  width: 100% !important;
-  height: auto !important;
-  overflow: visible;
+  min-height: auto !important;
+  overflow: visible !important;
 }
 
 .landing .showcase .panel-reveal,
@@ -8367,5 +8177,5 @@ html {
 
 .landing .showcase-panel.is-active .panel-reveal,
 .strip-section .showcase-panel.is-active .panel-reveal {
-  max-height: 640px;
+  max-height: 640px !important;
 }
