@@ -201,7 +201,7 @@ export default async function PublicProofPage({
                     </div>
                     <h3 className="entry-title">{entry.title}</h3>
                     {entry.body ? (
-                      <p className="entry-body">{entry.body}</p>
+                      <p className="entry-body entry-body-attest">{entry.body}</p>
                     ) : null}
                     <p className="entry-recorded muted">
                       Recorded {formatDateTime(entry.recorded_at)}
