@@ -114,11 +114,6 @@ export default async function Home() {
             <HeroProofMock />
           </AnimateIn>
         </div>
-
-        <div className="scroll-affordance" aria-hidden="true">
-          <span className="scroll-line" />
-          <span className="scroll-label">Scroll</span>
-        </div>
       </section>
 
       <hr className="rule-fade land-rule" />
