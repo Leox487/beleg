@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 
-import AnimateIn from "@/app/components/AnimateIn";
-
 const PANELS = [
   {
     id: "record",
@@ -159,7 +157,7 @@ export function Showcase() {
       {PANELS.map((panel, i) => {
         const isActive = i === active;
         return (
-          <AnimateIn key={panel.id} direction="up" delay={i * 150} className="showcase-panel-wrap">
+          <div key={panel.id} className="showcase-panel-wrap">
             <div
               className={`showcase-panel showcase-${panel.id} step-card${
                 isActive ? " is-active" : ""
@@ -182,7 +180,7 @@ export function Showcase() {
                 <div className="panel-mock">{MOCKS[i]}</div>
               </div>
             </div>
-          </AnimateIn>
+          </div>
         );
       })}
     </div>

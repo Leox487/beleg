@@ -8317,3 +8317,55 @@ html {
     scroll-behavior: auto;
   }
 }
+
+/* =========================================================================
+   SHOWCASE LAYOUT FIX
+   Old horizontal panels used flex: 1 1 0. In the vertical accordion that
+   collapses every wrap to height 0, so content paints over the next section.
+   ========================================================================= */
+.landing .showcase,
+.section-full .showcase,
+.strip-section .showcase {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.landing .showcase-panel-wrap,
+.section-full .showcase-panel-wrap,
+.strip-section .showcase-panel-wrap {
+  display: block !important;
+  flex: none !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+  flex-basis: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  position: relative;
+  overflow: visible;
+}
+
+.landing .showcase-panel,
+.section-full .showcase-panel,
+.strip-section .showcase-panel {
+  display: block !important;
+  flex: none !important;
+  width: 100% !important;
+  height: auto !important;
+  overflow: visible;
+}
+
+.landing .showcase .panel-reveal,
+.strip-section .showcase .panel-reveal {
+  overflow: hidden !important;
+}
+
+.landing .showcase-panel.is-active .panel-reveal,
+.strip-section .showcase-panel.is-active .panel-reveal {
+  max-height: 640px;
+}
