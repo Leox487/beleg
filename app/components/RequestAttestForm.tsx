@@ -3,12 +3,34 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { CopyText } from "@/app/components/CopyText";
-
 interface SentState {
   to: string;
-  emailed: boolean;
+  name: string;
+  emailSent: boolean;
   confirmUrl: string;
+}
+
+function CopyableLink({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <div className="attest-copy-field">
+      <code className="attest-copy-url mono">{value}</code>
+      <button type="button" className="btn btn-secondary btn-small" onClick={copy}>
+        {copied ? "Copied" : "Copy"}
+      </button>
+    </div>
+  );
 }
 
 export function RequestAttestForm({ entryId }: { entryId: string }) {
@@ -41,21 +63,24 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
     setSubmitting(true);
     setError(null);
 
+    const submittedEmail = email.trim();
+    const submittedName = name.trim();
+
     try {
       const res = await fetch("/api/attestations/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           entry_id: entryId,
-          attester_email: email.trim(),
-          attester_name: name.trim(),
+          attester_email: submittedEmail,
+          attester_name: submittedName,
           statement: statement.trim(),
         }),
       });
       const data = (await res.json()) as {
         url?: string;
         confirm_url?: string;
-        emailed?: boolean;
+        emailSent?: boolean;
         error?: string;
       };
       if (!res.ok || !data.url) {
@@ -63,8 +88,9 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
         return;
       }
       setSent({
-        to: email.trim(),
-        emailed: Boolean(data.emailed),
+        to: submittedEmail,
+        name: submittedName,
+        emailSent: Boolean(data.emailSent),
         confirmUrl: data.confirm_url ?? data.url,
       });
       setEmail("");
@@ -79,32 +105,36 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
   };
 
   if (sent) {
+    const who = sent.name || sent.to;
     return (
       <div className="attest-sent">
-        {sent.emailed ? (
+        {sent.emailSent ? (
           <>
             <p className="attest-sent-head">
               <span className="attest-sent-check" aria-hidden="true">
                 ✓
               </span>
-              Invitation sent to {sent.to}
+              Email sent
             </p>
             <p className="attest-sent-note">
-              They can confirm in one click — no account needed. You&apos;ll see
-              their confirmation appear in the chain once they do.
+              Email sent to {who} at {sent.to}. They&apos;ll receive a one-click
+              confirmation link. You can also copy the link below to send it
+              yourself.
             </p>
           </>
         ) : (
           <>
             <p className="attest-sent-head attest-sent-warn">
-              Request created, but the email didn&apos;t send.
+              We couldn&apos;t send the email automatically
             </p>
             <p className="attest-sent-note">
-              Send {sent.to} this link yourself — it works exactly the same.
+              Copy the link below and send it to {who} yourself.
             </p>
-            <CopyText value={sent.confirmUrl} />
           </>
         )}
+
+        <CopyableLink value={sent.confirmUrl} />
+
         <button
           type="button"
           className="btn btn-ghost btn-small"

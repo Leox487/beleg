@@ -7714,3 +7714,25 @@ select:focus {
   color: var(--text-3);
 }
 
+.attest-copy-field {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  margin: 4px 0 2px;
+}
+
+.attest-copy-url {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.4;
+  word-break: break-all;
+}
+
