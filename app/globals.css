@@ -7736,3 +7736,696 @@ select:focus {
   word-break: break-all;
 }
 
+
+/* =========================================================================
+   RESEND-STYLE POLISH + FULL-VIEWPORT LANDING
+   Appended last so these utilities win over earlier overrides.
+   ========================================================================= */
+
+/* --- A. Fading divider lines --- */
+.rule-fade {
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin: 0;
+  border: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border) 15%,
+    var(--border) 85%,
+    transparent 100%
+  );
+}
+
+.rule-fade-bright {
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin: 0;
+  border: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(45, 212, 160, 0.25) 50%,
+    transparent 100%
+  );
+}
+
+.eyebrow-rule {
+  max-width: 120px;
+  margin: 0 0 18px;
+}
+
+.land-rule {
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.chain-rule {
+  margin: 4px 0 18px;
+}
+
+/* Soften hard section borders into fading rules */
+.land-section,
+.strip-section,
+.voices-section,
+.pillar-band,
+.land-cta.land-band,
+.landing .land-band {
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
+.how-section,
+.doc-body h2,
+.doc-body h3,
+.glossary-item,
+.log-item,
+.acc,
+.site-footer-bottom {
+  border-image: none;
+}
+
+.glossary-item,
+.log-item {
+  border-top: none;
+  position: relative;
+}
+
+.glossary-item:not(:first-child)::before,
+.log-item:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border) 12%,
+    var(--border) 88%,
+    transparent 100%
+  );
+}
+
+/* --- B. Gradient borders on cards --- */
+.card-gradient {
+  position: relative;
+  background: var(--bg-raised);
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background-image:
+    linear-gradient(var(--bg-raised), var(--bg-raised)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.02) 40%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: none;
+  transition:
+    background-image 300ms ease,
+    transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 300ms ease;
+}
+
+.card-gradient:hover {
+  background-image:
+    linear-gradient(var(--bg-raised-2), var(--bg-raised-2)),
+    linear-gradient(
+      180deg,
+      rgba(45, 212, 160, 0.3) 0%,
+      rgba(255, 255, 255, 0.04) 45%,
+      rgba(255, 255, 255, 0) 100%
+    );
+}
+
+/* Apply gradient-border treatment site-wide to existing card surfaces */
+.card,
+.voice-card,
+.pillar-card,
+.entry-card,
+.venture-card,
+.attest-entry,
+.entry-empty,
+.verify-row,
+.uses-detail,
+.split-card,
+.how-lab-card,
+.acc,
+.hero-mock,
+.showcase-panel,
+.peace-card,
+.metric-card,
+.beat-stage,
+.lab-entry,
+.attest-sent,
+.anchor-proof,
+.doc-body.card {
+  border: 1px solid transparent;
+  background-image:
+    linear-gradient(var(--bg-raised), var(--bg-raised)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.02) 40%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: none;
+  transition:
+    background-image 300ms ease,
+    transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 300ms ease;
+}
+
+.card:hover,
+.voice-card:hover,
+.pillar-card:hover,
+.entry-card:hover,
+.venture-card:hover,
+.uses-detail:hover,
+.showcase-panel:hover,
+.peace-card:hover,
+.metric-card:hover,
+.hero-mock-wrap:hover .hero-mock {
+  background-image:
+    linear-gradient(var(--bg-raised-2), var(--bg-raised-2)),
+    linear-gradient(
+      180deg,
+      rgba(45, 212, 160, 0.3) 0%,
+      rgba(255, 255, 255, 0.04) 45%,
+      rgba(255, 255, 255, 0) 100%
+    );
+}
+
+/* --- C. Spotlight glows (three deliberate placements) --- */
+.spotlight {
+  position: relative;
+  isolation: isolate;
+}
+
+.spotlight::before {
+  content: "";
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1100px, 120%);
+  height: 560px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(45, 212, 160, 0.055) 0%,
+    rgba(45, 212, 160, 0.018) 40%,
+    transparent 72%
+  );
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.spotlight-hero::before {
+  top: -8%;
+  left: 72%;
+  width: min(900px, 90%);
+  height: 620px;
+  transform: translateX(-50%);
+}
+
+.spotlight-center::before {
+  top: 8%;
+  left: 50%;
+}
+
+.spotlight-cta::before {
+  top: auto;
+  bottom: -8%;
+  left: 50%;
+  height: 480px;
+}
+
+.verify-spotlight {
+  margin: 8px 0 24px;
+  padding: 8px 0;
+}
+
+/* --- D. Grain texture --- */
+body::after {
+  content: "";
+  display: block;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* --- E. Glow on interactive elements --- */
+.btn-primary,
+.cta,
+.navbar-signup {
+  box-shadow:
+    0 0 0 1px rgba(45, 212, 160, 0.35),
+    0 2px 12px rgba(45, 212, 160, 0.15) !important;
+}
+
+.btn-primary:hover:not(:disabled),
+.cta:hover,
+.navbar-signup:hover {
+  box-shadow:
+    0 0 0 1px rgba(45, 212, 160, 0.55),
+    0 4px 24px rgba(45, 212, 160, 0.28) !important;
+  filter: brightness(1.06);
+}
+
+.verify-ok,
+.verify-banner.verify-ok,
+.verify-success {
+  box-shadow:
+    0 0 0 1px rgba(45, 212, 160, 0.28),
+    0 0 28px rgba(45, 212, 160, 0.12);
+}
+
+.seal,
+.seal-ring,
+.hero-mock-seal,
+.bento-seal {
+  box-shadow: 0 0 0 1px rgba(45, 212, 160, 0.25), 0 0 18px rgba(45, 212, 160, 0.12);
+}
+
+.seal-ring::after,
+.seal.seal-ring {
+  box-shadow:
+    0 0 0 1px rgba(45, 212, 160, 0.35),
+    0 0 28px rgba(45, 212, 160, 0.22);
+}
+
+/* --- F. Typography refinement --- */
+body {
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--text-2);
+}
+
+.subline,
+.section-lead,
+.doc-lead,
+.lead {
+  font-size: 17px !important;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.section-heading,
+.h2,
+.how-title {
+  letter-spacing: -0.032em !important;
+}
+
+.section-eyebrow,
+.stage-eyebrow,
+.doc-eyebrow {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.section-eyebrow::before,
+.stage-eyebrow::before,
+.doc-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin-right: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  flex: none;
+}
+
+/* Kill the old hairline under eyebrows â€” bright rule replaces it */
+.section-eyebrow::after,
+.stage-eyebrow::after,
+.doc-eyebrow::after,
+.eyebrow::after {
+  display: none !important;
+}
+
+/* =========================================================================
+   FULL-VIEWPORT LANDING SECTIONS
+   ========================================================================= */
+
+html {
+  scroll-snap-type: y proximity;
+  scroll-behavior: smooth;
+}
+
+.landing {
+  padding: 0;
+}
+
+.section-full {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 88px 32px;
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+  max-width: none;
+  margin: 0;
+  width: 100%;
+}
+
+.section-full-inner,
+.section-full .land-band-inner,
+.section-full .stage-grid {
+  width: 100%;
+  max-width: 1140px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section-full.stage {
+  padding-top: 72px;
+  padding-bottom: 96px;
+}
+
+.section-full.voices-section {
+  text-align: left;
+}
+
+.section-full .voice-grid {
+  margin-top: 36px;
+}
+
+.section-full .bento {
+  margin-top: 36px;
+  grid-auto-rows: minmax(150px, auto);
+  gap: 14px;
+}
+
+.section-full .peace-card {
+  padding: 22px;
+}
+
+.section-full .showcase {
+  margin-top: 28px;
+}
+
+.section-full.strip-section .showcase {
+  min-height: 0;
+}
+
+.section-full .showcase-panel,
+.section-full .step-card {
+  min-height: 0;
+}
+
+.section-full.land-cta {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-radius: 0;
+  background: var(--bg-raised);
+  box-shadow: none;
+}
+
+.section-full.land-cta .section-heading,
+.section-full.land-cta .section-lead {
+  color: inherit;
+}
+
+.section-full.land-cta .section-heading {
+  color: var(--text);
+}
+
+.section-full.land-cta .section-lead {
+  color: var(--text-2);
+}
+
+/* Trust strip â€” single line on desktop */
+.trust-strip {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  margin-top: 28px;
+  padding: 0;
+  max-width: none;
+  width: auto;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  color: var(--text-3);
+}
+
+.trust-strip li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 20px;
+  white-space: nowrap;
+  border-left: 1px solid var(--border);
+}
+
+.trust-strip li:first-child {
+  padding-left: 0;
+  border-left: none;
+}
+
+.trust-dot {
+  width: 4px;
+  height: 4px;
+  margin-right: 8px;
+  background: var(--accent);
+}
+
+/* Scroll affordance */
+.scroll-affordance {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 2;
+}
+
+.scroll-line {
+  display: block;
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(180deg, var(--border) 0%, transparent 100%);
+  animation: scrollPulse 2.4s ease-in-out infinite;
+}
+
+.scroll-label {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+@keyframes scrollPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Proof page polish */
+.proof-page .certificate {
+  border: 1px solid transparent;
+  background-image:
+    linear-gradient(var(--bg-raised), var(--bg-raised)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.02) 35%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.proof-page .certificate-header {
+  margin-bottom: 28px;
+  padding-bottom: 8px;
+}
+
+.proof-page .verify-banner.verify-ok {
+  box-shadow:
+    0 0 0 1px rgba(45, 212, 160, 0.35),
+    0 0 36px rgba(45, 212, 160, 0.16);
+}
+
+.proof-page .chain {
+  gap: 0;
+}
+
+.proof-page .chain-entry-wrap {
+  display: block;
+}
+
+.proof-page .entry-card {
+  margin-bottom: 0;
+}
+
+.landing .site-footer {
+  scroll-snap-align: start;
+}
+
+@media (max-width: 640px) {
+  .trust-strip {
+    flex-wrap: wrap !important;
+    gap: 10px 0;
+  }
+
+  .trust-strip li {
+    border-left: none;
+    padding: 0 14px 0 0;
+  }
+
+  .trust-strip li:not(:last-child)::after {
+    content: "Â·";
+    margin-left: 14px;
+    color: var(--border-hover);
+  }
+}
+
+@media (max-height: 780px), (max-width: 860px) {
+  html {
+    scroll-snap-type: none;
+  }
+
+  .section-full {
+    min-height: auto;
+    padding: 64px 24px;
+  }
+
+  .section-full.stage {
+    padding-top: 48px;
+    padding-bottom: 72px;
+  }
+
+  .scroll-affordance {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-snap-type: none;
+    scroll-behavior: auto;
+  }
+
+  .scroll-line {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+/* Density tweaks so how-it-works fits a 900px viewport */
+@media (min-width: 861px) and (max-height: 960px) {
+  .section-full.strip-section {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+
+  .section-full .showcase {
+    height: min(460px, 52vh);
+  }
+
+  .section-full .mock {
+    transform: scale(0.92);
+    transform-origin: top center;
+  }
+
+  .section-full .section-lead {
+    margin-bottom: 8px;
+  }
+}
+
+@media (min-width: 861px) and (max-height: 900px) {
+  .section-full.voices-section .section-lead {
+    display: none;
+  }
+
+  .section-full .voice-quote {
+    font-size: 14px;
+  }
+
+  .section-full .bento {
+    grid-auto-rows: minmax(132px, auto);
+  }
+}
+
+
+/* How-it-works density: keep the section within one viewport when possible */
+.section-full.strip-section {
+  padding-top: 64px;
+  padding-bottom: 64px;
+  justify-content: center;
+}
+
+.section-full.strip-section .section-heading {
+  font-size: clamp(1.5rem, 2.6vw, 2rem) !important;
+  margin-bottom: 8px;
+}
+
+.section-full.strip-section .section-lead {
+  margin-bottom: 12px;
+  max-width: 54ch;
+}
+
+.section-full.strip-section .showcase {
+  height: min(420px, 48vh) !important;
+  min-height: 360px;
+  margin-top: 20px;
+}
+
+.section-full.strip-section .panel-text {
+  margin-bottom: 10px;
+  font-size: 13.5px;
+}
+
+.section-full.strip-section .section-outlink {
+  margin-top: 18px;
+}
+
+.section-full.voices-section .voice-card {
+  padding: 20px;
+}
+
+.section-full.voices-section .section-heading {
+  font-size: clamp(1.5rem, 2.8vw, 2.05rem) !important;
+}

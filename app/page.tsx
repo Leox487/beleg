@@ -58,11 +58,12 @@ export default async function Home() {
   return (
     <main className="landing">
       {/* ——— product-first hero ——— */}
-      <section className="stage">
+      <section className="section-full stage spotlight spotlight-hero">
         <div className="stage-grid">
           <div className="stage-copy">
             <AnimateIn direction="up" delay={0}>
               <p className="stage-eyebrow">Beleg</p>
+              <hr className="rule-fade-bright eyebrow-rule" />
 
               <h1 className="brand-tagline">
                 Proof and trust built into{" "}
@@ -113,49 +114,63 @@ export default async function Home() {
             <HeroProofMock />
           </AnimateIn>
         </div>
+
+        <div className="scroll-affordance" aria-hidden="true">
+          <span className="scroll-line" />
+          <span className="scroll-label">Scroll</span>
+        </div>
       </section>
+
+      <hr className="rule-fade land-rule" />
 
       {/* ——— human voices ——— */}
-      <section className="land-section voices-section">
-        <AnimateIn direction="up" delay={0}>
-          <p className="section-eyebrow">What it feels like</p>
-          <h2 className="section-heading">
-            Finally — a way to show what happened without hoping they believe
-            you.
-          </h2>
-          <p className="section-lead">
-            The voices Beleg is built for — not polished reviews, just the
-            situations people keep running into.
-          </p>
-        </AnimateIn>
+      <section className="section-full land-section voices-section">
+        <div className="section-full-inner">
+          <AnimateIn direction="up" delay={0}>
+            <p className="section-eyebrow">What it feels like</p>
+            <hr className="rule-fade-bright eyebrow-rule" />
+            <h2 className="section-heading">
+              Finally — a way to show what happened without hoping they believe
+              you.
+            </h2>
+            <p className="section-lead">
+              The voices Beleg is built for — not polished reviews, just the
+              situations people keep running into.
+            </p>
+          </AnimateIn>
 
-        <ul className="voice-grid">
-          {VOICES.map((v, i) => (
-            <li key={v.who}>
-              <AnimateIn direction="up" delay={i * 70}>
-                <div className="voice-card testimonial-card">
-                  <p className="voice-quote">&ldquo;{v.quote}&rdquo;</p>
-                  <div className="voice-meta">
-                    <span className="voice-avatar" aria-hidden="true">
-                      {v.who.charAt(0)}
-                    </span>
-                    <div>
-                      <p className="voice-who">{v.who}</p>
-                      <p className="voice-context">{v.context}</p>
+          <ul className="voice-grid">
+            {VOICES.map((v, i) => (
+              <li key={v.who}>
+                <AnimateIn direction="up" delay={i * 70}>
+                  <div className="voice-card testimonial-card card-gradient">
+                    <p className="voice-quote">&ldquo;{v.quote}&rdquo;</p>
+                    <hr className="rule-fade" />
+                    <div className="voice-meta">
+                      <span className="voice-avatar" aria-hidden="true">
+                        {v.who.charAt(0)}
+                      </span>
+                      <div>
+                        <p className="voice-who">{v.who}</p>
+                        <p className="voice-context">{v.context}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </AnimateIn>
-            </li>
-          ))}
-        </ul>
+                </AnimateIn>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
+      <hr className="rule-fade land-rule" />
+
       {/* ——— how it works ——— */}
-      <section className="strip-section land-band">
-        <div className="land-band-inner">
+      <section className="section-full strip-section land-band spotlight spotlight-center">
+        <div className="land-band-inner section-full-inner">
           <AnimateIn direction="up">
             <p className="section-eyebrow">How it works</p>
+            <hr className="rule-fade-bright eyebrow-rule" />
             <h2 className="section-heading">
               Record it. Get it witnessed. Share the proof.
             </h2>
@@ -169,7 +184,10 @@ export default async function Home() {
 
           <AnimateIn direction="up" delay={70}>
             <p className="section-outlink">
-              <Link className="ghost-link ghost-link-accent" href="/how-it-works">
+              <Link
+                className="ghost-link ghost-link-accent"
+                href="/how-it-works"
+              >
                 See the cryptography in detail →
               </Link>
             </p>
@@ -177,87 +195,95 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ——— peace of mind as bento ——— */}
-      <section className="land-section pillar-band">
-        <AnimateIn direction="up">
-          <p className="section-eyebrow">Peace of mind</p>
-          <h2 className="section-heading">
-            More clarity. Less asking people to take your word for it.
-          </h2>
-        </AnimateIn>
+      <hr className="rule-fade land-rule" />
 
-        <ul className="bento">
-          {PILLARS.map((item, i) => (
-            <li
-              key={item.title}
-              className={item.flagship ? "bento-flagship" : "bento-tile"}
-            >
-              <AnimateIn direction="up" delay={i * 70}>
-                <div className="pillar-card peace-card">
-                  {item.flagship ? (
-                    <div className="bento-mini" aria-hidden="true">
-                      <div className="bento-mini-chain">
-                        <span className="bento-mini-row">
-                          <span className="bento-mini-seq">#01</span>
-                          <span className="bento-mini-hash">
-                            a3f81c94b7d0e29b…
+      {/* ——— peace of mind as bento ——— */}
+      <section className="section-full land-section pillar-band">
+        <div className="section-full-inner">
+          <AnimateIn direction="up">
+            <p className="section-eyebrow">Peace of mind</p>
+            <hr className="rule-fade-bright eyebrow-rule" />
+            <h2 className="section-heading">
+              More clarity. Less asking people to take your word for it.
+            </h2>
+          </AnimateIn>
+
+          <ul className="bento">
+            {PILLARS.map((item, i) => (
+              <li
+                key={item.title}
+                className={item.flagship ? "bento-flagship" : "bento-tile"}
+              >
+                <AnimateIn direction="up" delay={i * 70}>
+                  <div className="pillar-card peace-card card-gradient">
+                    {item.flagship ? (
+                      <div className="bento-mini" aria-hidden="true">
+                        <div className="bento-mini-chain">
+                          <span className="bento-mini-row">
+                            <span className="bento-mini-seq">#01</span>
+                            <span className="bento-mini-hash">
+                              a3f81c94b7d0e29b…
+                            </span>
                           </span>
-                        </span>
-                        <span className="bento-mini-row">
-                          <span className="bento-mini-seq">#02</span>
-                          <span className="bento-mini-hash">
-                            7b02e9f3314fc118…
+                          <span className="bento-mini-row">
+                            <span className="bento-mini-seq">#02</span>
+                            <span className="bento-mini-hash">
+                              7b02e9f3314fc118…
+                            </span>
                           </span>
-                        </span>
-                        <span className="bento-mini-row">
-                          <span className="bento-mini-seq">#03</span>
-                          <span className="bento-mini-hash">
-                            c14d6a2e8099e07f…
+                          <span className="bento-mini-row">
+                            <span className="bento-mini-seq">#03</span>
+                            <span className="bento-mini-hash">
+                              c14d6a2e8099e07f…
+                            </span>
                           </span>
-                        </span>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <span className="bento-seal" aria-hidden="true">
-                      ✓
-                    </span>
-                  )}
-                  <h3 className="pillar-title">{item.title}</h3>
-                  <p className="pillar-text">{item.text}</p>
+                    ) : (
+                      <span className="bento-seal" aria-hidden="true">
+                        ✓
+                      </span>
+                    )}
+                    <h3 className="pillar-title">{item.title}</h3>
+                    <p className="pillar-text">{item.text}</p>
+                  </div>
+                </AnimateIn>
+              </li>
+            ))}
+
+            <li className="bento-metric">
+              <AnimateIn direction="up" delay={210}>
+                <div className="pillar-card peace-card metric-card card-gradient">
+                  <p className="metric-value mono">SHA-256</p>
+                  <p className="metric-label">
+                    the standard your browser already uses
+                  </p>
                 </div>
               </AnimateIn>
             </li>
-          ))}
 
-          <li className="bento-metric">
-            <AnimateIn direction="up" delay={210}>
-              <div className="pillar-card peace-card metric-card">
-                <p className="metric-value mono">SHA-256</p>
-                <p className="metric-label">
-                  the standard your browser already uses
-                </p>
-              </div>
-            </AnimateIn>
-          </li>
-
-          <li className="bento-metric">
-            <AnimateIn direction="up" delay={280}>
-              <div className="pillar-card peace-card metric-card">
-                <p className="metric-value mono">0</p>
-                <p className="metric-label">
-                  entries that can be edited after recording
-                </p>
-              </div>
-            </AnimateIn>
-          </li>
-        </ul>
+            <li className="bento-metric">
+              <AnimateIn direction="up" delay={280}>
+                <div className="pillar-card peace-card metric-card card-gradient">
+                  <p className="metric-value mono">0</p>
+                  <p className="metric-label">
+                    entries that can be edited after recording
+                  </p>
+                </div>
+              </AnimateIn>
+            </li>
+          </ul>
+        </div>
       </section>
 
+      <hr className="rule-fade land-rule" />
+
       {/* ——— closing CTA ——— */}
-      <section className="land-section land-cta land-band">
-        <div className="land-band-inner land-cta-inner">
+      <section className="section-full land-section land-cta land-band spotlight spotlight-cta">
+        <div className="land-band-inner land-cta-inner section-full-inner">
           <AnimateIn direction="up">
             <p className="section-eyebrow">Get started</p>
+            <hr className="rule-fade-bright eyebrow-rule" />
             <h2 className="section-heading">Start sealing what you ship.</h2>
             <p className="section-lead">
               Free while in beta. No credit card. Your first entry takes about a

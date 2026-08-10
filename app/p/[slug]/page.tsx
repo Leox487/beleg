@@ -92,8 +92,8 @@ export default async function PublicProofPage({
           not control what you&apos;re about to verify.
         </p>
 
-        <header className="ledger-header certificate-header">
-          <Seal size="lg" label="Sealed record" />
+        <header className="ledger-header certificate-header spotlight spotlight-center">
+          <Seal size="lg" ring label="Sealed record" />
           <h1 className="page-title certificate-title">{venture.name}</h1>
           {venture.tagline ? (
             <p className="ledger-tagline">{venture.tagline}</p>
@@ -107,8 +107,10 @@ export default async function PublicProofPage({
           </p>
         </header>
 
+        <hr className="rule-fade" />
+
         {confirmedAnchor ? (
-          <section className="anchor-proof anchor-proof-confirmed">
+          <section className="anchor-proof anchor-proof-confirmed card-gradient">
             <span
               className="anchor-glyph anchor-pulse seal seal-gold seal-lg"
               aria-hidden="true"
@@ -150,7 +152,7 @@ export default async function PublicProofPage({
             </div>
           </section>
         ) : pendingAnchor ? (
-          <section className="anchor-proof anchor-proof-pending">
+          <section className="anchor-proof anchor-proof-pending card-gradient">
             <span className="anchor-glyph seal seal-gold seal-lg" aria-hidden="true">
               ◐
             </span>
@@ -174,65 +176,71 @@ export default async function PublicProofPage({
           </section>
         ) : null}
 
-        <VerifyChain entries={entries} />
+        <hr className="rule-fade" />
+
+        <div className="spotlight spotlight-center verify-spotlight">
+          <VerifyChain entries={entries} />
+        </div>
+
+        <hr className="rule-fade" />
 
         {entries.length === 0 ? (
           <p className="muted empty-chain">This ledger has no entries yet.</p>
         ) : (
           <div className="chain">
-            {entries.map((entry) =>
-              entry.kind === "attestation" ? (
-                <article
-                  key={entry.id}
-                  className="entry-card entry-attestation attest-confirmed"
-                >
-                  <div className="entry-top">
-                    <span className="entry-seq">#{entry.seq}</span>
-                    <span className="badge badge-attestation">
-                      ✓ attestation
-                    </span>
-                  </div>
-                  <h3 className="entry-title">{entry.title}</h3>
-                  {entry.body ? (
-                    <p className="entry-body">{entry.body}</p>
-                  ) : null}
-                  <p className="entry-recorded muted">
-                    Recorded {formatDateTime(entry.recorded_at)}
-                  </p>
-                  <p className="seal-line">
-                    <span className="seal-label">SEAL</span>
-                    <span className="seal-hash">
-                      {entry.chain_hash.slice(0, 24)}…
-                    </span>
-                  </p>
-                </article>
-              ) : (
-                <article key={entry.id} className="entry-card">
-                  <div className="entry-top">
-                    <span className="entry-seq">#{entry.seq}</span>
-                    <span className="badge">{entry.kind}</span>
-                  </div>
-                  <h3 className="entry-title">{entry.title}</h3>
-                  {entry.body ? (
-                    <p className="entry-body">{entry.body}</p>
-                  ) : null}
-                  {entry.occurred_at ? (
-                    <p className="entry-occurred">
-                      Occurred {formatDate(entry.occurred_at)}
+            {entries.map((entry, i) => (
+              <div key={entry.id} className="chain-entry-wrap">
+                {i > 0 ? <hr className="rule-fade chain-rule" /> : null}
+                {entry.kind === "attestation" ? (
+                  <article className="entry-card entry-attestation attest-confirmed card-gradient">
+                    <div className="entry-top">
+                      <span className="entry-seq">#{entry.seq}</span>
+                      <span className="badge badge-attestation">
+                        ✓ attestation
+                      </span>
+                    </div>
+                    <h3 className="entry-title">{entry.title}</h3>
+                    {entry.body ? (
+                      <p className="entry-body">{entry.body}</p>
+                    ) : null}
+                    <p className="entry-recorded muted">
+                      Recorded {formatDateTime(entry.recorded_at)}
                     </p>
-                  ) : null}
-                  <p className="entry-recorded muted">
-                    Recorded {formatDateTime(entry.recorded_at)}
-                  </p>
-                  <p className="seal-line">
-                    <span className="seal-label">SEAL</span>
-                    <span className="seal-hash">
-                      {entry.chain_hash.slice(0, 24)}…
-                    </span>
-                  </p>
-                </article>
-              ),
-            )}
+                    <p className="seal-line">
+                      <span className="seal-label">SEAL</span>
+                      <span className="seal-hash">
+                        {entry.chain_hash.slice(0, 24)}…
+                      </span>
+                    </p>
+                  </article>
+                ) : (
+                  <article className="entry-card card-gradient">
+                    <div className="entry-top">
+                      <span className="entry-seq">#{entry.seq}</span>
+                      <span className="badge">{entry.kind}</span>
+                    </div>
+                    <h3 className="entry-title">{entry.title}</h3>
+                    {entry.body ? (
+                      <p className="entry-body">{entry.body}</p>
+                    ) : null}
+                    {entry.occurred_at ? (
+                      <p className="entry-occurred">
+                        Occurred {formatDate(entry.occurred_at)}
+                      </p>
+                    ) : null}
+                    <p className="entry-recorded muted">
+                      Recorded {formatDateTime(entry.recorded_at)}
+                    </p>
+                    <p className="seal-line">
+                      <span className="seal-label">SEAL</span>
+                      <span className="seal-hash">
+                        {entry.chain_hash.slice(0, 24)}…
+                      </span>
+                    </p>
+                  </article>
+                )}
+              </div>
+            ))}
           </div>
         )}
 
