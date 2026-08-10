@@ -33,7 +33,7 @@ export default async function AttestPage({
   const { data: attestationData } = await supabase
     .from("attestations")
     .select(
-      "id, venture_id, entry_id, attester_email, attester_name, statement, token, status, requested_at, confirmed_at",
+      "id, venture_id, entry_id, attester_email, attester_name, statement, attester_note, token, status, requested_at, confirmed_at",
     )
     .eq("token", token)
     .maybeSingle();
@@ -66,6 +66,12 @@ export default async function AttestPage({
               : ""}
             . Nothing more to do — thanks.
           </p>
+          {attestation.attester_note ? (
+            <div className="attest-statement">
+              <span className="field-label">Details you added:</span>
+              <blockquote>{attestation.attester_note}</blockquote>
+            </div>
+          ) : null}
         </div>
       </main>
     );

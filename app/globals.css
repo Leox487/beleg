@@ -3614,6 +3614,73 @@ a {
   color: var(--success);
 }
 
+.attest-form {
+  margin-top: 8px;
+}
+
+.attest-tabs {
+  display: flex;
+  gap: 0;
+  margin: 0 0 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.attest-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  margin: 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  color: var(--text-3, var(--muted));
+  font: inherit;
+  font-size: 14px;
+  font-weight: 550;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+
+.attest-tab:hover {
+  color: var(--text-2, var(--ink-soft));
+}
+
+.attest-tab.is-active {
+  color: var(--text, var(--ink));
+  border-bottom-color: var(--accent, var(--brand));
+}
+
+.attest-tab-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent, var(--brand));
+}
+
+.attest-tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.attest-tab-panel .field-group {
+  margin-bottom: 0;
+}
+
+.attest-tab-panel .textarea {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.entry-body-attest {
+  white-space: pre-wrap;
+}
+
 /* --- empty states & stranger-facing framing --- */
 .entry-empty {
   margin: 24px 0;

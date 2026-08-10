@@ -26,6 +26,15 @@ export async function POST(req: Request) {
   const attesterNameRaw = asTrimmedString(body.attester_name);
   const attesterName = attesterNameRaw.length > 0 ? attesterNameRaw : null;
 
+  const attesterNoteRaw = asTrimmedString(body.attester_note);
+  if (attesterNoteRaw.length > 2000) {
+    return NextResponse.json(
+      { error: "Details must be 2,000 characters or fewer." },
+      { status: 400 },
+    );
+  }
+  const attesterNote = attesterNoteRaw.length > 0 ? attesterNoteRaw : null;
+
   const supabase = createSupabaseServiceRoleClient();
 
   const { data: attestation, error: lookupError } = await supabase
@@ -64,10 +73,11 @@ export async function POST(req: Request) {
       status: "confirmed",
       confirmed_at: new Date().toISOString(),
       attester_name: attesterName,
+      attester_note: attesterNote,
     })
     .eq("token", token)
     .eq("status", "pending")
-    .select("id, confirmed_at, attester_name")
+    .select("id, confirmed_at, attester_name, attester_note")
     .maybeSingle();
 
   if (updateError) {
@@ -106,11 +116,18 @@ export async function POST(req: Request) {
       }
     }
 
-    const body =
-      `Attests to entry #${attestedSeq ?? "?"}: "${attestedTitle}" — ` +
-      `Statement: "${attestation.statement}" — ` +
-      `Attester: ${nameForCredit} <${attestation.attester_email}> — ` +
-      `Confirmed via attestation link.`;
+    const bodyParts = [
+      `Attests to entry #${attestedSeq ?? "?"}: "${attestedTitle}"`,
+      `Statement confirmed: "${attestation.statement}"`,
+    ];
+    if (updated.attester_note) {
+      bodyParts.push(`Attester details: "${updated.attester_note}"`);
+    }
+    bodyParts.push(
+      `Attester: ${nameForCredit} <${attestation.attester_email}>`,
+      "Confirmed via attestation link.",
+    );
+    const body = bodyParts.join("\n");
 
     const sealed = await appendEntry({
       venture_id: attestation.venture_id,

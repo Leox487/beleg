@@ -28,6 +28,8 @@ export interface Attestation {
   attester_email: string;
   attester_name: string | null;
   statement: string;
+  /** Optional facts/details the attester added when confirming. */
+  attester_note: string | null;
   token: string;
   status: string;
   requested_at: string;

@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+type Tab = "confirm" | "other";
+
 export function AttestForm({
   token,
   initialName,
@@ -11,7 +13,9 @@ export function AttestForm({
   initialName: string;
 }) {
   const router = useRouter();
+  const [tab, setTab] = useState<Tab>("confirm");
   const [name, setName] = useState(initialName);
+  const [note, setNote] = useState("");
   const [confirmed, setConfirmed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +27,14 @@ export function AttestForm({
 
     if (!confirmed) {
       setError("Please check the confirmation box.");
+      setTab("confirm");
+      return;
+    }
+
+    const trimmedNote = note.trim();
+    if (trimmedNote.length > 2000) {
+      setError("Details must be 2,000 characters or fewer.");
+      setTab("other");
       return;
     }
 
@@ -33,7 +45,11 @@ export function AttestForm({
       const res = await fetch("/api/attestations/confirm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, attester_name: name.trim() }),
+        body: JSON.stringify({
+          token,
+          attester_name: name.trim(),
+          attester_note: trimmedNote || undefined,
+        }),
       });
       const data = (await res.json()) as { success?: boolean; error?: string };
       if (!res.ok || !data.success) {
@@ -58,29 +74,95 @@ export function AttestForm({
   }
 
   return (
-    <form className="venture-form" onSubmit={onSubmit}>
-      <div className="field-group">
-        <label className="field-label" htmlFor="attester-name">
-          Your name
-        </label>
-        <input
-          id="attester-name"
-          type="text"
-          className="text-input"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="How you'd like to be credited"
-        />
+    <form className="venture-form attest-form" onSubmit={onSubmit}>
+      <div className="attest-tabs" role="tablist" aria-label="Confirmation steps">
+        <button
+          type="button"
+          role="tab"
+          id="attest-tab-confirm"
+          aria-selected={tab === "confirm"}
+          aria-controls="attest-panel-confirm"
+          className={`attest-tab${tab === "confirm" ? " is-active" : ""}`}
+          onClick={() => setTab("confirm")}
+        >
+          Confirm
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="attest-tab-other"
+          aria-selected={tab === "other"}
+          aria-controls="attest-panel-other"
+          className={`attest-tab${tab === "other" ? " is-active" : ""}`}
+          onClick={() => setTab("other")}
+        >
+          Other
+          {note.trim() ? <span className="attest-tab-dot" aria-hidden="true" /> : null}
+        </button>
       </div>
 
-      <label className="check-inline">
-        <input
-          type="checkbox"
-          checked={confirmed}
-          onChange={(e) => setConfirmed(e.target.checked)}
-        />
-        <span>I confirm this is accurate to the best of my knowledge.</span>
-      </label>
+      {tab === "confirm" ? (
+        <div
+          className="attest-tab-panel"
+          role="tabpanel"
+          id="attest-panel-confirm"
+          aria-labelledby="attest-tab-confirm"
+        >
+          <div className="field-group">
+            <label className="field-label" htmlFor="attester-name">
+              Your name
+            </label>
+            <input
+              id="attester-name"
+              type="text"
+              className="text-input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="How you'd like to be credited"
+            />
+          </div>
+
+          <label className="check-inline">
+            <input
+              type="checkbox"
+              checked={confirmed}
+              onChange={(e) => setConfirmed(e.target.checked)}
+            />
+            <span>I confirm this is accurate to the best of my knowledge.</span>
+          </label>
+
+          <p className="field-help">
+            Switch to Other if you want to add facts or context about what
+            actually happened — those details are sealed into the same record.
+          </p>
+        </div>
+      ) : (
+        <div
+          className="attest-tab-panel"
+          role="tabpanel"
+          id="attest-panel-other"
+          aria-labelledby="attest-tab-other"
+        >
+          <div className="field-group">
+            <label className="field-label" htmlFor="attester-note">
+              Your details
+            </label>
+            <textarea
+              id="attester-note"
+              className="text-input textarea"
+              rows={6}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="What did you actually see or know? Dates, amounts, roles, outcomes — anything a reviewer should be able to check against your word."
+              maxLength={2000}
+            />
+            <p className="field-help">
+              Optional, but useful. This becomes part of the public sealed
+              record with your name. {note.trim().length}/2000
+            </p>
+          </div>
+        </div>
+      )}
 
       {error ? <p className="form-error">{error}</p> : null}
 

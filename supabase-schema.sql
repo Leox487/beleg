@@ -33,6 +33,7 @@ create table if not exists public.attestations (
   attester_email text not null,
   attester_name text,
   statement text not null,
+  attester_note text,
   token text not null unique,
   status text not null default 'pending',
   requested_at timestamptz not null default now(),
