@@ -48,7 +48,7 @@ export async function sendAttestationEmail({
     from:
       process.env.RESEND_FROM_EMAIL ||
       process.env.EMAIL_FROM ||
-      "Beleg <onboarding@resend.dev>",
+      "Beleg <notifications@belegapp.com>",
     to,
     subject: `${founderName} is asking you to confirm something on Beleg`,
     html: `
