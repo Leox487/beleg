@@ -50,6 +50,7 @@ export async function sendAttestationEmail({
       process.env.EMAIL_FROM ||
       "Beleg <notifications@belegapp.com>",
     to,
+    replyTo: "beleg.app@proton.me",
     subject: `${founderName} is asking you to confirm something on Beleg`,
     html: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 0;">
