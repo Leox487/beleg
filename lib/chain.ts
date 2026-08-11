@@ -1,13 +1,14 @@
 import "server-only";
 
-import { createSupabaseServiceRoleClient } from "@/lib/supabase";
+import sql from "./supabase";
 import {
   GENESIS_HASH,
   chainHash,
   contentHash,
   type EntryContent,
-} from "@/lib/hash";
-import type { Entry } from "@/lib/types";
+} from "./hash";
+import { mapEntry } from "./row";
+import type { Entry } from "./types";
 
 export interface AppendEntryInput {
   venture_id: string;
@@ -17,8 +18,7 @@ export interface AppendEntryInput {
   occurred_at: string | null;
 }
 
-const MAX_ATTEMPTS = 3;
-const UNIQUE_VIOLATION = "23505";
+const MAX_RETRIES = 3;
 
 /**
  * The single code path that appends an entry to a venture's hash chain.
@@ -27,88 +27,62 @@ const UNIQUE_VIOLATION = "23505";
  * stamps recorded_at server-side, computes content_hash and chain_hash via
  * lib/hash.ts, and inserts with seq = last + 1. On a unique-constraint
  * violation of (venture_id, seq) — a concurrent append race — it re-reads the
- * tip and retries up to MAX_ATTEMPTS times.
+ * tip and retries up to MAX_RETRIES times.
  *
  * Caller is responsible for authorization (verifying the venture belongs to
  * the requester) before calling this.
  */
 export async function appendEntry(input: AppendEntryInput): Promise<Entry> {
-  const supabase = createSupabaseServiceRoleClient();
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    const tip = await sql`
+      SELECT seq, chain_hash FROM entries
+      WHERE venture_id = ${input.venture_id}
+      ORDER BY seq DESC LIMIT 1
+    `;
 
-  let lastError: unknown = null;
+    const lastSeq = (tip[0]?.seq as number | undefined) ?? 0;
+    const prevChainHash =
+      (tip[0]?.chain_hash as string | undefined) ?? GENESIS_HASH;
+    const recorded_at = new Date().toISOString();
 
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    // Fetch the current chain tip: highest seq and its chain_hash.
-    const { data: lastEntry, error: lastError2 } = await supabase
-      .from("entries")
-      .select("seq, chain_hash")
-      .eq("venture_id", input.venture_id)
-      .order("seq", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (lastError2) {
-      throw new Error(`Failed to load chain tip: ${lastError2.message}`);
-    }
-
-    const prevHash = lastEntry?.chain_hash ?? GENESIS_HASH;
-    const seq = (lastEntry?.seq ?? 0) + 1;
-
-    // recorded_at is set server-side, never trusted from the client.
-    const recordedAt = new Date().toISOString();
-
-    const content: EntryContent = {
+    const entry: EntryContent = {
       venture_id: input.venture_id,
-      seq,
+      seq: lastSeq + 1,
       kind: input.kind,
       title: input.title,
       body: input.body,
       occurred_at: input.occurred_at,
-      recorded_at: recordedAt,
+      recorded_at,
     };
 
-    const contentHashHex = contentHash(content);
-    const chainHashHex = chainHash(prevHash, contentHashHex);
+    const cHash = contentHash(entry);
+    const chHash = chainHash(prevChainHash, cHash);
 
-    const { data: inserted, error: insertError } = await supabase
-      .from("entries")
-      .insert({
-        venture_id: input.venture_id,
-        seq,
-        kind: input.kind,
-        title: input.title,
-        body: input.body,
-        occurred_at: input.occurred_at,
-        recorded_at: recordedAt,
-        content_hash: contentHashHex,
-        prev_hash: prevHash,
-        chain_hash: chainHashHex,
-      })
-      .select(
-        "id, venture_id, seq, kind, title, body, occurred_at, recorded_at, content_hash, prev_hash, chain_hash",
-      )
-      .single();
-
-    if (!insertError && inserted) {
-      return inserted as Entry;
+    try {
+      const rows = await sql`
+        INSERT INTO entries (
+          venture_id, seq, kind, title, body, occurred_at, recorded_at,
+          content_hash, prev_hash, chain_hash
+        )
+        VALUES (
+          ${input.venture_id}, ${lastSeq + 1}, ${input.kind}, ${input.title},
+          ${input.body}, ${input.occurred_at}, ${recorded_at},
+          ${cHash}, ${prevChainHash}, ${chHash}
+        )
+        RETURNING
+          id, venture_id, seq, kind, title, body, occurred_at, recorded_at,
+          content_hash, prev_hash, chain_hash
+      `;
+      return mapEntry(rows[0] as Record<string, unknown>);
+    } catch (e: unknown) {
+      const code =
+        typeof e === "object" && e && "code" in e
+          ? String((e as { code: unknown }).code)
+          : "";
+      if (code === "23505" && attempt < MAX_RETRIES - 1) continue;
+      throw e;
     }
-
-    lastError = insertError;
-
-    // Concurrent append grabbed our seq — re-read the tip and retry.
-    if (insertError && insertError.code === UNIQUE_VIOLATION) {
-      continue;
-    }
-
-    // Any other error is not retryable.
-    throw new Error(
-      `Failed to append entry: ${insertError?.message ?? "unknown error"}`,
-    );
   }
 
-  throw new Error(
-    `Failed to append entry after ${MAX_ATTEMPTS} attempts (seq contention): ${
-      lastError instanceof Error ? lastError.message : String(lastError)
-    }`,
-  );
+  throw new Error("Failed to append entry after max retries");
 }

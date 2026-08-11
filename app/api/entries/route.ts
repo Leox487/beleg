@@ -1,8 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import { appendEntry } from "@/lib/chain";
+import sql from "@/lib/supabase";
 
 type Body = Record<string, unknown>;
 
@@ -76,22 +76,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid kind" }, { status: 400 });
   }
 
-  const supabase = createSupabaseServiceRoleClient();
-
   // Verify the venture exists and belongs to the authenticated user.
-  const { data: venture, error: ventureError } = await supabase
-    .from("ventures")
-    .select("id, clerk_user_id")
-    .eq("id", ventureId)
-    .maybeSingle();
+  const ventures = await sql`
+    SELECT id, clerk_user_id FROM ventures
+    WHERE id = ${ventureId}
+    LIMIT 1
+  `;
+  const venture = ventures[0] as
+    | { id: string; clerk_user_id: string }
+    | undefined;
 
-  if (ventureError) {
-    console.error("Venture lookup error:", ventureError);
-    return NextResponse.json(
-      { error: "Failed to load venture" },
-      { status: 500 },
-    );
-  }
   if (!venture || venture.clerk_user_id !== userId) {
     // Do not leak existence of other users' ventures.
     return NextResponse.json({ error: "Venture not found" }, { status: 404 });

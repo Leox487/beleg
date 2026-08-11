@@ -4,7 +4,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { sendAttestationEmail } from "@/lib/email";
-import { createSupabaseServiceRoleClient } from "@/lib/supabase";
+import sql from "@/lib/supabase";
 
 type Body = Record<string, unknown>;
 
@@ -76,38 +76,28 @@ export async function POST(req: Request) {
     );
   }
 
-  const supabase = createSupabaseServiceRoleClient();
+  const entryRows = await sql`
+    SELECT id, venture_id, title FROM entries
+    WHERE id = ${entryId}
+    LIMIT 1
+  `;
+  const entry = entryRows[0] as
+    | { id: string; venture_id: string; title: string }
+    | undefined;
 
-  const { data: entry, error: entryError } = await supabase
-    .from("entries")
-    .select("id, venture_id, title")
-    .eq("id", entryId)
-    .maybeSingle();
-
-  if (entryError) {
-    console.error("Entry lookup error:", entryError);
-    return NextResponse.json(
-      { error: "Failed to load entry" },
-      { status: 500 },
-    );
-  }
   if (!entry) {
     return NextResponse.json({ error: "Entry not found" }, { status: 404 });
   }
 
-  const { data: venture, error: ventureError } = await supabase
-    .from("ventures")
-    .select("id, clerk_user_id, name")
-    .eq("id", entry.venture_id)
-    .maybeSingle();
+  const ventureRows = await sql`
+    SELECT id, clerk_user_id, name FROM ventures
+    WHERE id = ${entry.venture_id}
+    LIMIT 1
+  `;
+  const venture = ventureRows[0] as
+    | { id: string; clerk_user_id: string; name: string }
+    | undefined;
 
-  if (ventureError) {
-    console.error("Venture lookup error:", ventureError);
-    return NextResponse.json(
-      { error: "Failed to load venture" },
-      { status: 500 },
-    );
-  }
   if (!venture || venture.clerk_user_id !== userId) {
     // Don't leak existence of other users' entries.
     return NextResponse.json({ error: "Entry not found" }, { status: 404 });
@@ -115,22 +105,21 @@ export async function POST(req: Request) {
 
   const token = makeToken();
 
-  const { data: inserted, error: insertError } = await supabase
-    .from("attestations")
-    .insert({
-      venture_id: venture.id,
-      entry_id: entry.id,
-      attester_email: attesterEmail,
-      attester_name: attesterName,
-      statement,
-      token,
-      status: "pending",
-    })
-    .select("token")
-    .single();
-
-  if (insertError || !inserted) {
-    console.error("Attestation insert error:", insertError);
+  let inserted: { token: string };
+  try {
+    const rows = await sql`
+      INSERT INTO attestations (
+        venture_id, entry_id, attester_email, attester_name, statement, token, status
+      )
+      VALUES (
+        ${venture.id}, ${entry.id}, ${attesterEmail}, ${attesterName},
+        ${statement}, ${token}, 'pending'
+      )
+      RETURNING token
+    `;
+    inserted = rows[0] as { token: string };
+  } catch (e) {
+    console.error("Attestation insert error:", e);
     return NextResponse.json(
       { error: "Failed to create attestation request" },
       { status: 500 },
@@ -145,7 +134,7 @@ export async function POST(req: Request) {
   const founderName =
     [requester?.firstName, requester?.lastName].filter(Boolean).join(" ") ||
     requester?.username ||
-    (venture.name as string);
+    venture.name;
 
   let emailSent = false;
   try {
@@ -153,8 +142,8 @@ export async function POST(req: Request) {
       to: attesterEmail,
       attesterName: attesterName ?? "",
       founderName,
-      ventureName: venture.name as string,
-      entryTitle: entry.title as string,
+      ventureName: venture.name,
+      entryTitle: entry.title,
       statement,
       attestUrl,
     });

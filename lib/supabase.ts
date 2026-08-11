@@ -1,25 +1,13 @@
 import "server-only";
+import postgres from "postgres";
 
-import { createClient } from "@supabase/supabase-js";
+const connectionString = process.env.DATABASE_URL!;
 
-/**
- * Supabase client with the service role key. Server-only — never import from Client Components.
- * Uses NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.
- */
-export function createSupabaseServiceRoleClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const sql = postgres(connectionString, {
+  ssl: "require",
+  max: 10,
+  idle_timeout: 20,
+  connect_timeout: 10,
+});
 
-  if (!url || !serviceRoleKey) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY",
-    );
-  }
-
-  return createClient(url, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
+export default sql;

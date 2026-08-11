@@ -1,4 +1,5 @@
-import { createSupabaseServiceRoleClient } from "@/lib/supabase";
+import { mapEntry, mapVenture } from "@/lib/row";
+import sql from "@/lib/supabase";
 import type { Entry, Venture } from "@/lib/types";
 
 // PUBLIC, read-only. Returns exactly the data the proof page at /p/[slug]
@@ -10,40 +11,31 @@ export async function GET(
 ) {
   const { slug } = await params;
 
-  const supabase = createSupabaseServiceRoleClient();
+  const ventureRows = await sql`
+    SELECT id, clerk_user_id, name, slug, tagline, created_at
+    FROM ventures
+    WHERE slug = ${slug}
+    LIMIT 1
+  `;
 
-  const { data: ventureData, error: ventureError } = await supabase
-    .from("ventures")
-    .select("id, name, slug, tagline, created_at")
-    .eq("slug", slug)
-    .maybeSingle();
-
-  if (ventureError) {
-    console.error("Public venture lookup error:", ventureError);
-    return Response.json({ error: "Failed to load ledger" }, { status: 500 });
-  }
-
-  const venture = ventureData as Pick<
-    Venture,
-    "id" | "name" | "slug" | "tagline" | "created_at"
-  > | null;
-
-  if (!venture) {
+  if (!ventureRows[0]) {
     return Response.json({ error: "Ledger not found" }, { status: 404 });
   }
 
-  const { data: entriesData, error: entriesError } = await supabase
-    .from("entries")
-    .select(
-      "id, venture_id, seq, kind, title, body, occurred_at, recorded_at, content_hash, prev_hash, chain_hash",
-    )
-    .eq("venture_id", venture.id)
-    .order("seq", { ascending: true });
+  const venture = mapVenture(ventureRows[0] as Record<string, unknown>) as Pick<
+    Venture,
+    "id" | "name" | "slug" | "tagline" | "created_at"
+  > &
+    Venture;
 
-  if (entriesError) {
-    console.error("Public entries lookup error:", entriesError);
-    return Response.json({ error: "Failed to load entries" }, { status: 500 });
-  }
+  const entryRows = await sql`
+    SELECT
+      id, venture_id, seq, kind, title, body, occurred_at, recorded_at,
+      content_hash, prev_hash, chain_hash
+    FROM entries
+    WHERE venture_id = ${venture.id}
+    ORDER BY seq ASC
+  `;
 
   return Response.json(
     {
@@ -52,7 +44,9 @@ export async function GET(
         slug: venture.slug,
         tagline: venture.tagline,
       },
-      entries: (entriesData ?? []) as Entry[],
+      entries: entryRows.map((row) =>
+        mapEntry(row as Record<string, unknown>),
+      ) as Entry[],
     },
     {
       headers: {

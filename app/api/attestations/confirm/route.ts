@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import { appendEntry } from "@/lib/chain";
+import sql from "@/lib/supabase";
 
 type Body = Record<string, unknown>;
 
@@ -35,21 +35,23 @@ export async function POST(req: Request) {
   }
   const attesterNote = attesterNoteRaw.length > 0 ? attesterNoteRaw : null;
 
-  const supabase = createSupabaseServiceRoleClient();
+  const attestationRows = await sql`
+    SELECT id, venture_id, entry_id, attester_email, statement, status
+    FROM attestations
+    WHERE token = ${token}
+    LIMIT 1
+  `;
+  const attestation = attestationRows[0] as
+    | {
+        id: string;
+        venture_id: string;
+        entry_id: string | null;
+        attester_email: string;
+        statement: string;
+        status: string;
+      }
+    | undefined;
 
-  const { data: attestation, error: lookupError } = await supabase
-    .from("attestations")
-    .select("id, venture_id, entry_id, attester_email, statement, status")
-    .eq("token", token)
-    .maybeSingle();
-
-  if (lookupError) {
-    console.error("Attestation lookup error:", lookupError);
-    return NextResponse.json(
-      { error: "Failed to load attestation" },
-      { status: 500 },
-    );
-  }
   if (!attestation) {
     return NextResponse.json(
       { error: "This confirmation link is invalid." },
@@ -67,26 +69,26 @@ export async function POST(req: Request) {
 
   // Update only this row. The WHERE also re-checks status='pending' so a
   // concurrent double-submit can't both succeed.
-  const { data: updated, error: updateError } = await supabase
-    .from("attestations")
-    .update({
-      status: "confirmed",
-      confirmed_at: new Date().toISOString(),
-      attester_name: attesterName,
-      attester_note: attesterNote,
-    })
-    .eq("token", token)
-    .eq("status", "pending")
-    .select("id, confirmed_at, attester_name, attester_note")
-    .maybeSingle();
+  const confirmedAt = new Date().toISOString();
+  const updatedRows = await sql`
+    UPDATE attestations
+    SET
+      status = 'confirmed',
+      confirmed_at = ${confirmedAt},
+      attester_name = ${attesterName},
+      attester_note = ${attesterNote}
+    WHERE token = ${token} AND status = 'pending'
+    RETURNING id, confirmed_at, attester_name, attester_note
+  `;
+  const updated = updatedRows[0] as
+    | {
+        id: string;
+        confirmed_at: Date | string;
+        attester_name: string | null;
+        attester_note: string | null;
+      }
+    | undefined;
 
-  if (updateError) {
-    console.error("Attestation confirm error:", updateError);
-    return NextResponse.json(
-      { error: "Failed to confirm attestation" },
-      { status: 500 },
-    );
-  }
   if (!updated) {
     // Lost the race to another confirmation.
     return NextResponse.json(
@@ -105,14 +107,17 @@ export async function POST(req: Request) {
     let attestedSeq: number | null = null;
     let attestedTitle = "";
     if (attestation.entry_id) {
-      const { data: attestedEntry } = await supabase
-        .from("entries")
-        .select("seq, title")
-        .eq("id", attestation.entry_id)
-        .maybeSingle();
+      const attestedEntryRows = await sql`
+        SELECT seq, title FROM entries
+        WHERE id = ${attestation.entry_id}
+        LIMIT 1
+      `;
+      const attestedEntry = attestedEntryRows[0] as
+        | { seq: number; title: string }
+        | undefined;
       if (attestedEntry) {
-        attestedSeq = attestedEntry.seq as number;
-        attestedTitle = attestedEntry.title as string;
+        attestedSeq = Number(attestedEntry.seq);
+        attestedTitle = attestedEntry.title;
       }
     }
 
@@ -127,22 +132,23 @@ export async function POST(req: Request) {
       `Attester: ${nameForCredit} <${attestation.attester_email}>`,
       "Confirmed via attestation link.",
     );
-    const body = bodyParts.join("\n");
+    const sealedBody = bodyParts.join("\n");
 
     const sealed = await appendEntry({
       venture_id: attestation.venture_id,
       kind: "attestation",
       title: `Confirmed by ${nameForCredit}`,
-      body,
+      body: sealedBody,
       occurred_at: null,
     });
 
-    const { error: linkError } = await supabase
-      .from("attestations")
-      .update({ chain_entry_id: sealed.id })
-      .eq("id", updated.id);
-
-    if (linkError) {
+    try {
+      await sql`
+        UPDATE attestations
+        SET chain_entry_id = ${sealed.id}
+        WHERE id = ${updated.id}
+      `;
+    } catch (linkError) {
       console.error(
         `Attestation ${updated.id} sealed as entry ${sealed.id} but failed to store chain_entry_id:`,
         linkError,
@@ -155,5 +161,13 @@ export async function POST(req: Request) {
     );
   }
 
-  return NextResponse.json({ success: true, confirmed_at: updated.confirmed_at });
+  const confirmedAtOut =
+    updated.confirmed_at instanceof Date
+      ? updated.confirmed_at.toISOString()
+      : String(updated.confirmed_at);
+
+  return NextResponse.json({
+    success: true,
+    confirmed_at: confirmedAtOut,
+  });
 }

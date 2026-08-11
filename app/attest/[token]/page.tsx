@@ -1,4 +1,5 @@
-import { createSupabaseServiceRoleClient } from "@/lib/supabase";
+import { mapAttestation, mapEntry, mapVenture } from "@/lib/row";
+import sql from "@/lib/supabase";
 import type { Attestation, Entry, Venture } from "@/lib/types";
 import { AttestForm } from "@/app/components/AttestForm";
 
@@ -28,17 +29,18 @@ export default async function AttestPage({
 }) {
   const { token } = await params;
 
-  const supabase = createSupabaseServiceRoleClient();
+  const attestationRows = await sql`
+    SELECT
+      id, venture_id, entry_id, attester_email, attester_name, statement,
+      attester_note, token, status, requested_at, confirmed_at, chain_entry_id
+    FROM attestations
+    WHERE token = ${token}
+    LIMIT 1
+  `;
 
-  const { data: attestationData } = await supabase
-    .from("attestations")
-    .select(
-      "id, venture_id, entry_id, attester_email, attester_name, statement, attester_note, token, status, requested_at, confirmed_at",
-    )
-    .eq("token", token)
-    .maybeSingle();
-
-  const attestation = attestationData as Attestation | null;
+  const attestation = attestationRows[0]
+    ? (mapAttestation(attestationRows[0] as Record<string, unknown>) as Attestation)
+    : null;
 
   if (!attestation) {
     return (
@@ -78,21 +80,30 @@ export default async function AttestPage({
   }
 
   // Load the entry being attested and its venture for context.
-  const { data: entryData } = await supabase
-    .from("entries")
-    .select(
-      "id, venture_id, seq, kind, title, body, occurred_at, recorded_at, content_hash, prev_hash, chain_hash",
-    )
-    .eq("id", attestation.entry_id ?? "")
-    .maybeSingle();
-  const entry = entryData as Entry | null;
+  let entry: Entry | null = null;
+  if (attestation.entry_id) {
+    const entryRows = await sql`
+      SELECT
+        id, venture_id, seq, kind, title, body, occurred_at, recorded_at,
+        content_hash, prev_hash, chain_hash
+      FROM entries
+      WHERE id = ${attestation.entry_id}
+      LIMIT 1
+    `;
+    entry = entryRows[0]
+      ? mapEntry(entryRows[0] as Record<string, unknown>)
+      : null;
+  }
 
-  const { data: ventureData } = await supabase
-    .from("ventures")
-    .select("id, clerk_user_id, name, slug, tagline, created_at")
-    .eq("id", attestation.venture_id)
-    .maybeSingle();
-  const venture = ventureData as Venture | null;
+  const ventureRows = await sql`
+    SELECT id, clerk_user_id, name, slug, tagline, created_at
+    FROM ventures
+    WHERE id = ${attestation.venture_id}
+    LIMIT 1
+  `;
+  const venture = ventureRows[0]
+    ? (mapVenture(ventureRows[0] as Record<string, unknown>) as Venture)
+    : null;
 
   const founderLabel = venture?.name ?? "The founder";
 

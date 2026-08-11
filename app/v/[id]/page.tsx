@@ -1,7 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
 
-import { createSupabaseServiceRoleClient } from "@/lib/supabase";
+import { mapAnchor, mapAttestation, mapEntry, mapVenture } from "@/lib/row";
+import sql from "@/lib/supabase";
 import type { Anchor, Attestation, Entry, Venture } from "@/lib/types";
 import { NewEntryForm } from "@/app/components/NewEntryForm";
 import { CopyText } from "@/app/components/CopyText";
@@ -38,39 +39,43 @@ export default async function LedgerPage({
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
-  const supabase = createSupabaseServiceRoleClient();
-
-  const { data: ventureData } = await supabase
-    .from("ventures")
-    .select("id, clerk_user_id, name, slug, tagline, created_at")
-    .eq("id", id)
-    .maybeSingle();
-
-  const venture = ventureData as Venture | null;
+  const ventureRows = await sql`
+    SELECT id, clerk_user_id, name, slug, tagline, created_at
+    FROM ventures
+    WHERE id = ${id}
+    LIMIT 1
+  `;
+  const venture = ventureRows[0]
+    ? mapVenture(ventureRows[0] as Record<string, unknown>)
+    : null;
   if (!venture || venture.clerk_user_id !== userId) notFound();
 
-  const { data: entriesData } = await supabase
-    .from("entries")
-    .select(
-      "id, venture_id, seq, kind, title, body, occurred_at, recorded_at, content_hash, prev_hash, chain_hash",
-    )
-    .eq("venture_id", venture.id)
-    .order("seq", { ascending: true });
-
-  const entries = (entriesData ?? []) as Entry[];
+  const entryRows = await sql`
+    SELECT
+      id, venture_id, seq, kind, title, body, occurred_at, recorded_at,
+      content_hash, prev_hash, chain_hash
+    FROM entries
+    WHERE venture_id = ${venture.id}
+    ORDER BY seq ASC
+  `;
+  const entries = entryRows.map((row) =>
+    mapEntry(row as Record<string, unknown>),
+  ) as Entry[];
   // Render newest-first visually; seq numbering is preserved on each card.
   const ordered = [...entries].reverse();
 
   // All attestations for this venture, grouped by entry for per-card display.
-  const { data: attestationData } = await supabase
-    .from("attestations")
-    .select(
-      "id, venture_id, entry_id, attester_email, attester_name, statement, token, status, requested_at, confirmed_at",
-    )
-    .eq("venture_id", venture.id)
-    .order("requested_at", { ascending: true });
-
-  const attestations = (attestationData ?? []) as Attestation[];
+  const attestationRows = await sql`
+    SELECT
+      id, venture_id, entry_id, attester_email, attester_name, statement,
+      attester_note, token, status, requested_at, confirmed_at, chain_entry_id
+    FROM attestations
+    WHERE venture_id = ${venture.id}
+    ORDER BY requested_at ASC
+  `;
+  const attestations = attestationRows.map((row) =>
+    mapAttestation(row as Record<string, unknown>),
+  ) as Attestation[];
   const attestationsByEntry = new Map<string, Attestation[]>();
   for (const a of attestations) {
     if (!a.entry_id) continue;
@@ -80,15 +85,17 @@ export default async function LedgerPage({
   }
 
   // Past anchors, newest first, for the anchoring panel.
-  const { data: anchorData } = await supabase
-    .from("anchors")
-    .select(
-      "id, venture_id, anchored_seq, chain_tip_hash, status, created_at, upgraded_at, bitcoin_block_height",
-    )
-    .eq("venture_id", venture.id)
-    .order("created_at", { ascending: false });
-
-  const anchors = (anchorData ?? []) as Anchor[];
+  const anchorRows = await sql`
+    SELECT
+      id, venture_id, anchored_seq, chain_tip_hash, ots_proof, status,
+      created_at, upgraded_at, bitcoin_block_height
+    FROM anchors
+    WHERE venture_id = ${venture.id}
+    ORDER BY created_at DESC
+  `;
+  const anchors = anchorRows.map((row) =>
+    mapAnchor(row as Record<string, unknown>),
+  ) as Anchor[];
   const latestSeq = entries.length > 0 ? entries[entries.length - 1].seq : 0;
   const tipAlreadyAnchored = anchors.some(
     (a) => a.anchored_seq === latestSeq && latestSeq > 0,

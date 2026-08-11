@@ -2,7 +2,8 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-import { createSupabaseServiceRoleClient } from "@/lib/supabase";
+import { mapVenture } from "@/lib/row";
+import sql from "@/lib/supabase";
 import type { Venture } from "@/lib/types";
 import { NewVentureForm } from "@/app/components/NewVentureForm";
 
@@ -18,28 +19,27 @@ export default async function DashboardPage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
-  const supabase = createSupabaseServiceRoleClient();
+  const ventureRows = await sql`
+    SELECT id, clerk_user_id, name, slug, tagline, created_at
+    FROM ventures
+    WHERE clerk_user_id = ${userId}
+    ORDER BY created_at DESC
+  `;
 
-  const { data: venturesData } = await supabase
-    .from("ventures")
-    .select("id, clerk_user_id, name, slug, tagline, created_at")
-    .eq("clerk_user_id", userId)
-    .order("created_at", { ascending: false });
-
-  const ventures = (venturesData ?? []) as Venture[];
+  const ventures = ventureRows.map((row) =>
+    mapVenture(row as Record<string, unknown>),
+  ) as Venture[];
 
   // Entry counts for the user's ventures, gathered in one query.
   const counts = new Map<string, number>();
   if (ventures.length > 0) {
-    const { data: entryRows } = await supabase
-      .from("entries")
-      .select("venture_id")
-      .in(
-        "venture_id",
-        ventures.map((v) => v.id),
-      );
-    for (const row of entryRows ?? []) {
-      const id = (row as { venture_id: string }).venture_id;
+    const ids = ventures.map((v) => v.id);
+    const entryRows = await sql`
+      SELECT venture_id FROM entries
+      WHERE venture_id IN ${sql(ids)}
+    `;
+    for (const row of entryRows) {
+      const id = String((row as { venture_id: string }).venture_id);
       counts.set(id, (counts.get(id) ?? 0) + 1);
     }
   }

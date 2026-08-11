@@ -1,8 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-import { createSupabaseServiceRoleClient } from "@/lib/supabase";
+import { mapAnchor } from "@/lib/row";
 import { stampHashHex } from "@/lib/ots";
+import sql from "@/lib/supabase";
 
 // OpenTimestamps uses Node-only crypto/networking libraries (bitcore-lib,
 // request), so this route must run on the Node.js runtime, never the Edge.
@@ -35,42 +36,28 @@ export async function POST(req: Request) {
     );
   }
 
-  const supabase = createSupabaseServiceRoleClient();
-
   // Verify the venture exists and belongs to the authenticated user.
-  const { data: venture, error: ventureError } = await supabase
-    .from("ventures")
-    .select("id, clerk_user_id")
-    .eq("id", ventureId)
-    .maybeSingle();
+  const ventureRows = await sql`
+    SELECT id, clerk_user_id FROM ventures
+    WHERE id = ${ventureId}
+    LIMIT 1
+  `;
+  const venture = ventureRows[0] as
+    | { id: string; clerk_user_id: string }
+    | undefined;
 
-  if (ventureError) {
-    console.error("Venture lookup error:", ventureError);
-    return NextResponse.json(
-      { error: "Failed to load venture" },
-      { status: 500 },
-    );
-  }
   if (!venture || venture.clerk_user_id !== userId) {
     return NextResponse.json({ error: "Venture not found" }, { status: 404 });
   }
 
   // Read the chain tip: highest seq entry and its chain_hash.
-  const { data: tip, error: tipError } = await supabase
-    .from("entries")
-    .select("seq, chain_hash")
-    .eq("venture_id", ventureId)
-    .order("seq", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const tipRows = await sql`
+    SELECT seq, chain_hash FROM entries
+    WHERE venture_id = ${ventureId}
+    ORDER BY seq DESC LIMIT 1
+  `;
+  const tip = tipRows[0] as { seq: number; chain_hash: string } | undefined;
 
-  if (tipError) {
-    console.error("Chain tip lookup error:", tipError);
-    return NextResponse.json(
-      { error: "Failed to load your latest entry" },
-      { status: 500 },
-    );
-  }
   if (!tip) {
     return NextResponse.json(
       { error: "This ledger has no entries to anchor yet." },
@@ -78,28 +65,19 @@ export async function POST(req: Request) {
     );
   }
 
-  const anchoredSeq = tip.seq as number;
-  const chainTipHash = tip.chain_hash as string;
+  const anchoredSeq = Number(tip.seq);
+  const chainTipHash = String(tip.chain_hash);
 
   // No duplicate anchors: if the current tip (same seq and hash) is already
   // anchored, refuse. Anchoring the same fingerprint again buys nothing.
-  const { data: existing, error: existingError } = await supabase
-    .from("anchors")
-    .select("id")
-    .eq("venture_id", ventureId)
-    .eq("anchored_seq", anchoredSeq)
-    .eq("chain_tip_hash", chainTipHash)
-    .limit(1)
-    .maybeSingle();
-
-  if (existingError) {
-    console.error("Existing anchor lookup error:", existingError);
-    return NextResponse.json(
-      { error: "Failed to check existing anchors" },
-      { status: 500 },
-    );
-  }
-  if (existing) {
+  const existingRows = await sql`
+    SELECT id FROM anchors
+    WHERE venture_id = ${ventureId}
+      AND anchored_seq = ${anchoredSeq}
+      AND chain_tip_hash = ${chainTipHash}
+    LIMIT 1
+  `;
+  if (existingRows[0]) {
     return NextResponse.json(
       {
         error:
@@ -121,27 +99,27 @@ export async function POST(req: Request) {
     );
   }
 
-  const { data: anchor, error: insertError } = await supabase
-    .from("anchors")
-    .insert({
-      venture_id: ventureId,
-      anchored_seq: anchoredSeq,
-      chain_tip_hash: chainTipHash,
-      ots_proof: otsProof,
-      status: "pending",
-    })
-    .select(
-      "id, venture_id, anchored_seq, chain_tip_hash, status, created_at, upgraded_at, bitcoin_block_height",
-    )
-    .single();
-
-  if (insertError || !anchor) {
-    console.error("Anchor insert error:", insertError);
+  try {
+    const rows = await sql`
+      INSERT INTO anchors (
+        venture_id, anchored_seq, chain_tip_hash, ots_proof, status
+      )
+      VALUES (
+        ${ventureId}, ${anchoredSeq}, ${chainTipHash}, ${otsProof}, 'pending'
+      )
+      RETURNING
+        id, venture_id, anchored_seq, chain_tip_hash, status,
+        created_at, upgraded_at, bitcoin_block_height
+    `;
+    return NextResponse.json(
+      { anchor: mapAnchor(rows[0] as Record<string, unknown>) },
+      { status: 201 },
+    );
+  } catch (e) {
+    console.error("Anchor insert error:", e);
     return NextResponse.json(
       { error: "Failed to save anchor" },
       { status: 500 },
     );
   }
-
-  return NextResponse.json({ anchor }, { status: 201 });
 }

@@ -1,5 +1,5 @@
-import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import { proofBase64ToBytes } from "@/lib/ots";
+import sql from "@/lib/supabase";
 
 // Serves raw .ots proof bytes. Node runtime for Buffer handling.
 export const runtime = "nodejs";
@@ -12,32 +12,36 @@ export async function GET(
 ) {
   const { id } = await params;
 
-  const supabase = createSupabaseServiceRoleClient();
+  const anchorRows = await sql`
+    SELECT id, anchored_seq, ots_proof, venture_id
+    FROM anchors
+    WHERE id = ${id}
+    LIMIT 1
+  `;
+  const anchor = anchorRows[0] as
+    | {
+        id: string;
+        anchored_seq: number;
+        ots_proof: string;
+        venture_id: string;
+      }
+    | undefined;
 
-  const { data: anchor, error } = await supabase
-    .from("anchors")
-    .select("id, anchored_seq, ots_proof, venture_id")
-    .eq("id", id)
-    .maybeSingle();
-
-  if (error) {
-    console.error("Anchor lookup error:", error);
-    return new Response("Failed to load anchor", { status: 500 });
-  }
   if (!anchor) {
     return new Response("Anchor not found", { status: 404 });
   }
 
-  const { data: venture } = await supabase
-    .from("ventures")
-    .select("slug")
-    .eq("id", anchor.venture_id)
-    .maybeSingle();
+  const ventureRows = await sql`
+    SELECT slug FROM ventures
+    WHERE id = ${anchor.venture_id}
+    LIMIT 1
+  `;
+  const venture = ventureRows[0] as { slug: string } | undefined;
 
   const slug = venture?.slug ?? "ledger";
   const filename = `beleg-${slug}-seq${anchor.anchored_seq}.ots`;
 
-  const bytes = proofBase64ToBytes(anchor.ots_proof as string);
+  const bytes = proofBase64ToBytes(anchor.ots_proof);
   const arrayBuffer = bytes.buffer.slice(
     bytes.byteOffset,
     bytes.byteOffset + bytes.byteLength,

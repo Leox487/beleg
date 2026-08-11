@@ -1,7 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-import { createSupabaseServiceRoleClient } from "@/lib/supabase";
+import { mapVenture } from "@/lib/row";
+import sql from "@/lib/supabase";
 
 type Body = Record<string, unknown>;
 
@@ -51,28 +52,32 @@ export async function POST(req: Request) {
   const taglineRaw = typeof body.tagline === "string" ? body.tagline.trim() : "";
   const tagline = taglineRaw.length > 0 ? taglineRaw : null;
 
-  const supabase = createSupabaseServiceRoleClient();
-
   // Retry on the (unlikely) slug collision from the random suffix.
   for (let attempt = 0; attempt < 5; attempt++) {
     const slug = slugify(name);
-    const { data, error } = await supabase
-      .from("ventures")
-      .insert({ clerk_user_id: userId, name, slug, tagline })
-      .select("id, clerk_user_id, name, slug, tagline, created_at")
-      .single();
-
-    if (!error && data) {
-      return NextResponse.json({ venture: data }, { status: 201 });
-    }
-
-    // 23505 = unique_violation (slug collision); retry with a new suffix.
-    if (error && error.code !== "23505") {
-      console.error("Venture insert error:", error);
+    try {
+      const rows = await sql`
+        INSERT INTO ventures (clerk_user_id, name, slug, tagline)
+        VALUES (${userId}, ${name}, ${slug}, ${tagline})
+        RETURNING id, clerk_user_id, name, slug, tagline, created_at
+      `;
       return NextResponse.json(
-        { error: "Failed to create venture" },
-        { status: 500 },
+        { venture: mapVenture(rows[0] as Record<string, unknown>) },
+        { status: 201 },
       );
+    } catch (e: unknown) {
+      const code =
+        typeof e === "object" && e && "code" in e
+          ? String((e as { code: unknown }).code)
+          : "";
+      // 23505 = unique_violation (slug collision); retry with a new suffix.
+      if (code !== "23505") {
+        console.error("Venture insert error:", e);
+        return NextResponse.json(
+          { error: "Failed to create venture" },
+          { status: 500 },
+        );
+      }
     }
   }
 

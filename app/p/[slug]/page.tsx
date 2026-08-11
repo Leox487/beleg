@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
-import { createSupabaseServiceRoleClient } from "@/lib/supabase";
+import { mapAnchor, mapEntry, mapVenture } from "@/lib/row";
+import sql from "@/lib/supabase";
 import type { Anchor, Entry, Venture } from "@/lib/types";
 import { Footer } from "@/app/components/Footer";
 import { Seal } from "@/app/components/Seal";
@@ -41,41 +42,46 @@ export default async function PublicProofPage({
 }) {
   const { slug } = await params;
 
-  const supabase = createSupabaseServiceRoleClient();
-
-  const { data: ventureData } = await supabase
-    .from("ventures")
-    .select("id, clerk_user_id, name, slug, tagline, created_at")
-    .eq("slug", slug)
-    .maybeSingle();
-
-  const venture = ventureData as Venture | null;
+  const ventureRows = await sql`
+    SELECT id, clerk_user_id, name, slug, tagline, created_at
+    FROM ventures
+    WHERE slug = ${slug}
+    LIMIT 1
+  `;
+  const venture = ventureRows[0]
+    ? (mapVenture(ventureRows[0] as Record<string, unknown>) as Venture)
+    : null;
   if (!venture) notFound();
 
-  const { data: entriesData } = await supabase
-    .from("entries")
-    .select(
-      "id, venture_id, seq, kind, title, body, occurred_at, recorded_at, content_hash, prev_hash, chain_hash",
-    )
-    .eq("venture_id", venture.id)
-    .order("seq", { ascending: true });
+  const entryRows = await sql`
+    SELECT
+      id, venture_id, seq, kind, title, body, occurred_at, recorded_at,
+      content_hash, prev_hash, chain_hash
+    FROM entries
+    WHERE venture_id = ${venture.id}
+    ORDER BY seq ASC
+  `;
 
   // Oldest-first: a reader wants the story in order. Confirmations are no longer
   // read from the attestations table — they are sealed into the chain as
   // 'attestation'-kind entries, so they carry the same tamper-evidence as every
   // other entry and the in-browser verifier covers them too.
-  const entries = (entriesData ?? []) as Entry[];
+  const entries = entryRows.map((row) =>
+    mapEntry(row as Record<string, unknown>),
+  ) as Entry[];
   const latestSeq = entries.length > 0 ? entries[entries.length - 1].seq : 0;
 
-  const { data: anchorData } = await supabase
-    .from("anchors")
-    .select(
-      "id, venture_id, anchored_seq, chain_tip_hash, status, created_at, upgraded_at, bitcoin_block_height",
-    )
-    .eq("venture_id", venture.id)
-    .order("anchored_seq", { ascending: false });
-
-  const anchors = (anchorData ?? []) as Anchor[];
+  const anchorRows = await sql`
+    SELECT
+      id, venture_id, anchored_seq, chain_tip_hash, ots_proof, status,
+      created_at, upgraded_at, bitcoin_block_height
+    FROM anchors
+    WHERE venture_id = ${venture.id}
+    ORDER BY anchored_seq DESC
+  `;
+  const anchors = anchorRows.map((row) =>
+    mapAnchor(row as Record<string, unknown>),
+  ) as Anchor[];
   // Prefer the confirmed anchor covering the most entries; fall back to the
   // most recent pending one.
   const confirmedAnchor =
