@@ -85,7 +85,7 @@ export default function PrivacyPage() {
             because the integrity of the chain depends on every entry remaining
             as recorded. If you want your entire venture and all its data
             permanently deleted, email{" "}
-            <a href="mailto:privacy@beleg.app">privacy@beleg.app</a> (or the
+            <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a> (or the
             contact below) and we will delete your venture, all entries, all
             attestations, and your account within 30 days.
           </p>
