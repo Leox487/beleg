@@ -1,8 +1,14 @@
+import type { CSSProperties } from "react";
+
 /**
  * Fully rendered HTML/CSS mock of a Beleg public proof page.
  * Sits in the hero as the product visual — not an illustration.
+ * Entries seal in sequence so the mock feels like a living chain.
  */
 export function HeroProofMock() {
+  const seal = (delay: string): CSSProperties =>
+    ({ "--seal-delay": delay }) as CSSProperties;
+
   return (
     <div className="hero-mock-wrap" aria-hidden="true">
       <div className="hero-mock-glow" />
@@ -26,7 +32,7 @@ export function HeroProofMock() {
           </div>
 
           <ul className="hero-mock-entries">
-            <li className="hero-mock-entry">
+            <li className="hero-mock-entry" style={seal("0.4s")}>
               <span className="hero-mock-seq">#06</span>
               <div>
                 <p className="hero-mock-title">Grant received — $12,000</p>
@@ -36,7 +42,7 @@ export function HeroProofMock() {
                 </p>
               </div>
             </li>
-            <li className="hero-mock-entry is-attest">
+            <li className="hero-mock-entry is-attest" style={seal("1.1s")}>
               <span className="hero-mock-seq">#07</span>
               <div>
                 <p className="hero-mock-title">
@@ -48,7 +54,7 @@ export function HeroProofMock() {
                 </p>
               </div>
             </li>
-            <li className="hero-mock-entry">
+            <li className="hero-mock-entry" style={seal("1.8s")}>
               <span className="hero-mock-seq">#08</span>
               <div>
                 <p className="hero-mock-title">Pilot launched with 3 clinics</p>

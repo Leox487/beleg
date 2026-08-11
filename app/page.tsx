@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 
 import AnimateIn from "@/app/components/AnimateIn";
+import { ChainField } from "@/app/components/ChainField";
 import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
 import { HeroProofMock } from "@/app/components/HeroProofMock";
@@ -59,11 +60,11 @@ export default async function Home() {
     <main className="landing">
       {/* ——— product-first hero ——— */}
       <section className="section-full stage spotlight spotlight-hero">
+        <ChainField />
         <div className="stage-grid">
           <div className="stage-copy">
-            <AnimateIn direction="up" delay={0}>
-              <p className="stage-eyebrow">Beleg</p>
-              <hr className="rule-fade-bright eyebrow-rule" />
+            <AnimateIn direction="up" delay={0} duration={780}>
+              <p className="stage-brand">Beleg</p>
 
               <h1 className="brand-tagline">
                 Proof and trust built into{" "}
@@ -78,7 +79,7 @@ export default async function Home() {
               </p>
             </AnimateIn>
 
-            <AnimateIn direction="up" delay={70}>
+            <AnimateIn direction="up" delay={120} duration={780}>
               <div className="hero-actions">
                 <Link className="cta" href={ctaHref}>
                   <span className="cta-label">{ctaLabel}</span>
@@ -93,7 +94,7 @@ export default async function Home() {
                 Free while in beta. No credit card. About a minute to start.
               </p>
 
-              <ul className="trust-strip" aria-label="Why people trust Beleg">
+              <ul className="trust-strip trust-strip-quiet" aria-label="Why people trust Beleg">
                 <li>
                   <span className="trust-dot" aria-hidden="true" />
                   Free in beta
@@ -110,13 +111,13 @@ export default async function Home() {
             </AnimateIn>
           </div>
 
-          <AnimateIn direction="up" delay={140} className="stage-visual">
+          <AnimateIn direction="up" delay={220} duration={820} className="stage-visual">
             <HeroProofMock />
           </AnimateIn>
         </div>
       </section>
 
-      <hr className="rule-fade land-rule" />
+      <hr className="rule-fade land-rule land-rule-hero" />
 
       {/* ——— human voices ——— */}
       <section className="section-full land-section voices-section">

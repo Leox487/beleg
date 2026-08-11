@@ -8246,3 +8246,510 @@ html {
 .strip-section .showcase-panel.is-active .panel-reveal {
   max-height: 640px !important;
 }
+
+/* =========================================================================
+   Beleg-native striking hero — living hash-chain atmosphere
+   ========================================================================= */
+
+.spotlight-hero {
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.spotlight-hero::before {
+  top: 10%;
+  left: 58%;
+  width: min(1100px, 100%);
+  height: 720px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(45, 212, 160, 0.1) 0%,
+    rgba(122, 162, 255, 0.04) 42%,
+    transparent 72%
+  );
+  filter: blur(60px);
+  opacity: 0.9;
+}
+
+.spotlight-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 140px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(10, 11, 13, 0.55) 55%,
+    var(--bg) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.spotlight-hero .stage-grid {
+  position: relative;
+  z-index: 3;
+}
+
+.stage-brand {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.75rem, 7vw, 4.75rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--text);
+  margin: 0 0 18px;
+  text-shadow: 0 0 48px rgba(45, 212, 160, 0.12);
+}
+
+.spotlight-hero .brand-tagline {
+  font-size: clamp(1.85rem, 3.6vw, 2.65rem);
+  color: #f7f8fa;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.spotlight-hero .headline-accent {
+  color: var(--brand-bright);
+  background: linear-gradient(
+    120deg,
+    var(--brand-bright) 0%,
+    #7ee0c0 45%,
+    var(--gold) 120%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.spotlight-hero .subline {
+  color: rgba(242, 243, 245, 0.88);
+}
+
+.spotlight-hero .stage-copy {
+  position: relative;
+  z-index: 4;
+}
+
+.trust-strip-quiet {
+  opacity: 0.72;
+  margin-top: 22px;
+}
+
+.trust-strip-quiet .trust-dot {
+  box-shadow: 0 0 10px rgba(45, 212, 160, 0.45);
+}
+
+.land-rule-hero {
+  position: relative;
+  max-width: none;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(45, 212, 160, 0.35) 20%,
+    rgba(122, 162, 255, 0.28) 50%,
+    rgba(224, 168, 62, 0.3) 80%,
+    transparent 100%
+  );
+}
+
+/* --- ChainField backdrop --- */
+.chain-field {
+  position: absolute;
+  inset: -8% -6% -12%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.chain-field-wash {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 75% 60% at 74% 36%,
+      rgba(45, 212, 160, 0.28) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 50% 45% at 16% 72%,
+      rgba(224, 168, 62, 0.16) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 45% 40% at 90% 70%,
+      rgba(122, 162, 255, 0.18) 0%,
+      transparent 62%
+    );
+}
+
+.chain-field-bloom {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(56px);
+  opacity: 0.75;
+  will-change: transform, opacity;
+  animation: cf-bloom 14s ease-in-out infinite;
+}
+
+.chain-field-bloom-mint {
+  width: min(580px, 58vw);
+  height: min(580px, 58vw);
+  top: 4%;
+  right: 4%;
+  background: rgba(45, 212, 160, 0.38);
+}
+
+.chain-field-bloom-gold {
+  width: min(400px, 44vw);
+  height: min(400px, 44vw);
+  bottom: 4%;
+  left: 4%;
+  background: rgba(224, 168, 62, 0.24);
+  animation-delay: -4s;
+  animation-duration: 18s;
+}
+
+.chain-field-bloom-blue {
+  width: min(340px, 38vw);
+  height: min(340px, 38vw);
+  top: 40%;
+  left: 40%;
+  background: rgba(122, 162, 255, 0.22);
+  animation-delay: -8s;
+  animation-duration: 16s;
+}
+
+.chain-field-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+}
+
+.chain-field-path {
+  stroke-dasharray: 10 14;
+  stroke-width: 2;
+  animation: cf-dash 28s linear infinite;
+}
+
+.chain-field-path-b {
+  animation-duration: 36s;
+  animation-direction: reverse;
+}
+
+.chain-field-path-c {
+  stroke-dasharray: 6 14;
+  animation-duration: 22s;
+}
+
+.chain-field-node .chain-field-ring {
+  fill: rgba(10, 11, 13, 0.35);
+  stroke-width: 1.6;
+  opacity: 0.95;
+}
+
+.chain-field-node .chain-field-core {
+  opacity: 0.95;
+}
+
+.chain-field-node-mint .chain-field-ring {
+  stroke: rgba(45, 212, 160, 0.7);
+}
+.chain-field-node-mint .chain-field-core {
+  fill: var(--accent);
+}
+
+.chain-field-node-gold .chain-field-ring {
+  stroke: rgba(224, 168, 62, 0.7);
+}
+.chain-field-node-gold .chain-field-core {
+  fill: var(--gold);
+}
+
+.chain-field-node-blue .chain-field-ring {
+  stroke: rgba(122, 162, 255, 0.7);
+}
+.chain-field-node-blue .chain-field-core {
+  fill: var(--c-share);
+}
+
+.chain-field-node {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cf-pulse 5.5s ease-in-out infinite;
+}
+
+.chain-field-node-delay {
+  animation-delay: -2.2s;
+  animation-duration: 6.8s;
+}
+
+.chain-field-links {
+  animation: cf-drift 20s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+
+.chain-field-glyphs {
+  position: absolute;
+  inset: 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(160, 166, 176, 0.4);
+  pointer-events: none;
+}
+
+.chain-field-glyphs span {
+  position: absolute;
+  animation: cf-glyph 16s ease-in-out infinite;
+}
+
+.chain-field-glyphs span:nth-child(1) {
+  top: 18%;
+  left: 12%;
+  color: rgba(45, 212, 160, 0.45);
+}
+.chain-field-glyphs span:nth-child(2) {
+  top: 62%;
+  left: 28%;
+  animation-delay: -5s;
+  color: rgba(224, 168, 62, 0.4);
+}
+.chain-field-glyphs span:nth-child(3) {
+  top: 28%;
+  right: 14%;
+  animation-delay: -9s;
+  color: rgba(122, 162, 255, 0.42);
+}
+.chain-field-glyphs span:nth-child(4) {
+  bottom: 18%;
+  right: 30%;
+  animation-delay: -12s;
+  letter-spacing: 0.28em;
+  color: rgba(45, 212, 160, 0.35);
+}
+
+@keyframes cf-bloom {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0) scale(1.08);
+    opacity: 0.7;
+  }
+}
+
+@keyframes cf-dash {
+  to {
+    stroke-dashoffset: -240;
+  }
+}
+
+@keyframes cf-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes cf-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(10px, -14px, 0);
+  }
+}
+
+@keyframes cf-glyph {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.55;
+    transform: translateY(-8px);
+  }
+}
+
+/* --- Hero mock: sequential seal locks --- */
+.hero-mock-wrap {
+  --seal-delay: 0s;
+}
+
+.hero-mock-glow {
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(
+    circle,
+    rgba(45, 212, 160, 0.22) 0%,
+    rgba(122, 162, 255, 0.08) 45%,
+    transparent 70%
+  );
+  filter: blur(50px);
+  animation: cf-bloom 12s ease-in-out infinite;
+}
+
+.hero-mock {
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(45, 212, 160, 0.08),
+    0 0 60px rgba(45, 212, 160, 0.08);
+}
+
+.hero-mock-verify {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: hm-verify-in 700ms cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+}
+
+.hero-mock-seal {
+  animation: hm-seal-pop 900ms cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+
+.hero-mock-entry {
+  opacity: 0.35;
+  transform: translateX(-4px);
+  animation: hm-entry-lock 700ms cubic-bezier(0.16, 1, 0.3, 1) var(--seal-delay)
+    forwards;
+}
+
+.hero-mock-entry .hero-mock-seal-label {
+  position: relative;
+}
+
+.hero-mock-entry .hero-mock-seal-label::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: hm-seal-underline 450ms ease forwards;
+  animation-delay: calc(var(--seal-delay) + 280ms);
+}
+
+.hero-mock-anchor {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: hm-verify-in 750ms cubic-bezier(0.16, 1, 0.3, 1) 2.5s forwards;
+  box-shadow: 0 0 0 0 rgba(224, 168, 62, 0);
+  animation-name: hm-anchor-in;
+}
+
+@keyframes hm-verify-in {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hm-seal-pop {
+  0% {
+    transform: scale(0.7);
+    box-shadow: 0 0 0 0 rgba(45, 212, 160, 0);
+  }
+  60% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 6px rgba(45, 212, 160, 0.12);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 18px rgba(45, 212, 160, 0.25);
+  }
+}
+
+@keyframes hm-entry-lock {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hm-seal-underline {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes hm-anchor-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+    box-shadow: 0 0 0 0 rgba(224, 168, 62, 0);
+  }
+  70% {
+    opacity: 1;
+    transform: none;
+    box-shadow: 0 0 24px rgba(224, 168, 62, 0.22);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    box-shadow: 0 0 14px rgba(224, 168, 62, 0.12);
+  }
+}
+
+@media (max-width: 860px) {
+  .stage-brand {
+    font-size: clamp(2.4rem, 12vw, 3.4rem);
+  }
+
+  .chain-field-glyphs {
+    display: none;
+  }
+
+  .chain-field-bloom-gold,
+  .chain-field-bloom-blue {
+    opacity: 0.35;
+  }
+
+  .spotlight-hero .brand-tagline {
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chain-field-bloom,
+  .chain-field-path,
+  .chain-field-node,
+  .chain-field-links,
+  .chain-field-glyphs span,
+  .hero-mock-glow,
+  .hero-mock-verify,
+  .hero-mock-seal,
+  .hero-mock-entry,
+  .hero-mock-entry .hero-mock-seal-label::after,
+  .hero-mock-anchor {
+    animation: none !important;
+  }
+
+  .hero-mock-verify,
+  .hero-mock-entry,
+  .hero-mock-anchor {
+    opacity: 1;
+    transform: none;
+  }
+
+  .chain-field-wash {
+    opacity: 0.85;
+  }
+
+  .chain-field-bloom {
+    opacity: 0.35;
+  }
+}
