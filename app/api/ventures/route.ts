@@ -7,7 +7,6 @@ import sql from "@/lib/supabase";
 type Body = Record<string, unknown>;
 
 const SUFFIX_ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
-const INBOUND_DOMAIN = "ingest.belegapp.com";
 
 function randomSuffix(len = 4): string {
   let out = "";
@@ -26,26 +25,25 @@ function slugify(name: string): string {
   return `${stem}-${randomSuffix()}`;
 }
 
-/** Local-part stem from venture name (no random suffix — id slice provides uniqueness). */
-function slugifyName(name: string): string {
-  const base = name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 48);
-  return base || "venture";
-}
-
-function inboundEmailAddress(name: string, ventureId: string, salt = ""): string {
-  const local = `${slugifyName(name)}-${ventureId.slice(0, 8)}${salt}`;
-  return `${local}@${INBOUND_DOMAIN}`;
+function generateInboundEmail(
+  ventureName: string,
+  ventureId: string,
+  salt = "",
+): string {
+  const slug =
+    ventureName
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 30) || "venture";
+  const shortId = ventureId.slice(0, 8);
+  return `${slug}-${shortId}${salt}@ingest.belegapp.com`;
 }
 
 async function createInboundEndpoint(ventureId: string, name: string) {
-  // email_address is UNIQUE; collide only if the same id prefix somehow retries.
   for (let attempt = 0; attempt < 5; attempt++) {
-    const salt = attempt === 0 ? "" : `-${randomSuffix(3)}`;
-    const email_address = inboundEmailAddress(name, ventureId, salt);
+    const salt = attempt === 0 ? "" : `-${randomSuffix(4)}`;
+    const email_address = generateInboundEmail(name, ventureId, salt);
     try {
       const rows = await sql`
         INSERT INTO inbound_endpoints (venture_id, email_address)
@@ -107,8 +105,6 @@ export async function POST(req: Request) {
         inbound = await createInboundEndpoint(venture.id, venture.name);
       } catch (e) {
         console.error("Inbound endpoint create error:", e);
-        // Venture already exists; surface a soft failure so the client still
-        // gets the ledger. Endpoint can be backfilled later if needed.
       }
 
       return NextResponse.json(
