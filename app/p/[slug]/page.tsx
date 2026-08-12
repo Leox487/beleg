@@ -185,7 +185,7 @@ export default async function PublicProofPage({
         <hr className="rule-fade" />
 
         <div className="spotlight spotlight-center verify-spotlight">
-          <VerifyChain entries={entries} />
+          <VerifyChain entries={entries} ventureId={venture.id} />
         </div>
 
         <hr className="rule-fade" />

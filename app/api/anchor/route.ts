@@ -111,6 +111,19 @@ export async function POST(req: Request) {
         id, venture_id, anchored_seq, chain_tip_hash, status,
         created_at, upgraded_at, bitcoin_block_height
     `;
+
+    // Also mirror the .ots onto the venture so browser verification can load
+    // a single field without joining anchors.
+    try {
+      await sql`
+        UPDATE ventures
+        SET ots_file_base64 = ${otsProof}
+        WHERE id = ${ventureId}
+      `;
+    } catch (mirrorErr) {
+      console.error("Failed to mirror ots_file_base64 onto venture:", mirrorErr);
+    }
+
     return NextResponse.json(
       { anchor: mapAnchor(rows[0] as Record<string, unknown>) },
       { status: 201 },

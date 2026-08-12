@@ -39,15 +39,29 @@ type Status =
   | { state: "ok"; firstRecordedAt: string; count: number; rows: RowResult[] }
   | { state: "broken"; seq: number; reason: string; rows: RowResult[] };
 
+type BitcoinResult =
+  | { state: "idle" }
+  | { state: "running" }
+  | { state: "skipped"; message: string }
+  | { state: "ok"; message: string }
+  | { state: "failed"; message: string };
+
 function trunc(hash: string): string {
   return `${hash.slice(0, 24)}…`;
 }
 
-export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
+export function VerifyChain({
+  entries,
+  ventureId,
+}: {
+  entries: VerifyEntry[];
+  ventureId: string;
+}) {
   const [status, setStatus] = useState<Status>({ state: "idle" });
+  const [bitcoin, setBitcoin] = useState<BitcoinResult>({ state: "idle" });
   const [showMath, setShowMath] = useState(false);
 
-  const verify = useCallback(async () => {
+  const verifyChain = useCallback(async () => {
     setStatus({ state: "running" });
 
     // Work on a seq-ascending copy regardless of incoming order.
@@ -80,7 +94,6 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
         ok: true,
       };
 
-      // (d) seq runs 1..N with no gaps
       if (e.seq !== expectedSeq) {
         row.ok = false;
         rows.push(row);
@@ -90,10 +103,9 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
           reason: `sequence gap — expected #${expectedSeq}, found #${e.seq}`,
           rows,
         });
-        return;
+        return false;
       }
 
-      // (a) recomputed content hash === stored content_hash
       if (computedContent !== e.content_hash) {
         row.ok = false;
         rows.push(row);
@@ -103,10 +115,9 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
           reason: "content hash does not match (an entry's data was altered)",
           rows,
         });
-        return;
+        return false;
       }
 
-      // (b) prev_hash === previous entry's chain_hash (GENESIS for #1)
       if (e.prev_hash !== prevChain) {
         row.ok = false;
         rows.push(row);
@@ -119,10 +130,9 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
               : "prev hash does not match the previous entry's chain hash (link broken)",
           rows,
         });
-        return;
+        return false;
       }
 
-      // (c) recomputed chain hash === stored chain_hash
       if (computedChain !== e.chain_hash) {
         row.ok = false;
         rows.push(row);
@@ -132,7 +142,7 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
           reason: "chain hash does not match (the seal was tampered with)",
           rows,
         });
-        return;
+        return false;
       }
 
       rows.push(row);
@@ -146,7 +156,7 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
         count: 0,
         rows,
       });
-      return;
+      return true;
     }
 
     setStatus({
@@ -155,7 +165,90 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
       count: ordered.length,
       rows,
     });
+    return true;
   }, [entries]);
+
+  const verifyBitcoin = useCallback(async () => {
+    setBitcoin({ state: "running" });
+
+    try {
+      const res = await fetch(`/api/venture/${ventureId}`);
+      const data = (await res.json()) as {
+        ots_file_base64?: string | null;
+        latest_hash?: string | null;
+        error?: string;
+      };
+
+      if (!res.ok) {
+        setBitcoin({
+          state: "failed",
+          message: data.error || "Could not load venture proof data.",
+        });
+        return;
+      }
+
+      if (!data.ots_file_base64) {
+        setBitcoin({
+          state: "skipped",
+          message: "This venture has not been Bitcoin-anchored yet.",
+        });
+        return;
+      }
+
+      if (!data.latest_hash) {
+        setBitcoin({
+          state: "failed",
+          message: "No chain tip hash available to verify against.",
+        });
+        return;
+      }
+
+      // OpenTimestamps is Node-only; the browser fetches the proof + tip hash,
+      // then asks /api/verify-bitcoin to run the Merkle check (which itself
+      // pulls block headers from Blockstream / our proxy).
+      const verifyRes = await fetch("/api/verify-bitcoin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ots_file_base64: data.ots_file_base64,
+          ledger_hash: data.latest_hash,
+        }),
+      });
+      const result = (await verifyRes.json()) as {
+        verified?: boolean;
+        blockHeight?: number;
+        error?: string;
+      };
+
+      if (result.verified) {
+        setBitcoin({
+          state: "ok",
+          message: `Bitcoin-anchored at block #${result.blockHeight} — mathematically proven existence.`,
+        });
+      } else {
+        setBitcoin({
+          state: "failed",
+          message: `Verification failed: ${result.error || "Unknown error"}`,
+        });
+      }
+    } catch (error) {
+      setBitcoin({
+        state: "failed",
+        message:
+          "Verification error: " +
+          (error instanceof Error ? error.message : "unknown"),
+      });
+    }
+  }, [ventureId]);
+
+  const verify = useCallback(async () => {
+    const chainOk = await verifyChain();
+    if (chainOk) {
+      await verifyBitcoin();
+    } else {
+      setBitcoin({ state: "idle" });
+    }
+  }, [verifyChain, verifyBitcoin]);
 
   useEffect(() => {
     void verify();
@@ -175,6 +268,7 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
 
   const rows =
     status.state === "ok" || status.state === "broken" ? status.rows : [];
+  const busy = status.state === "running" || bitcoin.state === "running";
 
   return (
     <section className="verify">
@@ -183,17 +277,14 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
           type="button"
           className="btn btn-secondary"
           onClick={() => void verify()}
-          disabled={status.state === "running"}
+          disabled={busy}
         >
-          {status.state === "running" ? (
-            <span className="btn-ellipsis">…</span>
-          ) : (
-            "Verify chain"
-          )}
+          {busy ? <span className="btn-ellipsis">…</span> : "Verify chain"}
         </button>
         <p className="verify-note">
-          Your browser will independently recompute every hash and check the
-          seal — this server is not trusted with the answer.
+          Your browser recomputes every hash, then checks the Bitcoin
+          OpenTimestamps proof against public block headers — this server is
+          not trusted with the chain answer.
         </p>
       </div>
 
@@ -220,6 +311,26 @@ export function VerifyChain({ entries }: { entries: VerifyEntry[] }) {
         <div className="verify-banner verify-broken">
           ✗ Chain broken at entry #{status.seq} — {status.reason}
         </div>
+      ) : null}
+
+      {bitcoin.state === "running" ? (
+        <div className="verify-banner verify-running">
+          Checking Bitcoin OpenTimestamps proof…
+        </div>
+      ) : null}
+
+      {bitcoin.state === "ok" ? (
+        <div className="verify-banner verify-ok verify-success">
+          ✓ {bitcoin.message}
+        </div>
+      ) : null}
+
+      {bitcoin.state === "skipped" ? (
+        <div className="verify-banner verify-running">{bitcoin.message}</div>
+      ) : null}
+
+      {bitcoin.state === "failed" ? (
+        <div className="verify-banner verify-broken">✗ {bitcoin.message}</div>
       ) : null}
 
       {rows.length > 0 ? (

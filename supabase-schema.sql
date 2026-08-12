@@ -6,7 +6,9 @@ create table if not exists public.ventures (
   name text not null,
   slug text not null unique,
   tagline text,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  -- Latest OpenTimestamps .ots proof (base64) for browser / independent verify.
+  ots_file_base64 text
 );
 create index if not exists ventures_user_idx on public.ventures (clerk_user_id);
 

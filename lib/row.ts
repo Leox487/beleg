@@ -31,6 +31,8 @@ export function mapVenture(row: Record<string, unknown>): Venture {
     slug: String(row.slug),
     tagline: asNullableString(row.tagline),
     created_at: asTimestamp(row.created_at),
+    ots_file_base64:
+      row.ots_file_base64 == null ? null : String(row.ots_file_base64),
   };
 }
 

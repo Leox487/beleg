@@ -5,6 +5,8 @@ export interface Venture {
   slug: string;
   tagline: string | null;
   created_at: string;
+  /** Latest OpenTimestamps .ots proof (base64), when Bitcoin-anchored. */
+  ots_file_base64?: string | null;
 }
 
 export interface Entry {

@@ -60,6 +60,11 @@ async function handleUpgrade(req: Request) {
               ots_proof = ${result.proofBase64}
             WHERE id = ${anchor.id}
           `;
+          await sql`
+            UPDATE ventures
+            SET ots_file_base64 = ${result.proofBase64}
+            WHERE id = ${anchor.venture_id}
+          `;
           confirmed++;
         } catch (error) {
           console.error(`Failed to confirm anchor ${anchor.id}:`, error);
@@ -72,6 +77,11 @@ async function handleUpgrade(req: Request) {
             UPDATE anchors
             SET ots_proof = ${result.proofBase64}
             WHERE id = ${anchor.id}
+          `;
+          await sql`
+            UPDATE ventures
+            SET ots_file_base64 = ${result.proofBase64}
+            WHERE id = ${anchor.venture_id}
           `;
           updated++;
         } catch (error) {

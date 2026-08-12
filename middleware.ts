@@ -21,7 +21,13 @@ const isPublicRoute = createRouteMatcher([
   "/faq",
   "/security",
   "/contact",
+  "/for-reviewers",
   "/api/public/(.*)",
+  // Public verification surface — proof pages load these without auth.
+  "/api/venture/(.*)",
+  "/api/block-header/(.*)",
+  "/api/verify-bitcoin",
+  "/api/anchor/(.*)/proof",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
