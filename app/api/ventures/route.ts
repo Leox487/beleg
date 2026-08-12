@@ -25,6 +25,13 @@ function slugify(name: string): string {
   return `${stem}-${randomSuffix()}`;
 }
 
+function ingestEmailDomain(): string {
+  const fromEnv = process.env.INGEST_EMAIL_DOMAIN?.trim().toLowerCase();
+  // Prefer a dedicated receiving subdomain when available (avoids MX conflicts
+  // with human mail on the apex). Falls back for local/dev.
+  return fromEnv || "ingest.belegapp.com";
+}
+
 function generateInboundEmail(
   ventureName: string,
   ventureId: string,
@@ -37,7 +44,7 @@ function generateInboundEmail(
       .replace(/^-+|-+$/g, "")
       .slice(0, 30) || "venture";
   const shortId = ventureId.slice(0, 8);
-  return `${slug}-${shortId}${salt}@ingest.belegapp.com`;
+  return `${slug}-${shortId}${salt}@${ingestEmailDomain()}`;
 }
 
 async function createInboundEndpoint(ventureId: string, name: string) {

@@ -28,6 +28,8 @@ const isPublicRoute = createRouteMatcher([
   "/api/block-header/(.*)",
   "/api/verify-bitcoin",
   "/api/anchor/(.*)/proof",
+  // Resend inbound webhook (verified via RESEND_WEBHOOK_SECRET / Svix).
+  "/api/ingest/email",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

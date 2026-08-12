@@ -7,7 +7,12 @@ const nextConfig: NextConfig = {
   // opentimestamps pulls in Node-only CommonJS deps (bitcore-lib, request).
   // Keep them external so they run as real Node modules instead of being
   // bundled, which avoids Turbopack/webpack resolution issues.
-  serverExternalPackages: ["opentimestamps", "postgres"],
+  serverExternalPackages: [
+    "opentimestamps",
+    "postgres",
+    "mailparser",
+    "dkim-verifier",
+  ],
   // Next 16 defaults to Turbopack; keep an empty turbopack block so a webpack
   // polyfill config (buffer) does not fail the build.
   turbopack: {},

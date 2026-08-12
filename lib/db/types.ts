@@ -7,6 +7,13 @@ export interface InboundEndpoint {
   last_ingested_at: Date | null;
 }
 
+export interface EmailWhitelist {
+  id: string;
+  venture_id: string;
+  sender_email: string;
+  created_at: Date;
+}
+
 export interface IngestedEmail {
   id: string;
   endpoint_id: string;

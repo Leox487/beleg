@@ -61,7 +61,8 @@ create table if not exists public.anchors (
 );
 create index if not exists anchors_venture_idx on public.anchors (venture_id, created_at desc);
 
--- Inbound email ingestion: each venture gets a unique @ingest.belegapp.com address.
+-- Inbound email ingestion: each venture gets a unique address on INGEST_EMAIL_DOMAIN
+-- (e.g. ingest.belegapp.com when that subdomain is verified for Resend receiving).
 -- Beleg stores milestones as entries; milestone_id → entries(id).
 create table if not exists public.inbound_endpoints (
   id uuid primary key default gen_random_uuid(),
@@ -98,3 +99,14 @@ create index if not exists idx_ingested_emails_endpoint
   on public.ingested_emails (endpoint_id);
 create index if not exists idx_ingested_emails_status
   on public.ingested_emails (status);
+
+-- Allowed From: addresses for auto-creating milestones from inbound email.
+create table if not exists public.email_whitelist (
+  id uuid primary key default gen_random_uuid(),
+  venture_id uuid not null references public.ventures(id) on delete cascade,
+  sender_email text not null,
+  created_at timestamptz default now(),
+  unique (venture_id, sender_email)
+);
+create index if not exists idx_email_whitelist_venture
+  on public.email_whitelist (venture_id);
