@@ -7,6 +7,7 @@ import sql from "@/lib/supabase";
 type Body = Record<string, unknown>;
 
 const SUFFIX_ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
+const INBOUND_DOMAIN = "ingest.belegapp.com";
 
 function randomSuffix(len = 4): string {
   let out = "";
@@ -23,6 +24,44 @@ function slugify(name: string): string {
     .replace(/^-+|-+$/g, "");
   const stem = base || "venture";
   return `${stem}-${randomSuffix()}`;
+}
+
+/** Local-part stem from venture name (no random suffix — id slice provides uniqueness). */
+function slugifyName(name: string): string {
+  const base = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48);
+  return base || "venture";
+}
+
+function inboundEmailAddress(name: string, ventureId: string, salt = ""): string {
+  const local = `${slugifyName(name)}-${ventureId.slice(0, 8)}${salt}`;
+  return `${local}@${INBOUND_DOMAIN}`;
+}
+
+async function createInboundEndpoint(ventureId: string, name: string) {
+  // email_address is UNIQUE; collide only if the same id prefix somehow retries.
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const salt = attempt === 0 ? "" : `-${randomSuffix(3)}`;
+    const email_address = inboundEmailAddress(name, ventureId, salt);
+    try {
+      const rows = await sql`
+        INSERT INTO inbound_endpoints (venture_id, email_address)
+        VALUES (${ventureId}, ${email_address})
+        RETURNING id, venture_id, email_address, is_active, created_at, last_ingested_at
+      `;
+      return rows[0];
+    } catch (e: unknown) {
+      const code =
+        typeof e === "object" && e && "code" in e
+          ? String((e as { code: unknown }).code)
+          : "";
+      if (code !== "23505") throw e;
+    }
+  }
+  throw new Error("Could not allocate a unique inbound email address");
 }
 
 export async function POST(req: Request) {
@@ -61,8 +100,38 @@ export async function POST(req: Request) {
         VALUES (${userId}, ${name}, ${slug}, ${tagline})
         RETURNING id, clerk_user_id, name, slug, tagline, created_at
       `;
+      const venture = mapVenture(rows[0] as Record<string, unknown>);
+
+      let inbound = null;
+      try {
+        inbound = await createInboundEndpoint(venture.id, venture.name);
+      } catch (e) {
+        console.error("Inbound endpoint create error:", e);
+        // Venture already exists; surface a soft failure so the client still
+        // gets the ledger. Endpoint can be backfilled later if needed.
+      }
+
       return NextResponse.json(
-        { venture: mapVenture(rows[0] as Record<string, unknown>) },
+        {
+          venture,
+          inbound_endpoint: inbound
+            ? {
+                id: String(inbound.id),
+                venture_id: String(inbound.venture_id),
+                email_address: String(inbound.email_address),
+                is_active: Boolean(inbound.is_active),
+                created_at:
+                  inbound.created_at instanceof Date
+                    ? inbound.created_at.toISOString()
+                    : String(inbound.created_at),
+                last_ingested_at: inbound.last_ingested_at
+                  ? inbound.last_ingested_at instanceof Date
+                    ? inbound.last_ingested_at.toISOString()
+                    : String(inbound.last_ingested_at)
+                  : null,
+              }
+            : null,
+        },
         { status: 201 },
       );
     } catch (e: unknown) {
