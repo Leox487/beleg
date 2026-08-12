@@ -10,8 +10,23 @@ type ResendReceivedEvent = {
   data?: {
     email_id?: string;
     to?: string[];
+    from?: string;
+    subject?: string;
     received_for?: string[];
   };
+};
+
+type ReceivedEmailPayload = {
+  id?: string;
+  to?: string[] | null;
+  from?: string | null;
+  subject?: string | null;
+  text?: string | null;
+  html?: string | null;
+  headers?: Record<string, string> | null;
+  received_for?: string[] | null;
+  created_at?: string | null;
+  raw?: { download_url?: string; expires_at?: string } | null;
 };
 
 function getResend(): Resend | null {
@@ -41,16 +56,74 @@ function verifyResendWebhook(
   }) as ResendReceivedEvent;
 }
 
-function pickRecipient(event: ResendReceivedEvent): string {
-  const receivedFor = event.data?.received_for?.[0];
-  if (receivedFor) return receivedFor.trim().toLowerCase();
-  const to = event.data?.to?.[0];
-  return to ? to.trim().toLowerCase() : "";
+function pickRecipient(
+  event: ResendReceivedEvent,
+  email: ReceivedEmailPayload,
+): string {
+  const candidates = [
+    ...(event.data?.received_for ?? []),
+    ...(event.data?.to ?? []),
+    ...(email.received_for ?? []),
+    ...(email.to ?? []),
+  ];
+  for (const c of candidates) {
+    const v = (c ?? "").trim().toLowerCase();
+    if (v.includes("@")) return v;
+  }
+  return "";
+}
+
+/**
+ * Fetch full received-email content. Prefer the Receiving API
+ * (`/emails/receiving/:id`); fall back to `/emails/:id` if needed.
+ */
+async function fetchReceivedEmail(
+  apiKey: string,
+  emailId: string,
+): Promise<{ email: ReceivedEmailPayload | null; error: string | null }> {
+  const headers = {
+    Authorization: `Bearer ${apiKey}`,
+    Accept: "application/json",
+  };
+
+  for (const path of [
+    `https://api.resend.com/emails/receiving/${emailId}`,
+    `https://api.resend.com/emails/${emailId}`,
+  ]) {
+    const res = await fetch(path, { headers });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.warn("Received email fetch failed:", path, res.status, body);
+      continue;
+    }
+    const email = (await res.json()) as ReceivedEmailPayload;
+    return { email, error: null };
+  }
+
+  return { email: null, error: "Failed to fetch email content" };
+}
+
+function htmlToText(html: string): string {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
 }
 
 export async function POST(request: NextRequest) {
+  const apiKey = process.env.RESEND_API_KEY;
   const resend = getResend();
-  if (!resend) {
+  if (!resend || !apiKey) {
     return NextResponse.json(
       { error: "RESEND_API_KEY is not configured" },
       { status: 500 },
@@ -77,7 +150,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { data: email, error } = await resend.emails.receiving.get(emailId);
+    // Webhook is metadata-only — pull text/html (and optional raw) via API.
+    const { email, error } = await fetchReceivedEmail(apiKey, emailId);
     if (error || !email) {
       console.error("Failed to fetch received email:", error);
       return NextResponse.json(
@@ -86,31 +160,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let rawEmail = "";
     const downloadUrl = email.raw?.download_url;
-    if (!downloadUrl) {
-      return NextResponse.json(
-        { error: "Missing raw email download URL" },
-        { status: 502 },
-      );
+    if (downloadUrl) {
+      const rawResponse = await fetch(downloadUrl);
+      if (rawResponse.ok) {
+        rawEmail = await rawResponse.text();
+      } else {
+        console.warn(
+          "Raw .eml download failed; continuing with API text body",
+          rawResponse.status,
+        );
+      }
     }
 
-    const rawResponse = await fetch(downloadUrl);
-    if (!rawResponse.ok) {
-      console.error("Failed to download raw email:", rawResponse.status);
-      return NextResponse.json(
-        { error: "Failed to download raw email" },
-        { status: 502 },
-      );
-    }
+    const apiText =
+      (typeof email.text === "string" && email.text.trim()
+        ? email.text
+        : null) ||
+      (typeof email.html === "string" && email.html.trim()
+        ? htmlToText(email.html)
+        : null);
 
-    const rawEmail = await rawResponse.text();
-    const recipient =
-      pickRecipient(event) ||
-      email.received_for?.[0]?.trim().toLowerCase() ||
-      email.to?.[0]?.trim().toLowerCase() ||
-      "";
+    const recipient = pickRecipient(event, email);
+    const fromHeader =
+      email.headers?.from ||
+      email.from ||
+      event.data?.from ||
+      null;
 
-    const result = await processIncomingEmail(rawEmail, recipient);
+    const result = await processIncomingEmail(rawEmail, recipient, {
+      subject: email.subject ?? event.data?.subject ?? null,
+      text: apiText,
+      html: email.html ?? null,
+      from: fromHeader,
+      date: email.created_at ?? null,
+    });
 
     if (result.success && result.entryId) {
       return NextResponse.json(
@@ -119,8 +204,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Expected rejections (unknown venture, whitelist, etc.) → 200 so Resend
-    // does not retry forever. Only hard failures return 5xx.
     const isServerFault = result.error === "Failed to create entry";
     return NextResponse.json(
       {

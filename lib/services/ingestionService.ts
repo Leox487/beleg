@@ -19,6 +19,15 @@ export interface IngestionResult {
   dkimVerified: boolean;
 }
 
+/** Optional fields from Resend Received Emails API (webhook is metadata-only). */
+export interface InboundEmailMeta {
+  subject?: string | null;
+  text?: string | null;
+  html?: string | null;
+  from?: string | null;
+  date?: string | Date | null;
+}
+
 function firstAddress(
   field: AddressObject | AddressObject[] | undefined,
 ): string | null {
@@ -76,17 +85,44 @@ async function verifyDkim(rawEmail: string): Promise<{
   }
 }
 
+function parseFromHeader(from: string | null | undefined): string | null {
+  if (!from) return null;
+  const angle = from.match(/<([^>]+)>/);
+  const addr = (angle?.[1] ?? from).trim().toLowerCase();
+  return addr.includes("@") ? addr : null;
+}
+
 /**
- * Resolve venture from recipient `slug@domain` by matching ventures.slug
- * to the local-part before @. Optionally attach an inbound_endpoints row
- * for audit logging when one exists.
+ * Resolve venture from recipient `slug@*.resend.app` (or configured domain)
+ * by matching ventures.slug to the local-part before @.
  */
 async function resolveVenture(recipient: string): Promise<{
   ventureId: string;
   endpointId: string | null;
 } | null> {
-  const local = (recipient.split("@")[0] ?? "").trim().toLowerCase();
-  if (!local) return null;
+  const normalized = recipient.trim().toLowerCase();
+  const at = normalized.lastIndexOf("@");
+  if (at <= 0) return null;
+  const local = normalized.slice(0, at).trim();
+  const domain = normalized.slice(at + 1).trim();
+  if (!local || !domain) return null;
+
+  const expected = (
+    process.env.INGEST_EMAIL_DOMAIN ||
+    process.env.NEXT_PUBLIC_INGEST_EMAIL_DOMAIN ||
+    ""
+  )
+    .trim()
+    .toLowerCase();
+  if (expected && domain !== expected) {
+    console.warn(
+      "ingest: recipient domain mismatch",
+      domain,
+      "expected",
+      expected,
+    );
+    // Still allow match by slug — Resend may rewrite/forward; local-part is source of truth.
+  }
 
   const ventures = await sql`
     SELECT id
@@ -114,12 +150,15 @@ async function resolveVenture(recipient: string): Promise<{
 export async function processIncomingEmail(
   rawEmail: string,
   recipientEmail: string,
+  meta: InboundEmailMeta = {},
 ): Promise<IngestionResult> {
-  const parsed = await simpleParser(rawEmail);
+  const parsed = rawEmail.trim()
+    ? await simpleParser(rawEmail)
+    : null;
 
   const recipient =
     recipientEmail.trim().toLowerCase() ||
-    firstAddress(parsed.to) ||
+    (parsed ? firstAddress(parsed.to) : null) ||
     "";
 
   if (!recipient) {
@@ -143,7 +182,14 @@ export async function processIncomingEmail(
 
   const { ventureId, endpointId } = resolved;
 
-  const dkim = await verifyDkim(rawEmail);
+  const dkim = rawEmail.trim()
+    ? await verifyDkim(rawEmail)
+    : {
+        verified: false,
+        domain: null,
+        selector: null,
+        error: "No raw .eml for DKIM",
+      };
   if (!dkim.verified) {
     console.warn(
       "ingest: DKIM failed or absent — continuing (v1 soft gate)",
@@ -152,21 +198,49 @@ export async function processIncomingEmail(
   }
 
   const fromAddress =
-    parsed.from?.text ?? firstAddress(parsed.from) ?? null;
-  const senderEmail = firstAddress(parsed.from);
+    meta.from?.trim() ||
+    parsed?.from?.text ||
+    (parsed ? firstAddress(parsed.from) : null) ||
+    null;
+  const senderEmail =
+    parseFromHeader(meta.from) ||
+    (parsed ? firstAddress(parsed.from) : null);
+
+  // Prefer Resend Received Emails API text (webhook has no body).
   const plainText =
-    typeof parsed.text === "string" && parsed.text.trim()
+    (typeof meta.text === "string" && meta.text.trim()
+      ? meta.text
+      : null) ||
+    (parsed && typeof parsed.text === "string" && parsed.text.trim()
       ? parsed.text
-      : null;
+      : null);
   const htmlBody =
-    typeof parsed.html === "string" && parsed.html.length > 0
+    (typeof meta.html === "string" && meta.html.length > 0
+      ? meta.html
+      : null) ||
+    (parsed && typeof parsed.html === "string" && parsed.html.length > 0
       ? parsed.html
-      : null;
-  const subjectLine = parsed.subject ?? null;
-  const sentAt = parsed.date ?? new Date();
+      : null);
+  const subjectLine =
+    (typeof meta.subject === "string" ? meta.subject : null) ||
+    parsed?.subject ||
+    null;
+  const sentAt = (() => {
+    if (meta.date instanceof Date && !Number.isNaN(meta.date.getTime())) {
+      return meta.date;
+    }
+    if (typeof meta.date === "string" && meta.date.trim()) {
+      const d = new Date(meta.date);
+      if (!Number.isNaN(d.getTime())) return d;
+    }
+    return parsed?.date ?? new Date();
+  })();
+
+  // Persist something for audit even when raw download is unavailable.
+  const storedRaw = rawEmail.trim() || plainText || htmlBody || "";
 
   let ingestedEmailId: string | null = null;
-  if (endpointId) {
+  if (endpointId && storedRaw) {
     const insertRows = await sql`
       INSERT INTO ingested_emails (
         endpoint_id, raw_eml, plain_text_body, html_body, subject_line,
@@ -174,7 +248,7 @@ export async function processIncomingEmail(
         verification_error, status
       ) VALUES (
         ${endpointId},
-        ${rawEmail},
+        ${storedRaw},
         ${plainText},
         ${htmlBody},
         ${subjectLine},
