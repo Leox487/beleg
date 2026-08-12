@@ -27,7 +27,6 @@ function verifyResendWebhook(
 ): ResendReceivedEvent {
   const secret = process.env.RESEND_WEBHOOK_SECRET;
   if (!secret) {
-    // Local/dev fallback when signature secret is unset.
     return JSON.parse(payload) as ResendReceivedEvent;
   }
 
@@ -97,11 +96,7 @@ export async function POST(request: NextRequest) {
 
     const rawResponse = await fetch(downloadUrl);
     if (!rawResponse.ok) {
-      console.error(
-        "Failed to download raw email:",
-        rawResponse.status,
-        await rawResponse.text().catch(() => ""),
-      );
+      console.error("Failed to download raw email:", rawResponse.status);
       return NextResponse.json(
         { error: "Failed to download raw email" },
         { status: 502 },
@@ -117,24 +112,21 @@ export async function POST(request: NextRequest) {
 
     const result = await processIncomingEmail(rawEmail, recipient);
 
-    if (result.success) {
+    if (result.success && result.entryId) {
       return NextResponse.json(
-        {
-          success: true,
-          milestoneId: result.milestoneId,
-          dkimVerified: result.dkimVerified,
-        },
+        { success: true, entry_id: result.entryId },
         { status: 200 },
       );
     }
 
-    const isServerFault = result.error === "Failed to create milestone";
-    // Return 200 for expected rejections so Resend does not retry forever.
+    // Expected rejections (unknown venture, whitelist, etc.) → 200 so Resend
+    // does not retry forever. Only hard failures return 5xx.
+    const isServerFault = result.error === "Failed to create entry";
     return NextResponse.json(
       {
         success: false,
         error: result.error,
-        dkimVerified: result.dkimVerified,
+        dkim_verified: result.dkimVerified,
       },
       { status: isServerFault ? 500 : 200 },
     );

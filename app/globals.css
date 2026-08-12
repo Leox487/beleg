@@ -3327,8 +3327,147 @@ a {
 .entry-top {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 8px;
+}
+
+.badge-email {
+  letter-spacing: 0.06em;
+}
+
+.dkim-chip {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+
+.dkim-chip-ok {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+}
+
+.dkim-chip-miss {
+  color: var(--text-3);
+}
+
+.ledger-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.settings-link {
+  font-size: 13px;
+  color: var(--text-3);
+  text-decoration: none;
+}
+
+.settings-link:hover {
+  color: var(--text-2);
+  text-decoration: underline;
+}
+
+.share-card .ingest-hint {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.share-card .ingest-hint code {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.settings-page .settings-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settings-dl {
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.settings-dl dt {
+  font-size: 12px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.settings-dl dd {
+  margin: 2px 0 0;
+  color: var(--text);
+}
+
+.settings-form,
+.danger-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-raised-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.settings-error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--danger);
+}
+
+.settings-subhead {
+  margin: 8px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ingest-address-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ingest-address {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 13px;
+  padding: 8px 12px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.settings-danger {
+  border-color: color-mix(in srgb, var(--danger) 35%, var(--border));
 }
 
 .entry-seq {

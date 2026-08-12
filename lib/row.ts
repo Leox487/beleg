@@ -49,6 +49,9 @@ export function mapEntry(row: Record<string, unknown>): Entry {
     content_hash: String(row.content_hash),
     prev_hash: String(row.prev_hash),
     chain_hash: String(row.chain_hash),
+    source: row.source == null ? "manual" : String(row.source),
+    dkim_verified:
+      row.dkim_verified == null ? null : Boolean(row.dkim_verified),
   };
 }
 

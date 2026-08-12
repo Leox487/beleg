@@ -8,12 +8,13 @@ import {
 } from "dkim-verifier";
 import { simpleParser, type AddressObject } from "mailparser";
 
-import { createMilestone } from "@/lib/services/milestoneService";
+import { appendEntry } from "@/lib/chain";
+import { extractMilestoneFromEmail } from "@/lib/services/extractMilestone";
 import sql from "@/lib/supabase";
 
 export interface IngestionResult {
   success: boolean;
-  milestoneId?: string;
+  entryId?: string;
   error?: string;
   dkimVerified: boolean;
 }
@@ -75,6 +76,42 @@ async function verifyDkim(rawEmail: string): Promise<{
   }
 }
 
+/**
+ * Resolve venture from recipient address:
+ * 1) exact match on inbound_endpoints
+ * 2) fallback: local-part ends with -[8 hex chars] matching ventures.id prefix
+ */
+async function resolveVenture(recipient: string): Promise<{
+  ventureId: string;
+  endpointId: string | null;
+} | null> {
+  const endpoints = await sql`
+    SELECT id, venture_id
+    FROM inbound_endpoints
+    WHERE lower(email_address) = ${recipient} AND is_active = true
+    LIMIT 1
+  `;
+  if (endpoints[0]) {
+    return {
+      ventureId: String(endpoints[0].venture_id),
+      endpointId: String(endpoints[0].id),
+    };
+  }
+
+  const local = recipient.split("@")[0] ?? "";
+  const match = local.match(/-([0-9a-f]{8})(?:-[a-z0-9]+)?$/i);
+  if (!match) return null;
+  const idPrefix = match[1].toLowerCase();
+
+  const ventures = await sql`
+    SELECT id FROM ventures
+    WHERE id::text LIKE ${idPrefix + "%"}
+    LIMIT 1
+  `;
+  if (!ventures[0]) return null;
+  return { ventureId: String(ventures[0].id), endpointId: null };
+}
+
 export async function processIncomingEmail(
   rawEmail: string,
   recipientEmail: string,
@@ -87,6 +124,7 @@ export async function processIncomingEmail(
     "";
 
   if (!recipient) {
+    console.warn("ingest: missing recipient address");
     return {
       success: false,
       error: "Missing recipient address",
@@ -94,28 +132,26 @@ export async function processIncomingEmail(
     };
   }
 
-  const endpoints = await sql`
-    SELECT id, venture_id, email_address, is_active
-    FROM inbound_endpoints
-    WHERE email_address = ${recipient} AND is_active = true
-    LIMIT 1
-  `;
-  const endpoint = endpoints[0] as
-    | { id: string; venture_id: string; email_address: string; is_active: boolean }
-    | undefined;
-
-  if (!endpoint) {
+  const resolved = await resolveVenture(recipient);
+  if (!resolved) {
+    console.warn("ingest: no venture for recipient", recipient);
     return {
       success: false,
-      error: "No active endpoint for this recipient",
+      error: "No venture found for recipient",
       dkimVerified: false,
     };
   }
 
-  const ventureId = String(endpoint.venture_id);
-  const endpointId = String(endpoint.id);
+  const { ventureId, endpointId } = resolved;
 
   const dkim = await verifyDkim(rawEmail);
+  if (!dkim.verified) {
+    console.warn(
+      "ingest: DKIM failed or absent — continuing (v1 soft gate)",
+      dkim.error,
+    );
+  }
+
   const fromAddress =
     parsed.from?.text ?? firstAddress(parsed.from) ?? null;
   const senderEmail = firstAddress(parsed.from);
@@ -130,47 +166,45 @@ export async function processIncomingEmail(
   const subjectLine = parsed.subject ?? null;
   const sentAt = parsed.date ?? new Date();
 
-  const insertRows = await sql`
-    INSERT INTO ingested_emails (
-      endpoint_id, raw_eml, plain_text_body, html_body, subject_line,
-      from_address, sent_at, dkim_verified, dkim_domain, dkim_selector,
-      verification_error, status
-    ) VALUES (
-      ${endpointId},
-      ${rawEmail},
-      ${plainText},
-      ${htmlBody},
-      ${subjectLine},
-      ${fromAddress},
-      ${sentAt.toISOString()},
-      ${dkim.verified},
-      ${dkim.domain},
-      ${dkim.selector},
-      ${dkim.error},
-      ${dkim.verified ? "verified" : "rejected"}
-    )
-    RETURNING id
-  `;
-  const ingestedEmailId = String(insertRows[0].id);
-
-  if (!dkim.verified) {
-    return {
-      success: false,
-      error: dkim.error || "DKIM verification failed",
-      dkimVerified: false,
-    };
+  let ingestedEmailId: string | null = null;
+  if (endpointId) {
+    const insertRows = await sql`
+      INSERT INTO ingested_emails (
+        endpoint_id, raw_eml, plain_text_body, html_body, subject_line,
+        from_address, sent_at, dkim_verified, dkim_domain, dkim_selector,
+        verification_error, status
+      ) VALUES (
+        ${endpointId},
+        ${rawEmail},
+        ${plainText},
+        ${htmlBody},
+        ${subjectLine},
+        ${fromAddress},
+        ${sentAt.toISOString()},
+        ${dkim.verified},
+        ${dkim.domain},
+        ${dkim.selector},
+        ${dkim.error},
+        ${dkim.verified ? "verified" : "rejected"}
+      )
+      RETURNING id
+    `;
+    ingestedEmailId = String(insertRows[0].id);
   }
 
   if (!senderEmail) {
-    await sql`
-      UPDATE ingested_emails
-      SET status = 'rejected', verification_error = ${"Missing From address"}
-      WHERE id = ${ingestedEmailId}
-    `;
+    console.warn("ingest: missing From address");
+    if (ingestedEmailId) {
+      await sql`
+        UPDATE ingested_emails
+        SET status = 'rejected', verification_error = ${"Missing From address"}
+        WHERE id = ${ingestedEmailId}
+      `;
+    }
     return {
       success: false,
       error: "Missing From address",
-      dkimVerified: true,
+      dkimVerified: dkim.verified,
     };
   }
 
@@ -183,83 +217,73 @@ export async function processIncomingEmail(
   `;
 
   if (!whitelist[0]) {
-    await sql`
-      UPDATE ingested_emails
-      SET status = 'rejected', verification_error = ${"Sender not whitelisted"}
-      WHERE id = ${ingestedEmailId}
-    `;
+    console.warn("ingest: sender not whitelisted", senderEmail, ventureId);
+    if (ingestedEmailId) {
+      await sql`
+        UPDATE ingested_emails
+        SET status = 'rejected', verification_error = ${"Sender not whitelisted"}
+        WHERE id = ${ingestedEmailId}
+      `;
+    }
     return {
       success: false,
-      error: "Sender not whitelisted",
-      dkimVerified: true,
-    };
-  }
-
-  if (!plainText) {
-    await sql`
-      UPDATE ingested_emails
-      SET status = 'rejected', verification_error = ${"No plain text body"}
-      WHERE id = ${ingestedEmailId}
-    `;
-    return {
-      success: false,
-      error: "DKIM verification failed or no plain text body",
-      dkimVerified: true,
+      error: "sender not whitelisted",
+      dkimVerified: dkim.verified,
     };
   }
 
   try {
-    const title =
-      (subjectLine && subjectLine.trim()) ||
-      plainText.split("\n")[0].slice(0, 60) ||
-      "Email milestone";
-
-    const description = [
-      "**Auto-ingested from email**",
-      "",
-      `From: ${fromAddress ?? senderEmail}`,
-      `Date: ${sentAt.toISOString()}`,
-      `Ingested email id: ${ingestedEmailId}`,
-      "",
-      plainText.slice(0, 1000) + (plainText.length > 1000 ? "..." : ""),
-    ].join("\n");
-
-    const milestone = await createMilestone({
-      ventureId,
-      title,
-      description,
-      occurredAt: asDateOnly(sentAt),
+    const extracted = await extractMilestoneFromEmail({
+      subject: subjectLine,
+      text: plainText,
     });
 
-    await sql`
-      UPDATE ingested_emails
-      SET milestone_id = ${milestone.id}, status = 'milestone_created'
-      WHERE id = ${ingestedEmailId}
-    `;
+    const entry = await appendEntry({
+      venture_id: ventureId,
+      kind: "email",
+      title: extracted.title.slice(0, 200),
+      body: extracted.body,
+      occurred_at: asDateOnly(sentAt),
+      source: "email",
+      dkim_verified: dkim.verified,
+    });
 
-    await sql`
-      UPDATE inbound_endpoints
-      SET last_ingested_at = ${new Date().toISOString()}
-      WHERE id = ${endpointId}
-    `;
+    if (ingestedEmailId) {
+      await sql`
+        UPDATE ingested_emails
+        SET milestone_id = ${entry.id}, status = 'milestone_created'
+        WHERE id = ${ingestedEmailId}
+      `;
+    }
+
+    if (endpointId) {
+      await sql`
+        UPDATE inbound_endpoints
+        SET last_ingested_at = ${new Date().toISOString()}
+        WHERE id = ${endpointId}
+      `;
+    }
 
     return {
       success: true,
-      milestoneId: milestone.id,
-      dkimVerified: true,
+      entryId: entry.id,
+      dkimVerified: dkim.verified,
     };
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Milestone creation failed";
-    await sql`
-      UPDATE ingested_emails
-      SET status = 'failed', verification_error = ${message}
-      WHERE id = ${ingestedEmailId}
-    `;
+      error instanceof Error ? error.message : "Entry creation failed";
+    console.error("ingest: failed to append entry", error);
+    if (ingestedEmailId) {
+      await sql`
+        UPDATE ingested_emails
+        SET status = 'failed', verification_error = ${message}
+        WHERE id = ${ingestedEmailId}
+      `;
+    }
     return {
       success: false,
-      error: "Failed to create milestone",
-      dkimVerified: true,
+      error: "Failed to create entry",
+      dkimVerified: dkim.verified,
     };
   }
 }

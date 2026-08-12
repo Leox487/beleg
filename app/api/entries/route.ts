@@ -6,9 +6,8 @@ import sql from "@/lib/supabase";
 
 type Body = Record<string, unknown>;
 
-// 'attestation' is accepted so system-sealed confirmations validate, but it is
-// NOT offered in the founder-facing NewEntryForm — only the confirm route
-// creates attestation entries.
+// 'attestation' and 'email' are system-only — accepted here so sealed
+// confirmations / inbound mail validate, but NOT offered in NewEntryForm.
 const ALLOWED_KINDS = new Set([
   "milestone",
   "revenue",
@@ -19,6 +18,7 @@ const ALLOWED_KINDS = new Set([
   "product",
   "legal",
   "attestation",
+  "email",
   "other",
 ]);
 

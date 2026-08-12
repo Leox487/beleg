@@ -85,7 +85,7 @@ export default async function AttestPage({
     const entryRows = await sql`
       SELECT
         id, venture_id, seq, kind, title, body, occurred_at, recorded_at,
-        content_hash, prev_hash, chain_hash
+        content_hash, prev_hash, chain_hash, source, dkim_verified
       FROM entries
       WHERE id = ${attestation.entry_id}
       LIMIT 1

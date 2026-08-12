@@ -6,6 +6,7 @@ import type { Anchor, Entry, Venture } from "@/lib/types";
 import { Footer } from "@/app/components/Footer";
 import { Seal } from "@/app/components/Seal";
 import { VerifyChain } from "@/app/components/VerifyChain";
+import { DkimChip } from "@/app/components/DkimChip";
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {
@@ -56,7 +57,7 @@ export default async function PublicProofPage({
   const entryRows = await sql`
     SELECT
       id, venture_id, seq, kind, title, body, occurred_at, recorded_at,
-      content_hash, prev_hash, chain_hash
+      content_hash, prev_hash, chain_hash, source, dkim_verified
     FROM entries
     WHERE venture_id = ${venture.id}
     ORDER BY seq ASC
@@ -194,7 +195,10 @@ export default async function PublicProofPage({
           <p className="muted empty-chain">This ledger has no entries yet.</p>
         ) : (
           <div className="chain">
-            {entries.map((entry, i) => (
+            {entries.map((entry, i) => {
+              const isEmail =
+                entry.source === "email" || entry.kind === "email";
+              return (
               <div key={entry.id} className="chain-entry-wrap">
                 {i > 0 ? <hr className="rule-fade chain-rule" /> : null}
                 {entry.kind === "attestation" ? (
@@ -224,6 +228,12 @@ export default async function PublicProofPage({
                     <div className="entry-top">
                       <span className="entry-seq">#{entry.seq}</span>
                       <span className="badge">{entry.kind}</span>
+                      {isEmail ? (
+                        <span className="badge badge-email">EMAIL</span>
+                      ) : null}
+                      {isEmail ? (
+                        <DkimChip verified={entry.dkim_verified} />
+                      ) : null}
                     </div>
                     <h3 className="entry-title">{entry.title}</h3>
                     {entry.body ? (
@@ -246,7 +256,8 @@ export default async function PublicProofPage({
                   </article>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

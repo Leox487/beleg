@@ -31,7 +31,7 @@ export async function GET(
   const entryRows = await sql`
     SELECT
       id, venture_id, seq, kind, title, body, occurred_at, recorded_at,
-      content_hash, prev_hash, chain_hash
+      content_hash, prev_hash, chain_hash, source, dkim_verified
     FROM entries
     WHERE venture_id = ${venture.id}
     ORDER BY seq ASC

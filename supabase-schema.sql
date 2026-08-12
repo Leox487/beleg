@@ -24,6 +24,9 @@ create table if not exists public.entries (
   content_hash text not null,
   prev_hash text not null,
   chain_hash text not null,
+  -- Provenance metadata (not part of the hash chain payload).
+  source text not null default 'manual',
+  dkim_verified boolean,
   unique (venture_id, seq)
 );
 create index if not exists entries_venture_idx on public.entries (venture_id, seq);

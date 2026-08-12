@@ -16,6 +16,10 @@ export interface AppendEntryInput {
   title: string;
   body: string | null;
   occurred_at: string | null;
+  /** Provenance; defaults to 'manual'. Not included in content_hash. */
+  source?: string;
+  /** DKIM trust signal for email-sourced entries. Not hashed. */
+  dkim_verified?: boolean | null;
 }
 
 const MAX_RETRIES = 3;
@@ -58,20 +62,25 @@ export async function appendEntry(input: AppendEntryInput): Promise<Entry> {
     const cHash = contentHash(entry);
     const chHash = chainHash(prevChainHash, cHash);
 
+    const source = input.source?.trim() || "manual";
+    const dkimVerified =
+      input.dkim_verified === undefined ? null : input.dkim_verified;
+
     try {
       const rows = await sql`
         INSERT INTO entries (
           venture_id, seq, kind, title, body, occurred_at, recorded_at,
-          content_hash, prev_hash, chain_hash
+          content_hash, prev_hash, chain_hash, source, dkim_verified
         )
         VALUES (
           ${input.venture_id}, ${lastSeq + 1}, ${input.kind}, ${input.title},
           ${input.body}, ${input.occurred_at}, ${recorded_at},
-          ${cHash}, ${prevChainHash}, ${chHash}
+          ${cHash}, ${prevChainHash}, ${chHash},
+          ${source}, ${dkimVerified}
         )
         RETURNING
           id, venture_id, seq, kind, title, body, occurred_at, recorded_at,
-          content_hash, prev_hash, chain_hash
+          content_hash, prev_hash, chain_hash, source, dkim_verified
       `;
       return mapEntry(rows[0] as Record<string, unknown>);
     } catch (e: unknown) {

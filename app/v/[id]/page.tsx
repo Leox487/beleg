@@ -8,6 +8,8 @@ import { NewEntryForm } from "@/app/components/NewEntryForm";
 import { CopyText } from "@/app/components/CopyText";
 import { RequestAttestForm } from "@/app/components/RequestAttestForm";
 import { AnchorButton } from "@/app/components/AnchorButton";
+import { DkimChip } from "@/app/components/DkimChip";
+import Link from "next/link";
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {
@@ -53,7 +55,7 @@ export default async function LedgerPage({
   const entryRows = await sql`
     SELECT
       id, venture_id, seq, kind, title, body, occurred_at, recorded_at,
-      content_hash, prev_hash, chain_hash
+      content_hash, prev_hash, chain_hash, source, dkim_verified
     FROM entries
     WHERE venture_id = ${venture.id}
     ORDER BY seq ASC
@@ -63,6 +65,16 @@ export default async function LedgerPage({
   ) as Entry[];
   // Render newest-first visually; seq numbering is preserved on each card.
   const ordered = [...entries].reverse();
+
+  const endpointRows = await sql`
+    SELECT email_address
+    FROM inbound_endpoints
+    WHERE venture_id = ${venture.id} AND is_active = true
+    ORDER BY created_at ASC
+    LIMIT 1
+  `;
+  const ingestEmail =
+    (endpointRows[0]?.email_address as string | undefined) ?? null;
 
   // All attestations for this venture, grouped by entry for per-card display.
   const attestationRows = await sql`
@@ -107,16 +119,27 @@ export default async function LedgerPage({
     <main className="page">
       <div className="page-inner ledger">
         <header className="ledger-header">
-          <h1 className="page-title">{venture.name}</h1>
+          <div className="ledger-title-row">
+            <h1 className="page-title">{venture.name}</h1>
+            <Link href={`/v/${venture.id}/settings`} className="settings-link">
+              Settings
+            </Link>
+          </div>
           {venture.tagline ? (
             <p className="ledger-tagline">{venture.tagline}</p>
           ) : null}
-          <div className="public-link">
-            <span className="muted">Public proof page:</span>{" "}
+          <div className="public-link share-card">
+            <span className="muted">Share your proof page:</span>{" "}
             <CopyText value={publicUrl} />
             <a className="public-open" href={publicUrl} target="_blank" rel="noopener noreferrer">
               Open public page →
             </a>
+            {ingestEmail ? (
+              <p className="ingest-hint">
+                Forward emails to <code>{ingestEmail}</code> to auto-create
+                entries. Only whitelisted senders will be processed.
+              </p>
+            ) : null}
           </div>
           <p className="append-note">
             Entries are permanent. Once recorded, nothing on this ledger can be
@@ -207,6 +230,7 @@ export default async function LedgerPage({
           <div className="chain">
             {ordered.map((entry) => {
               const isAttestation = entry.kind === "attestation";
+              const isEmail = entry.source === "email" || entry.kind === "email";
               // Only pending requests are working state shown under an entry;
               // confirmed attestations now live in the timeline as their own
               // sealed chain entries.
@@ -229,6 +253,8 @@ export default async function LedgerPage({
                     >
                       {isAttestation ? "✓ attestation" : entry.kind}
                     </span>
+                    {isEmail ? <span className="badge badge-email">EMAIL</span> : null}
+                    {isEmail ? <DkimChip verified={entry.dkim_verified} /> : null}
                   </div>
                   <h3 className="entry-title">{entry.title}</h3>
                   {entry.body ? (

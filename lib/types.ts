@@ -21,6 +21,10 @@ export interface Entry {
   content_hash: string;
   prev_hash: string;
   chain_hash: string;
+  /** Origin of the entry; 'email' for auto-ingested mail. Not hashed. */
+  source: string;
+  /** DKIM result for email-sourced entries; null for manual/system kinds. */
+  dkim_verified: boolean | null;
 }
 
 export interface Attestation {
