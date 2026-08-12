@@ -2,10 +2,8 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 
 import AnimateIn from "@/app/components/AnimateIn";
-import { ChainField } from "@/app/components/ChainField";
 import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
-import { HeroProofMock } from "@/app/components/HeroProofMock";
 import { Showcase } from "@/app/components/Showcase";
 
 const PILLARS = [
@@ -54,65 +52,41 @@ export default async function Home() {
   const { userId } = await auth();
   const signedIn = Boolean(userId);
   const ctaHref = signedIn ? "/dashboard" : "/sign-up";
-  const ctaLabel = signedIn ? "Go to your ledger" : "Start your ledger";
+  const ctaLabel = signedIn
+    ? "Go to your ledger →"
+    : "Start Your Free Proof Timeline →";
 
   return (
     <main className="landing">
-      {/* ——— product-first hero ——— */}
-      <section className="section-full stage spotlight spotlight-hero">
-        <ChainField />
-        <div className="stage-grid">
-          <div className="stage-copy">
-            <AnimateIn direction="up" delay={0} duration={780}>
-              <p className="stage-brand">Beleg</p>
+      {/* ——— Phase 1 hero ——— */}
+      <section className="section-full stage land-hero-prove spotlight spotlight-hero">
+        <div className="land-hero-prove-inner">
+          <AnimateIn direction="up" delay={0} duration={780}>
+            <p className="stage-brand land-hero-prove-brand">Beleg</p>
+            <h1 className="land-hero-prove-title">
+              Stop claiming traction. <br />
+              <span className="land-hero-prove-accent">Start proving it.</span>
+            </h1>
+            <p className="land-hero-prove-lead">
+              Beleg creates a tamper-proof, publicly verifiable timeline of your
+              startup&apos;s achievements. Share one link that replaces due
+              diligence for grants, accelerators, and investors.
+            </p>
+          </AnimateIn>
 
-              <h1 className="brand-tagline">
-                Proof and trust built into{" "}
-                <span className="headline-accent">your timeline</span>.
-              </h1>
-
-              <p className="subline">
-                Applications and pitches are drowning in AI-polished claims
-                nobody can check. Beleg gives your traction a sealed record —
-                written as it happens, confirmed by real people, and verifiable
-                by anyone.
-              </p>
-            </AnimateIn>
-
-            <AnimateIn direction="up" delay={120} duration={780}>
-              <div className="hero-actions">
-                <Link className="cta" href={ctaHref}>
-                  <span className="cta-label">{ctaLabel}</span>
-                  <CtaBadge />
-                </Link>
-                <Link className="ghost-link" href="/how-it-works">
-                  See how it works →
-                </Link>
-              </div>
-
-              <p className="cta-note">
-                Free while in beta. No credit card. About a minute to start.
-              </p>
-
-              <ul className="trust-strip trust-strip-quiet" aria-label="Why people trust Beleg">
-                <li>
-                  <span className="trust-dot" aria-hidden="true" />
-                  Free in beta
-                </li>
-                <li>
-                  <span className="trust-dot" aria-hidden="true" />
-                  Verifiable in your browser
-                </li>
-                <li>
-                  <span className="trust-dot" aria-hidden="true" />
-                  Anchored to Bitcoin
-                </li>
-              </ul>
-            </AnimateIn>
-          </div>
-
-          <AnimateIn direction="up" delay={220} duration={820} className="stage-visual">
-            <HeroProofMock />
+          <AnimateIn direction="up" delay={100} duration={780}>
+            <div className="land-hero-prove-actions">
+              <Link className="cta" href={ctaHref}>
+                <span className="cta-label">{ctaLabel}</span>
+                <CtaBadge />
+              </Link>
+              <Link className="ghost-link land-hero-prove-ghost" href="/how-it-works">
+                See how it works
+              </Link>
+            </div>
+            <p className="land-hero-prove-note">
+              ✓ Free in beta. No credit card. 2-minute setup.
+            </p>
           </AnimateIn>
         </div>
       </section>
@@ -287,10 +261,50 @@ export default async function Home() {
             </p>
             <div className="hero-actions">
               <Link className="cta" href={ctaHref}>
-                <span className="cta-label">{ctaLabel}</span>
+                <span className="cta-label">
+                  {signedIn ? "Go to your ledger" : "Start your ledger"}
+                </span>
                 <CtaBadge />
               </Link>
             </div>
+          </AnimateIn>
+        </div>
+      </section>
+
+      <hr className="rule-fade land-rule" />
+
+      {/* ——— For Reviewers ——— */}
+      <section className="section-full land-section land-reviewers">
+        <div className="section-full-inner land-reviewers-inner">
+          <AnimateIn direction="up">
+            <span className="land-reviewers-badge">FOR EVALUATORS</span>
+            <h2 className="section-heading land-reviewers-title">
+              Stop guessing. Start verifying.
+            </h2>
+            <p className="section-lead land-reviewers-lead">
+              Reviewing applications? Ask founders for their Beleg link. One
+              click runs a cryptographic check in your own browser — no server,
+              no trust, no blind faith.
+            </p>
+            <Link className="land-reviewers-link" href="/for-reviewers">
+              Learn how reviewers use Beleg
+              <svg
+                className="land-reviewers-arrow"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </Link>
           </AnimateIn>
         </div>
       </section>
