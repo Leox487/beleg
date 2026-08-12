@@ -6,6 +6,7 @@ import { DeleteVentureForm } from "@/app/components/DeleteVentureForm";
 import { TaglineForm } from "@/app/components/TaglineForm";
 import WhitelistManager from "@/app/components/WhitelistManager";
 import { CopyText } from "@/app/components/CopyText";
+import { ingestAddressForSlug } from "@/lib/ingestEmail";
 import { mapVenture } from "@/lib/row";
 import sql from "@/lib/supabase";
 
@@ -29,17 +30,7 @@ export default async function VentureSettingsPage({
     : null;
   if (!venture || venture.clerk_user_id !== userId) notFound();
 
-  const endpointRows = await sql`
-    SELECT email_address
-    FROM inbound_endpoints
-    WHERE venture_id = ${venture.id} AND is_active = true
-    ORDER BY created_at ASC
-    LIMIT 1
-  `;
-  const ingestEmail =
-    (endpointRows[0]?.email_address as string | undefined) ?? null;
-  const domain =
-    process.env.INGEST_EMAIL_DOMAIN?.trim().toLowerCase() || "belegapp.com";
+  const ingestEmail = ingestAddressForSlug(venture.slug);
 
   return (
     <main className="page">
@@ -82,16 +73,10 @@ export default async function VentureSettingsPage({
             Forward emails to this address to auto-create sealed ledger entries.
             Only whitelisted senders are processed.
           </p>
-          {ingestEmail ? (
-            <div className="ingest-address-row">
-              <code className="ingest-address">{ingestEmail}</code>
-              <CopyText value={ingestEmail} />
-            </div>
-          ) : (
-            <p className="muted">
-              No ingest address provisioned yet. Domain: @{domain}
-            </p>
-          )}
+          <div className="ingest-address-row">
+            <code className="ingest-address">{ingestEmail}</code>
+            <CopyText value={ingestEmail} />
+          </div>
           <div className="whitelist-wrap">
             <h3 className="settings-subhead">Whitelisted senders</h3>
             <WhitelistManager ventureId={venture.id} />

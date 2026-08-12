@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+import { ingestAddressForSlug } from "@/lib/ingestEmail";
 import { mapVenture } from "@/lib/row";
 import sql from "@/lib/supabase";
 
@@ -25,48 +26,16 @@ function slugify(name: string): string {
   return `${stem}-${randomSuffix()}`;
 }
 
-function ingestEmailDomain(): string {
-  const fromEnv = process.env.INGEST_EMAIL_DOMAIN?.trim().toLowerCase();
-  // Prefer a dedicated receiving subdomain when available (avoids MX conflicts
-  // with human mail on the apex). Falls back for local/dev.
-  return fromEnv || "ingest.belegapp.com";
-}
-
-function generateInboundEmail(
-  ventureName: string,
-  ventureId: string,
-  salt = "",
-): string {
-  const slug =
-    ventureName
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 30) || "venture";
-  const shortId = ventureId.slice(0, 8);
-  return `${slug}-${shortId}${salt}@${ingestEmailDomain()}`;
-}
-
-async function createInboundEndpoint(ventureId: string, name: string) {
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const salt = attempt === 0 ? "" : `-${randomSuffix(4)}`;
-    const email_address = generateInboundEmail(name, ventureId, salt);
-    try {
-      const rows = await sql`
-        INSERT INTO inbound_endpoints (venture_id, email_address)
-        VALUES (${ventureId}, ${email_address})
-        RETURNING id, venture_id, email_address, is_active, created_at, last_ingested_at
-      `;
-      return rows[0];
-    } catch (e: unknown) {
-      const code =
-        typeof e === "object" && e && "code" in e
-          ? String((e as { code: unknown }).code)
-          : "";
-      if (code !== "23505") throw e;
-    }
-  }
-  throw new Error("Could not allocate a unique inbound email address");
+async function createInboundEndpoint(ventureId: string, slug: string) {
+  const email_address = ingestAddressForSlug(slug);
+  const rows = await sql`
+    INSERT INTO inbound_endpoints (venture_id, email_address)
+    VALUES (${ventureId}, ${email_address})
+    ON CONFLICT (email_address) DO UPDATE
+      SET venture_id = EXCLUDED.venture_id, is_active = true
+    RETURNING id, venture_id, email_address, is_active, created_at, last_ingested_at
+  `;
+  return rows[0];
 }
 
 export async function POST(req: Request) {
@@ -109,7 +78,7 @@ export async function POST(req: Request) {
 
       let inbound = null;
       try {
-        inbound = await createInboundEndpoint(venture.id, venture.name);
+        inbound = await createInboundEndpoint(venture.id, venture.slug);
       } catch (e) {
         console.error("Inbound endpoint create error:", e);
       }

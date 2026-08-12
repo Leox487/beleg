@@ -9,6 +9,7 @@ import { CopyText } from "@/app/components/CopyText";
 import { RequestAttestForm } from "@/app/components/RequestAttestForm";
 import { AnchorButton } from "@/app/components/AnchorButton";
 import { DkimChip } from "@/app/components/DkimChip";
+import { ingestAddressForSlug } from "@/lib/ingestEmail";
 import Link from "next/link";
 
 function formatDateTime(iso: string): string {
@@ -66,15 +67,7 @@ export default async function LedgerPage({
   // Render newest-first visually; seq numbering is preserved on each card.
   const ordered = [...entries].reverse();
 
-  const endpointRows = await sql`
-    SELECT email_address
-    FROM inbound_endpoints
-    WHERE venture_id = ${venture.id} AND is_active = true
-    ORDER BY created_at ASC
-    LIMIT 1
-  `;
-  const ingestEmail =
-    (endpointRows[0]?.email_address as string | undefined) ?? null;
+  const ingestEmail = ingestAddressForSlug(venture.slug);
 
   // All attestations for this venture, grouped by entry for per-card display.
   const attestationRows = await sql`
@@ -134,12 +127,10 @@ export default async function LedgerPage({
             <a className="public-open" href={publicUrl} target="_blank" rel="noopener noreferrer">
               Open public page →
             </a>
-            {ingestEmail ? (
-              <p className="ingest-hint">
-                Forward emails to <code>{ingestEmail}</code> to auto-create
-                entries. Only whitelisted senders will be processed.
-              </p>
-            ) : null}
+            <p className="ingest-hint">
+              Forward emails to <code>{ingestEmail}</code> to auto-create
+              entries. Only whitelisted senders will be processed.
+            </p>
           </div>
           <p className="append-note">
             Entries are permanent. Once recorded, nothing on this ledger can be

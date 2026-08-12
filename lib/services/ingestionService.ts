@@ -77,39 +77,38 @@ async function verifyDkim(rawEmail: string): Promise<{
 }
 
 /**
- * Resolve venture from recipient address:
- * 1) exact match on inbound_endpoints
- * 2) fallback: local-part ends with -[8 hex chars] matching ventures.id prefix
+ * Resolve venture from recipient `slug@domain` by matching ventures.slug
+ * to the local-part before @. Optionally attach an inbound_endpoints row
+ * for audit logging when one exists.
  */
 async function resolveVenture(recipient: string): Promise<{
   ventureId: string;
   endpointId: string | null;
 } | null> {
-  const endpoints = await sql`
-    SELECT id, venture_id
-    FROM inbound_endpoints
-    WHERE lower(email_address) = ${recipient} AND is_active = true
-    LIMIT 1
-  `;
-  if (endpoints[0]) {
-    return {
-      ventureId: String(endpoints[0].venture_id),
-      endpointId: String(endpoints[0].id),
-    };
-  }
-
-  const local = recipient.split("@")[0] ?? "";
-  const match = local.match(/-([0-9a-f]{8})(?:-[a-z0-9]+)?$/i);
-  if (!match) return null;
-  const idPrefix = match[1].toLowerCase();
+  const local = (recipient.split("@")[0] ?? "").trim().toLowerCase();
+  if (!local) return null;
 
   const ventures = await sql`
-    SELECT id FROM ventures
-    WHERE id::text LIKE ${idPrefix + "%"}
+    SELECT id
+    FROM ventures
+    WHERE lower(slug) = ${local}
     LIMIT 1
   `;
   if (!ventures[0]) return null;
-  return { ventureId: String(ventures[0].id), endpointId: null };
+
+  const ventureId = String(ventures[0].id);
+  const endpoints = await sql`
+    SELECT id
+    FROM inbound_endpoints
+    WHERE venture_id = ${ventureId} AND is_active = true
+    ORDER BY created_at ASC
+    LIMIT 1
+  `;
+
+  return {
+    ventureId,
+    endpointId: endpoints[0] ? String(endpoints[0].id) : null,
+  };
 }
 
 export async function processIncomingEmail(
