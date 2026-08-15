@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 
 import AnimateIn from "@/app/components/AnimateIn";
+import { ChainField } from "@/app/components/ChainField";
 import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
 import { Showcase } from "@/app/components/Showcase";
@@ -60,6 +61,7 @@ export default async function Home() {
     <main className="landing">
       {/* ——— Phase 1 hero ——— */}
       <section className="section-full stage land-hero-prove spotlight spotlight-hero">
+        <ChainField />
         <div className="land-hero-prove-inner">
           <AnimateIn direction="up" delay={0} duration={780}>
             <p className="stage-brand land-hero-prove-brand">Beleg</p>

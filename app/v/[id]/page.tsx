@@ -6,9 +6,8 @@ import sql from "@/lib/supabase";
 import type { Anchor, Attestation, Entry, Venture } from "@/lib/types";
 import { NewEntryForm } from "@/app/components/NewEntryForm";
 import { CopyText } from "@/app/components/CopyText";
-import { RequestAttestForm } from "@/app/components/RequestAttestForm";
 import { AnchorButton } from "@/app/components/AnchorButton";
-import { DkimChip } from "@/app/components/DkimChip";
+import { EntryCard } from "@/app/components/EntryCard";
 import { ingestAddressForSlug } from "@/lib/ingestEmail";
 import Link from "next/link";
 
@@ -19,16 +18,6 @@ function formatDateTime(iso: string): string {
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  });
-}
-
-function formatDate(iso: string): string {
-  // occurred_at is a date column (YYYY-MM-DD); render without timezone shifting.
-  const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y, (m ?? 1) - 1, d ?? 1).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
   });
 }
 
@@ -218,72 +207,18 @@ export default async function LedgerPage({
         </section>
 
         {ordered.length === 0 ? null : (
-          <div className="chain">
+          <div className="chain-stack">
             {ordered.map((entry) => {
-              const isAttestation = entry.kind === "attestation";
-              const isEmail = entry.source === "email" || entry.kind === "email";
-              const isStripe = entry.source === "stripe";
-              // Only pending requests are working state shown under an entry;
-              // confirmed attestations now live in the timeline as their own
-              // sealed chain entries.
               const pending = (attestationsByEntry.get(entry.id) ?? []).filter(
                 (a) => a.status !== "confirmed",
               );
               return (
-                <article
+                <EntryCard
                   key={entry.id}
-                  className={
-                    isAttestation ? "entry-card entry-attestation" : "entry-card"
-                  }
-                >
-                  <div className="entry-top">
-                    <span className="entry-seq">#{entry.seq}</span>
-                    <span
-                      className={
-                        isAttestation ? "badge badge-attestation" : "badge"
-                      }
-                    >
-                      {isAttestation ? "✓ attestation" : entry.kind}
-                    </span>
-                    {isEmail ? <span className="badge badge-email">EMAIL</span> : null}
-                    {isEmail ? <DkimChip verified={entry.dkim_verified} /> : null}
-                    {isStripe ? <span className="badge badge-stripe">STRIPE</span> : null}
-                  </div>
-                  <h3 className="entry-title">{entry.title}</h3>
-                  {entry.body ? (
-                    <p className="entry-body">{entry.body}</p>
-                  ) : null}
-                  {entry.occurred_at ? (
-                    <p className="entry-occurred">
-                      Occurred {formatDate(entry.occurred_at)}
-                    </p>
-                  ) : null}
-                  <p className="entry-recorded muted">
-                    Recorded {formatDateTime(entry.recorded_at)}
-                  </p>
-                  <p className="seal-line">
-                    <span className="seal-label">SEAL</span>
-                    <span className="seal-hash">
-                      {entry.chain_hash.slice(0, 24)}…
-                    </span>
-                  </p>
-
-                  {/* Attestation entries are themselves evidence — you don't
-                      attest an attestation, so no request UI on those. */}
-                  {isAttestation ? null : (
-                    <div className="attest-list">
-                      {pending.map((a) => (
-                        <div key={a.id} className="attest-pending muted">
-                          <span>
-                            Awaiting confirmation from {a.attester_email}
-                          </span>
-                          <CopyText value={`/attest/${a.token}`} />
-                        </div>
-                      ))}
-                      <RequestAttestForm entryId={entry.id} />
-                    </div>
-                  )}
-                </article>
+                  entry={entry}
+                  pending={pending}
+                  showAttest
+                />
               );
             })}
           </div>

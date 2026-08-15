@@ -153,7 +153,7 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
     return (
       <button
         type="button"
-        className="btn btn-secondary btn-small"
+        className="attest-ghost-link"
         onClick={() => setOpen(true)}
       >
         Request attestation

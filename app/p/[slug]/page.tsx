@@ -3,10 +3,10 @@ import { notFound } from "next/navigation";
 import { mapAnchor, mapEntry, mapVenture } from "@/lib/row";
 import sql from "@/lib/supabase";
 import type { Anchor, Entry, Venture } from "@/lib/types";
+import { EntryCard } from "@/app/components/EntryCard";
 import { Footer } from "@/app/components/Footer";
 import { Seal } from "@/app/components/Seal";
 import { VerifyChain } from "@/app/components/VerifyChain";
-import { DkimChip } from "@/app/components/DkimChip";
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {
@@ -15,16 +15,6 @@ function formatDateTime(iso: string): string {
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  });
-}
-
-function formatDate(iso: string): string {
-  // occurred_at is a date column (YYYY-MM-DD); render without timezone shifting.
-  const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y, (m ?? 1) - 1, d ?? 1).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
   });
 }
 
@@ -194,74 +184,10 @@ export default async function PublicProofPage({
         {entries.length === 0 ? (
           <p className="muted empty-chain">This ledger has no entries yet.</p>
         ) : (
-          <div className="chain">
-            {entries.map((entry, i) => {
-              const isEmail =
-                entry.source === "email" || entry.kind === "email";
-              const isStripe = entry.source === "stripe";
-              return (
-              <div key={entry.id} className="chain-entry-wrap">
-                {i > 0 ? <hr className="rule-fade chain-rule" /> : null}
-                {entry.kind === "attestation" ? (
-                  <article className="entry-card entry-attestation attest-confirmed card-gradient">
-                    <div className="entry-top">
-                      <span className="entry-seq">#{entry.seq}</span>
-                      <span className="badge badge-attestation">
-                        ✓ attestation
-                      </span>
-                    </div>
-                    <h3 className="entry-title">{entry.title}</h3>
-                    {entry.body ? (
-                      <p className="entry-body entry-body-attest">{entry.body}</p>
-                    ) : null}
-                    <p className="entry-recorded muted">
-                      Recorded {formatDateTime(entry.recorded_at)}
-                    </p>
-                    <p className="seal-line">
-                      <span className="seal-label">SEAL</span>
-                      <span className="seal-hash">
-                        {entry.chain_hash.slice(0, 24)}…
-                      </span>
-                    </p>
-                  </article>
-                ) : (
-                  <article className="entry-card card-gradient">
-                    <div className="entry-top">
-                      <span className="entry-seq">#{entry.seq}</span>
-                      <span className="badge">{entry.kind}</span>
-                      {isEmail ? (
-                        <span className="badge badge-email">EMAIL</span>
-                      ) : null}
-                      {isEmail ? (
-                        <DkimChip verified={entry.dkim_verified} />
-                      ) : null}
-                      {isStripe ? (
-                        <span className="badge badge-stripe">STRIPE</span>
-                      ) : null}
-                    </div>
-                    <h3 className="entry-title">{entry.title}</h3>
-                    {entry.body ? (
-                      <p className="entry-body">{entry.body}</p>
-                    ) : null}
-                    {entry.occurred_at ? (
-                      <p className="entry-occurred">
-                        Occurred {formatDate(entry.occurred_at)}
-                      </p>
-                    ) : null}
-                    <p className="entry-recorded muted">
-                      Recorded {formatDateTime(entry.recorded_at)}
-                    </p>
-                    <p className="seal-line">
-                      <span className="seal-label">SEAL</span>
-                      <span className="seal-hash">
-                        {entry.chain_hash.slice(0, 24)}…
-                      </span>
-                    </p>
-                  </article>
-                )}
-              </div>
-              );
-            })}
+          <div className="chain-stack">
+            {entries.map((entry) => (
+              <EntryCard key={entry.id} entry={entry} />
+            ))}
           </div>
         )}
 

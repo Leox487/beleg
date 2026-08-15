@@ -88,11 +88,17 @@ export function ChainField() {
         </g>
       </svg>
 
+      <div className="chain-field-grid" />
+      <div className="chain-field-particles">
+        <i /><i /><i /><i /><i /><i /><i /><i /><i /><i />
+      </div>
       <div className="chain-field-glyphs">
         <span>a3f81c</span>
         <span>7b02e9</span>
         <span>c14d6a</span>
         <span>seal</span>
+        <span>0x4e2</span>
+        <span>linked</span>
       </div>
     </div>
   );
