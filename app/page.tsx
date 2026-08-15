@@ -60,7 +60,7 @@ export default async function Home() {
   return (
     <main className="landing">
       {/* ——— Phase 1 hero ——— */}
-      <section className="section-full stage land-hero-prove spotlight spotlight-hero">
+      <section className="section-full stage land-hero-prove spotlight spotlight-hero home-scene home-scene-prove">
         <ChainField />
         <div className="land-hero-prove-inner">
           <AnimateIn direction="up" delay={0} duration={780}>
@@ -96,7 +96,7 @@ export default async function Home() {
       <hr className="rule-fade land-rule land-rule-hero" />
 
       {/* ——— human voices ——— */}
-      <section className="section-full land-section voices-section">
+      <section className="section-full land-section voices-section home-scene home-scene-voices">
         <div className="section-full-inner">
           <AnimateIn direction="up" delay={0}>
             <p className="section-eyebrow">What it feels like</p>
@@ -114,7 +114,11 @@ export default async function Home() {
           <ul className="voice-grid">
             {VOICES.map((v, i) => (
               <li key={v.who}>
-                <AnimateIn direction="up" delay={i * 70}>
+                <AnimateIn
+                  direction={i === 0 ? "left" : i === 2 ? "right" : "up"}
+                  delay={i * 90}
+                  distance={22}
+                >
                   <div className="voice-card testimonial-card card-gradient">
                     <p className="voice-quote">&ldquo;{v.quote}&rdquo;</p>
                     <hr className="rule-fade" />
@@ -138,7 +142,7 @@ export default async function Home() {
       <hr className="rule-fade land-rule" />
 
       {/* ——— how it works ——— */}
-      <section className="section-full strip-section land-band spotlight spotlight-center">
+      <section className="section-full strip-section land-band spotlight spotlight-center home-scene home-scene-how">
         <div className="land-band-inner section-full-inner">
           <AnimateIn direction="up">
             <p className="section-eyebrow">How it works</p>
@@ -170,7 +174,7 @@ export default async function Home() {
       <hr className="rule-fade land-rule" />
 
       {/* ——— peace of mind as bento ——— */}
-      <section className="section-full land-section pillar-band">
+      <section className="section-full land-section pillar-band home-scene home-scene-seals">
         <div className="section-full-inner">
           <AnimateIn direction="up">
             <p className="section-eyebrow">Peace of mind</p>
@@ -186,7 +190,7 @@ export default async function Home() {
                 key={item.title}
                 className={item.flagship ? "bento-flagship" : "bento-tile"}
               >
-                <AnimateIn direction="up" delay={i * 70}>
+                <AnimateIn direction="up" delay={i * 90} distance={18}>
                   <div className="pillar-card peace-card card-gradient">
                     {item.flagship ? (
                       <div className="bento-mini" aria-hidden="true">
@@ -251,7 +255,7 @@ export default async function Home() {
       <hr className="rule-fade land-rule" />
 
       {/* ——— closing CTA ——— */}
-      <section className="section-full land-section land-cta land-band spotlight spotlight-cta">
+      <section className="section-full land-section land-cta land-band spotlight spotlight-cta home-scene home-scene-start">
         <div className="land-band-inner land-cta-inner section-full-inner">
           <AnimateIn direction="up">
             <p className="section-eyebrow">Get started</p>
@@ -276,10 +280,14 @@ export default async function Home() {
       <hr className="rule-fade land-rule" />
 
       {/* ——— For Reviewers ——— */}
-      <section className="section-full land-section land-reviewers">
+      <section className="section-full land-section land-reviewers home-scene home-scene-verify">
         <div className="section-full-inner land-reviewers-inner">
           <AnimateIn direction="up">
             <span className="land-reviewers-badge">FOR EVALUATORS</span>
+            <p className="home-verify-chip" aria-hidden="true">
+              <span className="home-verify-dot" />
+              Chain verified · 8 seals intact
+            </p>
             <h2 className="section-heading land-reviewers-title">
               Stop guessing. Start verifying.
             </h2>

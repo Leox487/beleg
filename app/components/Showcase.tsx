@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const PANELS = [
   {
@@ -151,9 +151,51 @@ const MOCKS = [<RecordMock key="r" />, <WitnessMock key="w" />, <ShareMock key="
  */
 export function Showcase() {
   const [active, setActive] = useState(0);
+  const [seen, setSeen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const userTookOver = useRef(false);
+  const timers = useRef<number[]>([]);
+
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setSeen(true);
+      return;
+    }
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        obs.disconnect();
+        setSeen(true);
+        if (reduce) return;
+        timers.current = [
+          window.setTimeout(() => {
+            if (!userTookOver.current) setActive(1);
+          }, 1400),
+          window.setTimeout(() => {
+            if (!userTookOver.current) setActive(2);
+          }, 3000),
+        ];
+      },
+      { threshold: 0.35 },
+    );
+    obs.observe(el);
+    return () => {
+      obs.disconnect();
+      timers.current.forEach((id) => window.clearTimeout(id));
+    };
+  }, []);
+
+  const takeOver = (i: number) => {
+    userTookOver.current = true;
+    setActive(i);
+  };
 
   return (
-    <div className="showcase">
+    <div className={`showcase${seen ? " is-seen" : ""}`} ref={rootRef}>
       {PANELS.map((panel, i) => {
         const isActive = i === active;
         return (
@@ -162,14 +204,14 @@ export function Showcase() {
               className={`showcase-panel showcase-${panel.id} step-card${
                 isActive ? " is-active" : ""
               }`}
-              onMouseEnter={() => setActive(i)}
+              onMouseEnter={() => takeOver(i)}
             >
               <button
                 type="button"
                 className="panel-head"
                 aria-expanded={isActive}
-                onFocus={() => setActive(i)}
-                onClick={() => setActive(i)}
+                onFocus={() => takeOver(i)}
+                onClick={() => takeOver(i)}
               >
                 <span className="panel-step mono">{panel.step}</span>
                 <span className="panel-label">{panel.label}</span>
