@@ -2,13 +2,21 @@ import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { CopyText } from "@/app/components/CopyText";
 import { DeleteVentureForm } from "@/app/components/DeleteVentureForm";
 import { TaglineForm } from "@/app/components/TaglineForm";
 import WhitelistManager from "@/app/components/WhitelistManager";
-import { CopyText } from "@/app/components/CopyText";
 import { ingestAddressForSlug } from "@/lib/ingestEmail";
 import { mapVenture } from "@/lib/row";
 import sql from "@/lib/supabase";
+
+function formatCreated(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
 
 export default async function VentureSettingsPage({
   params,
@@ -30,7 +38,23 @@ export default async function VentureSettingsPage({
     : null;
   if (!venture || venture.clerk_user_id !== userId) notFound();
 
+  const [entryCountRows, attestationCountRows] = await Promise.all([
+    sql`
+      SELECT count(*)::int AS count
+      FROM entries
+      WHERE venture_id = ${venture.id}
+    `,
+    sql`
+      SELECT count(*)::int AS count
+      FROM attestations
+      WHERE venture_id = ${venture.id} AND status = 'confirmed'
+    `,
+  ]);
+
+  const entryCount = Number(entryCountRows[0]?.count ?? 0);
+  const confirmedAttestations = Number(attestationCountRows[0]?.count ?? 0);
   const ingestEmail = ingestAddressForSlug(venture.slug);
+  const publicPath = `/p/${venture.slug}`;
 
   return (
     <main className="page">
@@ -40,27 +64,40 @@ export default async function VentureSettingsPage({
         </p>
 
         <header className="ledger-header">
-          <h1 className="page-title">Settings</h1>
-          <p className="ledger-tagline">{venture.name}</p>
+          <h1 className="page-title">{venture.name}</h1>
+          <p className="muted settings-immutable-note">
+            Name and URL cannot be changed — this protects the integrity of
+            existing proof page links.
+          </p>
+          <div className="public-link">
+            <span className="muted">Public proof page:</span>{" "}
+            <CopyText value={publicPath} />
+            <a
+              className="public-open"
+              href={publicPath}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open →
+            </a>
+          </div>
+          <dl className="settings-stats">
+            <div>
+              <dt>Created</dt>
+              <dd>{formatCreated(venture.created_at)}</dd>
+            </div>
+            <div>
+              <dt>Entries</dt>
+              <dd>{entryCount}</dd>
+            </div>
+            <div>
+              <dt>Confirmed attestations</dt>
+              <dd>{confirmedAttestations}</dd>
+            </div>
+          </dl>
         </header>
 
         <section className="settings-section">
-          <h2 className="section-title">Venture</h2>
-          <p className="muted">
-            Name and URL cannot be changed after creation.
-          </p>
-          <dl className="settings-dl">
-            <div>
-              <dt>Name</dt>
-              <dd>{venture.name}</dd>
-            </div>
-            <div>
-              <dt>Public URL</dt>
-              <dd>
-                <code>/p/{venture.slug}</code>
-              </dd>
-            </div>
-          </dl>
           <TaglineForm
             ventureId={venture.id}
             initialTagline={venture.tagline}

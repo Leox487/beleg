@@ -55,7 +55,18 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  if (!("tagline" in body)) {
+  if ("name" in body || "slug" in body) {
+    return NextResponse.json(
+      {
+        error:
+          "Name and URL cannot be changed — this protects existing proof page links",
+      },
+      { status: 400 },
+    );
+  }
+
+  const keys = Object.keys(body).filter((k) => body[k] !== undefined);
+  if (keys.length === 0 || keys.some((k) => k !== "tagline")) {
     return NextResponse.json(
       { error: "Only tagline can be updated" },
       { status: 400 },
@@ -104,7 +115,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  // Cascade via FKs where defined; clear dependents that lack ON DELETE.
+  // Clear inbound audit tables first (they reference entries / endpoints).
   await sql`DELETE FROM email_whitelist WHERE venture_id = ${id}`;
   await sql`
     DELETE FROM ingested_emails
@@ -113,9 +124,11 @@ export async function DELETE(
     )
   `;
   await sql`DELETE FROM inbound_endpoints WHERE venture_id = ${id}`;
+
+  // Required FK order: attestations → entries → anchors → venture.
   await sql`DELETE FROM attestations WHERE venture_id = ${id}`;
-  await sql`DELETE FROM anchors WHERE venture_id = ${id}`;
   await sql`DELETE FROM entries WHERE venture_id = ${id}`;
+  await sql`DELETE FROM anchors WHERE venture_id = ${id}`;
   await sql`DELETE FROM ventures WHERE id = ${id} AND clerk_user_id = ${userId}`;
 
   return NextResponse.json({ deleted: true });

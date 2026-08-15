@@ -3414,6 +3414,38 @@ a {
   color: var(--text);
 }
 
+.settings-immutable-note {
+  max-width: 42rem;
+  margin: 8px 0 14px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.settings-help {
+  margin: -4px 0 8px;
+  font-size: 13px;
+}
+
+.settings-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 28px;
+  margin: 18px 0 0;
+}
+
+.settings-stats dt {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
+}
+
+.settings-stats dd {
+  margin: 2px 0 0;
+  font-size: 15px;
+  color: var(--text);
+}
+
 .settings-form,
 .danger-zone {
   display: flex;

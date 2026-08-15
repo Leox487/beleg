@@ -34,6 +34,7 @@ export function TaglineForm({
     }
     setSaving(false);
     setSaved(true);
+    window.setTimeout(() => setSaved(false), 2000);
     router.refresh();
   }
 
@@ -42,21 +43,20 @@ export function TaglineForm({
       <label className="field-label" htmlFor="tagline">
         Tagline
       </label>
+      <p className="muted settings-help">
+        A one-line description of what you&apos;re building.
+      </p>
       <input
         id="tagline"
         value={tagline}
         onChange={(e) => setTagline(e.target.value)}
         maxLength={280}
-        placeholder="One line about what this venture is"
+        placeholder="What you're building in one line"
         className="settings-input"
       />
       <div className="settings-actions">
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={saving}
-        >
-          {saving ? "Saving…" : "Save tagline"}
+        <button type="submit" className="btn btn-primary" disabled={saving}>
+          {saving ? "Saving…" : "Save"}
         </button>
         {saved ? <span className="muted">Saved</span> : null}
         {error ? <span className="settings-error">{error}</span> : null}
