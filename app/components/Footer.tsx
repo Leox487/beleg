@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { BelegMark } from "@/app/components/BelegMark";
+
 const COLUMNS = [
   {
     heading: "Product",
@@ -42,7 +44,10 @@ export function Footer() {
       <div className="site-footer-inner">
         <div className="site-footer-grid">
           <div className="site-footer-brand">
-            <p className="site-footer-wordmark">Beleg</p>
+            <p className="site-footer-wordmark">
+              <BelegMark className="site-footer-mark" />
+              Beleg
+            </p>
             <p className="site-footer-tagline">
               A sealed record of what you actually did.
             </p>

@@ -9451,3 +9451,28 @@ html {
     width: 32px;
   }
 }
+
+.wordmark {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 10px;
+}
+
+.wordmark-mark,
+.site-footer-mark {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  color: var(--text);
+}
+
+.site-footer-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.site-footer-mark {
+  width: 26px;
+  height: 26px;
+}

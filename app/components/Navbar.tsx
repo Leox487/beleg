@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { UserButton } from "@clerk/nextjs";
 
+import { BelegMark } from "@/app/components/BelegMark";
 import { LinkPending } from "@/app/components/CtaBadge";
 
 export async function Navbar() {
@@ -11,6 +12,7 @@ export async function Navbar() {
   return (
     <header className="navbar">
       <Link href="/" className="wordmark">
+        <BelegMark className="wordmark-mark" />
         Beleg
       </Link>
 
