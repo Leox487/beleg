@@ -33,6 +33,13 @@ export const metadata: Metadata = {
   title: "Beleg — Proof, not prose.",
   description:
     "Beleg gives your traction a cryptographically sealed timeline — recorded as it happens, witnessed by real people, and provable to anyone reading.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({
