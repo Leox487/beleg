@@ -5,6 +5,15 @@ import AnimateIn from "@/app/components/AnimateIn";
 import { ChainField } from "@/app/components/ChainField";
 import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
+import {
+  StageGrant,
+  StageNda,
+  StageSeal,
+  StageSolo,
+  StageStamp,
+  StageVerify,
+  StageWitness,
+} from "@/app/components/HomeStages";
 import { Showcase } from "@/app/components/Showcase";
 
 const PILLARS = [
@@ -31,18 +40,21 @@ const VOICES = [
       "Reviewers kept asking me to prove the grant was real. Now I hand them a link and they check it themselves.",
     who: "Grant applicant",
     context: "Civic Innovation Fund award",
+    stage: "grant" as const,
   },
   {
     quote:
       "I don't have a co-founder to vouch for me. The chain is the thing that remembers when I shipped.",
     who: "Solo founder",
     context: "Indie SaaS, pre-seed",
+    stage: "solo" as const,
   },
   {
     quote:
       "Half my best work is under NDA. The client confirms the engagement — I don't have to show the code.",
     who: "Freelance developer",
     context: "Payments integration for a SaaS client",
+    stage: "nda" as const,
   },
 ];
 
@@ -95,6 +107,60 @@ export default async function Home() {
 
       <hr className="rule-fade land-rule land-rule-hero" />
 
+      {/* ——— illustrated capabilities (unique scene per claim) ——— */}
+      <section className="section-full land-section home-scene home-scene-prims">
+        <div className="section-full-inner">
+          <AnimateIn direction="up">
+            <p className="section-eyebrow">What the chain does</p>
+            <hr className="rule-fade-bright eyebrow-rule" />
+            <h2 className="section-heading">
+              Each part of the record has its own proof.
+            </h2>
+          </AnimateIn>
+
+          <ul className="home-prims">
+            <li>
+              <AnimateIn direction="up" delay={40}>
+                <div className="home-prim-card card-gradient">
+                  <StageSeal />
+                  <h3 className="home-prim-title">Your past, sealed.</h3>
+                  <p className="home-prim-text">
+                    Every milestone is hashed and linked to the one before it.
+                    Edit the past and every seal after it breaks.
+                  </p>
+                </div>
+              </AnimateIn>
+            </li>
+            <li>
+              <AnimateIn direction="up" delay={120}>
+                <div className="home-prim-card card-gradient">
+                  <StageWitness />
+                  <h3 className="home-prim-title">Witnessed by someone there.</h3>
+                  <p className="home-prim-text">
+                    A grant officer, mentor, or client confirms in one click —
+                    no account. Their word becomes a sealed entry.
+                  </p>
+                </div>
+              </AnimateIn>
+            </li>
+            <li>
+              <AnimateIn direction="up" delay={200}>
+                <div className="home-prim-card card-gradient">
+                  <StageVerify />
+                  <h3 className="home-prim-title">Checked in their browser.</h3>
+                  <p className="home-prim-text">
+                    Verification is math, not a badge we issue. A reviewer
+                    recomputes every seal locally.
+                  </p>
+                </div>
+              </AnimateIn>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <hr className="rule-fade land-rule" />
+
       {/* ——— human voices ——— */}
       <section className="section-full land-section voices-section home-scene home-scene-voices">
         <div className="section-full-inner">
@@ -120,6 +186,13 @@ export default async function Home() {
                   distance={22}
                 >
                   <div className="voice-card testimonial-card card-gradient">
+                    {v.stage === "grant" ? (
+                      <StageGrant />
+                    ) : v.stage === "solo" ? (
+                      <StageSolo />
+                    ) : (
+                      <StageNda />
+                    )}
                     <p className="voice-quote">&ldquo;{v.quote}&rdquo;</p>
                     <hr className="rule-fade" />
                     <div className="voice-meta">
@@ -193,32 +266,11 @@ export default async function Home() {
                 <AnimateIn direction="up" delay={i * 90} distance={18}>
                   <div className="pillar-card peace-card card-gradient">
                     {item.flagship ? (
-                      <div className="bento-mini" aria-hidden="true">
-                        <div className="bento-mini-chain">
-                          <span className="bento-mini-row">
-                            <span className="bento-mini-seq">#01</span>
-                            <span className="bento-mini-hash">
-                              a3f81c94b7d0e29b…
-                            </span>
-                          </span>
-                          <span className="bento-mini-row">
-                            <span className="bento-mini-seq">#02</span>
-                            <span className="bento-mini-hash">
-                              7b02e9f3314fc118…
-                            </span>
-                          </span>
-                          <span className="bento-mini-row">
-                            <span className="bento-mini-seq">#03</span>
-                            <span className="bento-mini-hash">
-                              c14d6a2e8099e07f…
-                            </span>
-                          </span>
-                        </div>
-                      </div>
+                      <StageSeal />
+                    ) : item.title.startsWith("Witnessed") ? (
+                      <StageWitness />
                     ) : (
-                      <span className="bento-seal" aria-hidden="true">
-                        ✓
-                      </span>
+                      <StageVerify />
                     )}
                     <h3 className="pillar-title">{item.title}</h3>
                     <p className="pillar-text">{item.text}</p>
@@ -261,6 +313,7 @@ export default async function Home() {
             <p className="section-eyebrow">Get started</p>
             <hr className="rule-fade-bright eyebrow-rule" />
             <h2 className="section-heading">Start sealing what you ship.</h2>
+            <StageStamp />
             <p className="section-lead">
               Free while in beta. No credit card. Your first entry takes about a
               minute — and from then on, the chain speaks for itself.
@@ -284,10 +337,7 @@ export default async function Home() {
         <div className="section-full-inner land-reviewers-inner">
           <AnimateIn direction="up">
             <span className="land-reviewers-badge">FOR EVALUATORS</span>
-            <p className="home-verify-chip" aria-hidden="true">
-              <span className="home-verify-dot" />
-              Chain verified · 8 seals intact
-            </p>
+            <StageVerify />
             <h2 className="section-heading land-reviewers-title">
               Stop guessing. Start verifying.
             </h2>
