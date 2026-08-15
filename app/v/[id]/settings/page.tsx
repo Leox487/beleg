@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { CopyText } from "@/app/components/CopyText";
 import { DeleteVentureForm } from "@/app/components/DeleteVentureForm";
+import { StripeConnect } from "@/app/components/StripeConnect";
 import { TaglineForm } from "@/app/components/TaglineForm";
 import WhitelistManager from "@/app/components/WhitelistManager";
 import { ingestAddressForSlug } from "@/lib/ingestEmail";
@@ -55,6 +56,22 @@ export default async function VentureSettingsPage({
   const confirmedAttestations = Number(attestationCountRows[0]?.count ?? 0);
   const ingestEmail = ingestAddressForSlug(venture.slug);
   const publicPath = `/p/${venture.slug}`;
+  const appOrigin =
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+    "https://belegapp.com";
+
+  const stripeRows = await sql`
+    SELECT stripe_account_id
+    FROM stripe_connections
+    WHERE venture_id = ${venture.id}
+    LIMIT 1
+  `;
+  const stripeConnection = stripeRows[0]
+    ? {
+        accountId: String(stripeRows[0].stripe_account_id),
+        webhookUrl: `${appOrigin}/api/stripe/webhook/${venture.id}`,
+      }
+    : null;
 
   return (
     <main className="page">
@@ -101,6 +118,14 @@ export default async function VentureSettingsPage({
           <TaglineForm
             ventureId={venture.id}
             initialTagline={venture.tagline}
+          />
+        </section>
+
+        <section className="settings-section">
+          <h2 className="section-title">Stripe Integration</h2>
+          <StripeConnect
+            ventureId={venture.id}
+            initial={stripeConnection}
           />
         </section>
 

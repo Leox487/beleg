@@ -222,6 +222,7 @@ export default async function LedgerPage({
             {ordered.map((entry) => {
               const isAttestation = entry.kind === "attestation";
               const isEmail = entry.source === "email" || entry.kind === "email";
+              const isStripe = entry.source === "stripe";
               // Only pending requests are working state shown under an entry;
               // confirmed attestations now live in the timeline as their own
               // sealed chain entries.
@@ -246,6 +247,7 @@ export default async function LedgerPage({
                     </span>
                     {isEmail ? <span className="badge badge-email">EMAIL</span> : null}
                     {isEmail ? <DkimChip verified={entry.dkim_verified} /> : null}
+                    {isStripe ? <span className="badge badge-stripe">STRIPE</span> : null}
                   </div>
                   <h3 className="entry-title">{entry.title}</h3>
                   {entry.body ? (

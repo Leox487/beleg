@@ -30,6 +30,8 @@ const isPublicRoute = createRouteMatcher([
   "/api/anchor/(.*)/proof",
   // Resend inbound webhook (verified via RESEND_WEBHOOK_SECRET / Svix).
   "/api/ingest/email",
+  // Stripe inbound webhooks (verified via per-venture HMAC secret).
+  "/api/stripe/webhook/(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

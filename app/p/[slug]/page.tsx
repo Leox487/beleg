@@ -198,6 +198,7 @@ export default async function PublicProofPage({
             {entries.map((entry, i) => {
               const isEmail =
                 entry.source === "email" || entry.kind === "email";
+              const isStripe = entry.source === "stripe";
               return (
               <div key={entry.id} className="chain-entry-wrap">
                 {i > 0 ? <hr className="rule-fade chain-rule" /> : null}
@@ -233,6 +234,9 @@ export default async function PublicProofPage({
                       ) : null}
                       {isEmail ? (
                         <DkimChip verified={entry.dkim_verified} />
+                      ) : null}
+                      {isStripe ? (
+                        <span className="badge badge-stripe">STRIPE</span>
                       ) : null}
                     </div>
                     <h3 className="entry-title">{entry.title}</h3>

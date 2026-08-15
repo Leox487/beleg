@@ -3336,6 +3336,13 @@ a {
   letter-spacing: 0.06em;
 }
 
+.badge-stripe {
+  letter-spacing: 0.06em;
+  color: var(--gold);
+  border-color: color-mix(in srgb, var(--gold) 45%, var(--border));
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+}
+
 .dkim-chip {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 10px;
@@ -3500,6 +3507,18 @@ a {
 
 .settings-danger {
   border-color: color-mix(in srgb, var(--danger) 35%, var(--border));
+}
+
+.stripe-connect {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stripe-connected {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gold);
 }
 
 .entry-seq {

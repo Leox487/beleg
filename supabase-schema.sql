@@ -25,7 +25,8 @@ create table if not exists public.entries (
   prev_hash text not null,
   chain_hash text not null,
   -- Provenance metadata (not part of the hash chain payload).
-  source text not null default 'manual',
+  source text not null default 'manual'
+    check (source in ('manual', 'email', 'stripe')),
   dkim_verified boolean,
   unique (venture_id, seq)
 );
@@ -112,3 +113,17 @@ create table if not exists public.email_whitelist (
   unique (venture_id, sender_email)
 );
 create index if not exists whitelist_venture_idx on public.email_whitelist (venture_id);
+
+-- Per-venture Stripe webhook connector. Secret key is AES-256-GCM encrypted.
+create table if not exists public.stripe_connections (
+  id uuid primary key default gen_random_uuid(),
+  venture_id uuid not null references public.ventures(id),
+  clerk_user_id text not null,
+  stripe_account_id text not null,
+  stripe_secret_key_enc text,
+  webhook_secret text not null,
+  created_at timestamptz not null default now(),
+  unique (venture_id)
+);
+create index if not exists stripe_connections_venture_idx
+  on public.stripe_connections (venture_id);

@@ -124,6 +124,7 @@ export async function DELETE(
     )
   `;
   await sql`DELETE FROM inbound_endpoints WHERE venture_id = ${id}`;
+  await sql`DELETE FROM stripe_connections WHERE venture_id = ${id}`;
 
   // Required FK order: attestations → entries → anchors → venture.
   await sql`DELETE FROM attestations WHERE venture_id = ${id}`;

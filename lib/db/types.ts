@@ -33,3 +33,13 @@ export interface IngestedEmail {
   created_at: Date;
   attachment_urls: string[];
 }
+
+export interface StripeConnection {
+  id: string;
+  venture_id: string;
+  clerk_user_id: string;
+  stripe_account_id: string;
+  stripe_secret_key_enc: string | null;
+  webhook_secret: string;
+  created_at: Date;
+}
