@@ -112,9 +112,8 @@ export default async function Home() {
         <div className="section-full-inner">
           <AnimateIn direction="up">
             <p className="home-kicker">
-              A sealed timeline, a witness who was there, and a check that runs
-              in the reviewer&apos;s browser — three things a reviewer can
-              inspect without taking your word for it.
+              A sealed timeline, a witness, and a check that runs in the
+              reviewer&apos;s browser.
             </p>
           </AnimateIn>
 
@@ -163,9 +162,7 @@ export default async function Home() {
         <div className="section-full-inner">
           <AnimateIn direction="up" delay={0}>
             <p className="home-kicker">
-              Grant applicants, solo founders, and people whose best work sits
-              under NDA — anyone who has to prove something that never leaves
-              an official paper trail.
+              Grant applicants, solo founders, and work under NDA.
             </p>
           </AnimateIn>
 
@@ -211,8 +208,7 @@ export default async function Home() {
         <div className="land-band-inner section-full-inner">
           <AnimateIn direction="up">
             <p className="home-kicker">
-              One $12,000 grant, from the day it landed to the public link a
-              reviewer can check. Hover a step to watch that path.
+              One $12,000 grant, from the day it landed to a public link.
             </p>
           </AnimateIn>
 
@@ -238,8 +234,8 @@ export default async function Home() {
         <div className="section-full-inner">
           <AnimateIn direction="up">
             <p className="home-kicker">
-              What cannot be edited after you record it: the order of entries,
-              the seals, and who confirmed them.
+              What cannot be edited: the order, the seals, and who confirmed
+              them.
             </p>
           </AnimateIn>
 
@@ -320,8 +316,7 @@ export default async function Home() {
           <AnimateIn direction="up">
             <StageVerify />
             <p className="home-kicker home-kicker-center">
-              For grant officers, accelerators, and anyone who has to check
-              traction without living in the founder&apos;s inbox.
+              For grant officers and accelerators checking traction.
             </p>
             <Link className="land-reviewers-link" href="/for-reviewers">
               Learn how reviewers use Beleg
