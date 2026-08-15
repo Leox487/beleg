@@ -1,55 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
-
-function useOnScreen(threshold = 0.4) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [on, setOn] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (typeof IntersectionObserver === "undefined") {
-      setOn(true);
-      return;
-    }
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        setOn(true);
-        obs.disconnect();
-      },
-      { threshold, rootMargin: "0px 0px -10% 0px" },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [threshold]);
-
-  return { ref, on };
-}
+import type { ReactNode } from "react";
 
 function StageFrame({
   className,
   children,
-  threshold,
 }: {
   className: string;
   children: ReactNode;
-  threshold?: number;
 }) {
-  const { ref, on } = useOnScreen(threshold);
   return (
-    <div
-      ref={ref}
-      className={`${className}${on ? " is-on" : ""}`}
-      aria-hidden="true"
-    >
+    <div className={`${className} is-on`} aria-hidden="true">
       {children}
     </div>
   );
 }
 
-/** Animated hash-chain: entries lock in sequence. */
+/** Hash-chain: entries lock in sequence, then the cycle restarts. */
 export function StageSeal() {
   return (
     <StageFrame className="hs hs-seal">
@@ -119,7 +86,11 @@ export function StageVerify() {
 
 export function StageGrant() {
   return (
-    <StageFrame className="hs hs-mini hs-grant" threshold={0.3}>
+    <StageFrame className="hs hs-mini hs-grant">
+      <div className="hs-grant-row">
+        <span className="hs-grant-seq">#07</span>
+        <span className="hs-grant-title">Grant received</span>
+      </div>
       <span className="hs-grant-amt">$12,000</span>
       <span className="hs-grant-meta">Civic Innovation Fund</span>
       <span className="hs-grant-ok">Verified on the public page</span>
@@ -129,7 +100,7 @@ export function StageGrant() {
 
 export function StageSolo() {
   return (
-    <StageFrame className="hs hs-mini hs-solo" threshold={0.3}>
+    <StageFrame className="hs hs-mini hs-solo">
       <span className="hs-solo-node" />
       <span className="hs-solo-wire" />
       <span className="hs-solo-node" />
@@ -142,9 +113,9 @@ export function StageSolo() {
 
 export function StageNda() {
   return (
-    <StageFrame className="hs hs-mini hs-nda" threshold={0.3}>
-      <span className="hs-nda-lock">NDA</span>
-      <span className="hs-nda-plus">+</span>
+    <StageFrame className="hs hs-mini hs-nda">
+      <span className="hs-nda-file">Payments integration</span>
+      <span className="hs-nda-lock">NDA — code hidden</span>
       <span className="hs-nda-confirm">Client confirmed</span>
     </StageFrame>
   );
@@ -152,7 +123,7 @@ export function StageNda() {
 
 export function StageStamp() {
   return (
-    <StageFrame className="hs hs-stamp" threshold={0.35}>
+    <StageFrame className="hs hs-stamp">
       <span className="hs-stamp-ring" />
       <span className="hs-stamp-core">SEAL</span>
     </StageFrame>

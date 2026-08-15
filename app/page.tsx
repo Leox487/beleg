@@ -18,17 +18,17 @@ import { Showcase } from "@/app/components/Showcase";
 
 const PILLARS = [
   {
-    title: "Your past, sealed.",
+    stage: "seal" as const,
     text: "Every milestone you add is hashed and linked to the one before it. Editing, deleting, or reordering anything would break every seal after it — so the past stays as you recorded it.",
     flagship: true,
   },
   {
-    title: "Witnessed by someone who was there.",
+    stage: "witness" as const,
     text: "A grant officer, a mentor, a client — whoever actually saw it happen can confirm an entry without creating an account. Their word becomes part of the record, not a screenshot you pasted in.",
     flagship: false,
   },
   {
-    title: "Checked by anyone, anywhere.",
+    stage: "verify" as const,
     text: "Verification is math, not a badge we issue. A reviewer can confirm your record is intact without taking our word for it — or yours.",
     flagship: false,
   },
@@ -111,11 +111,11 @@ export default async function Home() {
       <section className="section-full land-section home-scene home-scene-prims">
         <div className="section-full-inner">
           <AnimateIn direction="up">
-            <p className="section-eyebrow">What the chain does</p>
-            <hr className="rule-fade-bright eyebrow-rule" />
-            <h2 className="section-heading">
-              Each part of the record has its own proof.
-            </h2>
+            <p className="home-kicker">
+              A sealed timeline, a witness who was there, and a check that runs
+              in the reviewer&apos;s browser — three things a reviewer can
+              inspect without taking your word for it.
+            </p>
           </AnimateIn>
 
           <ul className="home-prims">
@@ -123,7 +123,6 @@ export default async function Home() {
               <AnimateIn direction="up" delay={40}>
                 <div className="home-prim-card card-gradient">
                   <StageSeal />
-                  <h3 className="home-prim-title">Your past, sealed.</h3>
                   <p className="home-prim-text">
                     Every milestone is hashed and linked to the one before it.
                     Edit the past and every seal after it breaks.
@@ -135,7 +134,6 @@ export default async function Home() {
               <AnimateIn direction="up" delay={120}>
                 <div className="home-prim-card card-gradient">
                   <StageWitness />
-                  <h3 className="home-prim-title">Witnessed by someone there.</h3>
                   <p className="home-prim-text">
                     A grant officer, mentor, or client confirms in one click —
                     no account. Their word becomes a sealed entry.
@@ -147,7 +145,6 @@ export default async function Home() {
               <AnimateIn direction="up" delay={200}>
                 <div className="home-prim-card card-gradient">
                   <StageVerify />
-                  <h3 className="home-prim-title">Checked in their browser.</h3>
                   <p className="home-prim-text">
                     Verification is math, not a badge we issue. A reviewer
                     recomputes every seal locally.
@@ -165,15 +162,10 @@ export default async function Home() {
       <section className="section-full land-section voices-section home-scene home-scene-voices">
         <div className="section-full-inner">
           <AnimateIn direction="up" delay={0}>
-            <p className="section-eyebrow">What it feels like</p>
-            <hr className="rule-fade-bright eyebrow-rule" />
-            <h2 className="section-heading">
-              Finally — a way to show what happened without hoping they believe
-              you.
-            </h2>
-            <p className="section-lead">
-              The voices Beleg is built for — not polished reviews, just the
-              situations people keep running into.
+            <p className="home-kicker">
+              Grant applicants, solo founders, and people whose best work sits
+              under NDA — anyone who has to prove something that never leaves
+              an official paper trail.
             </p>
           </AnimateIn>
 
@@ -218,14 +210,9 @@ export default async function Home() {
       <section className="section-full strip-section land-band spotlight spotlight-center home-scene home-scene-how">
         <div className="land-band-inner section-full-inner">
           <AnimateIn direction="up">
-            <p className="section-eyebrow">How it works</p>
-            <hr className="rule-fade-bright eyebrow-rule" />
-            <h2 className="section-heading">
-              Record it. Get it witnessed. Share the proof.
-            </h2>
-            <p className="section-lead">
-              Hover a step to watch it happen — one $12,000 grant, followed from
-              the day it landed to the link a reviewer can check.
+            <p className="home-kicker">
+              One $12,000 grant, from the day it landed to the public link a
+              reviewer can check. Hover a step to watch that path.
             </p>
           </AnimateIn>
 
@@ -250,29 +237,27 @@ export default async function Home() {
       <section className="section-full land-section pillar-band home-scene home-scene-seals">
         <div className="section-full-inner">
           <AnimateIn direction="up">
-            <p className="section-eyebrow">Peace of mind</p>
-            <hr className="rule-fade-bright eyebrow-rule" />
-            <h2 className="section-heading">
-              More clarity. Less asking people to take your word for it.
-            </h2>
+            <p className="home-kicker">
+              What cannot be edited after you record it: the order of entries,
+              the seals, and who confirmed them.
+            </p>
           </AnimateIn>
 
           <ul className="bento">
             {PILLARS.map((item, i) => (
               <li
-                key={item.title}
+                key={item.stage}
                 className={item.flagship ? "bento-flagship" : "bento-tile"}
               >
                 <AnimateIn direction="up" delay={i * 90} distance={18}>
                   <div className="pillar-card peace-card card-gradient">
-                    {item.flagship ? (
+                    {item.stage === "seal" ? (
                       <StageSeal />
-                    ) : item.title.startsWith("Witnessed") ? (
+                    ) : item.stage === "witness" ? (
                       <StageWitness />
                     ) : (
                       <StageVerify />
                     )}
-                    <h3 className="pillar-title">{item.title}</h3>
                     <p className="pillar-text">{item.text}</p>
                   </div>
                 </AnimateIn>
@@ -310,14 +295,11 @@ export default async function Home() {
       <section className="section-full land-section land-cta land-band spotlight spotlight-cta home-scene home-scene-start">
         <div className="land-band-inner land-cta-inner section-full-inner">
           <AnimateIn direction="up">
-            <p className="section-eyebrow">Get started</p>
-            <hr className="rule-fade-bright eyebrow-rule" />
-            <h2 className="section-heading">Start sealing what you ship.</h2>
-            <StageStamp />
-            <p className="section-lead">
-              Free while in beta. No credit card. Your first entry takes about a
-              minute — and from then on, the chain speaks for itself.
+            <p className="home-kicker">
+              Free in beta. No credit card. The first entry takes about a
+              minute.
             </p>
+            <StageStamp />
             <div className="hero-actions">
               <Link className="cta" href={ctaHref}>
                 <span className="cta-label">
@@ -336,15 +318,10 @@ export default async function Home() {
       <section className="section-full land-section land-reviewers home-scene home-scene-verify">
         <div className="section-full-inner land-reviewers-inner">
           <AnimateIn direction="up">
-            <span className="land-reviewers-badge">FOR EVALUATORS</span>
             <StageVerify />
-            <h2 className="section-heading land-reviewers-title">
-              Stop guessing. Start verifying.
-            </h2>
-            <p className="section-lead land-reviewers-lead">
-              Reviewing applications? Ask founders for their Beleg link. One
-              click runs a cryptographic check in your own browser — no server,
-              no trust, no blind faith.
+            <p className="home-kicker home-kicker-center">
+              For grant officers, accelerators, and anyone who has to check
+              traction without living in the founder&apos;s inbox.
             </p>
             <Link className="land-reviewers-link" href="/for-reviewers">
               Learn how reviewers use Beleg

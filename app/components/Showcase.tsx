@@ -172,20 +172,19 @@ export function Showcase() {
         setSeen(true);
         if (reduce) return;
         timers.current = [
-          window.setTimeout(() => {
-            if (!userTookOver.current) setActive(1);
-          }, 1400),
-          window.setTimeout(() => {
-            if (!userTookOver.current) setActive(2);
-          }, 3000),
+          window.setInterval(() => {
+            if (!userTookOver.current) {
+              setActive((i) => (i + 1) % PANELS.length);
+            }
+          }, 8000),
         ];
       },
-      { threshold: 0.35 },
+      { threshold: 0.28 },
     );
     obs.observe(el);
     return () => {
       obs.disconnect();
-      timers.current.forEach((id) => window.clearTimeout(id));
+      timers.current.forEach((id) => window.clearInterval(id));
     };
   }, []);
 
