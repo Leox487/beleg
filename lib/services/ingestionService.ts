@@ -306,16 +306,27 @@ export async function processIncomingEmail(
   }
 
   try {
-    const extracted = await extractMilestoneFromEmail({
-      subject: subjectLine,
-      text: plainText,
-    });
+    let title = (subjectLine ?? "").trim().slice(0, 200) || "Email milestone";
+    let body = plainText ? plainText.slice(0, 200) : null;
+    try {
+      const extracted = await extractMilestoneFromEmail({
+        subject: subjectLine,
+        text: plainText,
+      });
+      title = extracted.title.slice(0, 200);
+      body = extracted.body;
+    } catch (error) {
+      console.warn(
+        "ingest: Claude extract threw; using subject/body fallback",
+        error,
+      );
+    }
 
     const entry = await appendEntry({
       venture_id: ventureId,
       kind: "email",
-      title: extracted.title.slice(0, 200),
-      body: extracted.body,
+      title,
+      body,
       occurred_at: asDateOnly(sentAt),
       source: "email",
       dkim_verified: dkim.verified,

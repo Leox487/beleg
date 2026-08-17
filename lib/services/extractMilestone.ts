@@ -1,57 +1,73 @@
 import "server-only";
 
 import { anthropic } from "@ai-sdk/anthropic";
-import { generateText, Output } from "ai";
-import { z } from "zod";
+import { generateText } from "ai";
 
-const MilestoneExtractSchema = z.object({
-  title: z.string(),
-  body: z.string().nullable(),
-});
+function fallbackFromEmail(input: {
+  subject: string | null;
+  text: string | null;
+}): { title: string; body: string | null } {
+  const subject = (input.subject ?? "").trim();
+  const text = (input.text ?? "").trim();
+  const title = subject.slice(0, 200) || "Email milestone";
+  const body = text ? text.slice(0, 200) : null;
+  return { title, body };
+}
 
-const SYSTEM_PROMPT =
-  "You are processing a forwarded email to extract a business milestone. Return ONLY valid JSON with two fields: title (a specific, factual one-sentence milestone title under 80 characters, drawn from the email content) and body (optional additional detail, 1-2 sentences max, or null if nothing substantive to add). Do not invent facts. Do not add commentary.";
+function parseMilestoneJson(
+  raw: string,
+  fallback: { title: string; body: string | null },
+): { title: string; body: string | null } {
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error("Claude response was not JSON");
+  const parsed = JSON.parse(match[0]) as {
+    title?: unknown;
+    body?: unknown;
+  };
+  const title =
+    typeof parsed.title === "string" && parsed.title.trim()
+      ? parsed.title.trim().slice(0, 200)
+      : fallback.title;
+  const body =
+    typeof parsed.body === "string" && parsed.body.trim()
+      ? parsed.body.trim().slice(0, 500)
+      : fallback.body;
+  return { title, body };
+}
 
 /**
  * Extract a clean milestone title/body from an inbound email via Claude Haiku.
- * Falls back to subject / truncated body if the model call fails.
+ * Invalid JSON, timeouts, or any model error fall back to the email subject
+ * and the first 200 characters of the body so an entry is always created.
  */
 export async function extractMilestoneFromEmail(input: {
   subject: string | null;
   text: string | null;
 }): Promise<{ title: string; body: string | null }> {
-  const subject = (input.subject ?? "").trim();
-  const text = (input.text ?? "").trim();
-  const fallbackTitle =
-    subject.slice(0, 80) ||
-    text.split(/\r?\n/).find((l) => l.trim())?.trim().slice(0, 80) ||
-    "Email milestone";
-  const fallbackBody = text
-    ? text.slice(0, 400) + (text.length > 400 ? "…" : "")
-    : null;
+  const fallback = fallbackFromEmail(input);
 
   if (!process.env.ANTHROPIC_API_KEY) {
     console.warn("ANTHROPIC_API_KEY unset; using subject/body fallback");
-    return { title: fallbackTitle, body: fallbackBody };
+    return fallback;
   }
 
   try {
-    const { output } = await generateText({
+    const { text } = await generateText({
       model: anthropic("claude-haiku-4-5-20251001"),
-      system: SYSTEM_PROMPT,
-      prompt: `Subject: ${subject}\n\nBody: ${text.slice(0, 6000)}`,
-      output: Output.object({ schema: MilestoneExtractSchema }),
+      system:
+        "You are processing a forwarded email to extract a business milestone. Return ONLY valid JSON with two fields: title (a specific, factual one-sentence milestone title under 80 characters, drawn from the email content) and body (optional additional detail, 1-2 sentences max, or null if nothing substantive to add). Do not invent facts. Do not add commentary.",
+      prompt: `Subject: ${fallback.title}\n\nBody: ${(input.text ?? "").slice(0, 6000)}`,
+      abortSignal: AbortSignal.timeout(12_000),
     });
 
-    const title = (output?.title ?? "").trim().slice(0, 80) || fallbackTitle;
-    const bodyRaw = output?.body;
-    const body =
-      typeof bodyRaw === "string" && bodyRaw.trim()
-        ? bodyRaw.trim().slice(0, 500)
-        : null;
-    return { title, body };
+    try {
+      return parseMilestoneJson(text, fallback);
+    } catch (error) {
+      console.warn("Claude returned invalid JSON; using subject/body fallback:", error);
+      return fallback;
+    }
   } catch (error) {
     console.warn("Milestone extraction failed; using fallback:", error);
-    return { title: fallbackTitle, body: fallbackBody };
+    return fallback;
   }
 }
