@@ -89,7 +89,7 @@ export function NewEntryForm({ ventureId }: { ventureId: string }) {
           rows={3}
         />
         <p className="field-help">
-          Optional — links, numbers, names, context. Also sealed.
+          Optional: links, numbers, names, context. Also sealed.
         </p>
       </div>
 

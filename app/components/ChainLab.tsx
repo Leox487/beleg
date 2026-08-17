@@ -133,7 +133,7 @@ export default function ChainLab() {
               {i === 0 ? (
                 <label className="lab-edit">
                   <span className="lab-edit-label">
-                    Editable &mdash; try changing it
+                    Editable. Try changing it
                   </span>
                   <input
                     className="lab-input"

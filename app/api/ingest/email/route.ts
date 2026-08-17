@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // Webhook is metadata-only — pull text/html (and optional raw) via API.
+    // Webhook is metadata-only. Pull text/html (and optional raw) via API.
     const { email, error } = await fetchReceivedEmail(apiKey, emailId);
     if (error || !email) {
       console.error("Failed to fetch received email:", error);

@@ -6,7 +6,7 @@ import sql from "@/lib/supabase";
 
 type Body = Record<string, unknown>;
 
-// 'attestation' and 'email' are system-only — accepted here so sealed
+// 'attestation' and 'email' are system-only, accepted here so sealed
 // confirmations / inbound mail validate, but NOT offered in NewEntryForm.
 const ALLOWED_KINDS = new Set([
   "milestone",
@@ -27,7 +27,7 @@ function asTrimmedString(v: unknown): string {
 }
 
 // Append-only: this route only ever INSERTs (via appendEntry). There is
-// deliberately no PATCH, PUT, or DELETE handler here or anywhere else — the
+// deliberately no PATCH, PUT, or DELETE handler here or anywhere else. The
 // immutable chain is the product.
 export async function POST(req: Request) {
   const { userId } = await auth();

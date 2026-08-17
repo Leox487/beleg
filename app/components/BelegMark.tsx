@@ -27,7 +27,7 @@ export function BelegMark({
         />
       </g>
 
-      {/* Angular B — vertical spine, two right-pointing triangles */}
+      {/* Angular B: vertical spine, two right-pointing triangles */}
       <path
         fill="currentColor"
         d="M17 12h7.2L50 22.4 26.4 32 50 41.6 24.2 52H17V12Z"

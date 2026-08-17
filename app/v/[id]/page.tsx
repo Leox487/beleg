@@ -131,7 +131,7 @@ export default async function LedgerPage({
           <section className="entry-empty">
             <h2 className="entry-empty-title">No entries yet.</h2>
             <p className="entry-empty-text">
-              An entry is anything real that happened — a milestone, a paying
+              An entry is anything real that happened: a milestone, a paying
               customer, a signed pilot, a shipped prototype. Add your first
               below.
             </p>
@@ -155,7 +155,7 @@ export default async function LedgerPage({
             <p className="muted">
               Anchoring commits the current state of your ledger to the Bitcoin
               blockchain via OpenTimestamps, proving these entries existed by a
-              certain time — verifiable without trusting Beleg.
+              certain time, verifiable without trusting Beleg.
             </p>
           </div>
 

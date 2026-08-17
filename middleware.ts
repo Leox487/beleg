@@ -23,7 +23,7 @@ const isPublicRoute = createRouteMatcher([
   "/contact",
   "/for-reviewers",
   "/api/public/(.*)",
-  // Public verification surface — proof pages load these without auth.
+  // Public verification surface. Proof pages load these without auth.
   "/api/venture/(.*)",
   "/api/block-header/(.*)",
   "/api/verify-bitcoin",

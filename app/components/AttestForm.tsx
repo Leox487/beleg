@@ -68,7 +68,7 @@ export function AttestForm({
   if (done) {
     return (
       <div className="attest-done verify-ok">
-        ✓ Thank you — your confirmation has been recorded.
+        ✓ Thank you. Your confirmation has been recorded.
       </div>
     );
   }
@@ -133,7 +133,7 @@ export function AttestForm({
 
           <p className="field-help">
             Switch to Other if you want to add facts or context about what
-            actually happened — those details are sealed into the same record.
+            actually happened. Those details are sealed into the same record.
           </p>
         </div>
       ) : (
@@ -153,7 +153,7 @@ export function AttestForm({
               rows={6}
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="What did you actually see or know? Dates, amounts, roles, outcomes — anything a reviewer should be able to check against your word."
+              placeholder="What did you actually see or know? Dates, amounts, roles, outcomes: anything a reviewer should be able to check against your word."
               maxLength={2000}
             />
             <p className="field-help">

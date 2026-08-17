@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Footer } from "@/app/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Verify it yourself — Beleg",
+  title: "Verify it yourself · Beleg",
   description:
     "Verify a Beleg ledger and its Bitcoin anchor using only open-source tools and public infrastructure.",
 };
@@ -16,7 +16,7 @@ export default function VerifyGuidePage() {
           <p className="doc-eyebrow">For technical readers</p>
           <h1 className="h1 doc-title">Verify it yourself.</h1>
           <p className="doc-lead">
-            No Beleg-hosted tool required — just SHA-256 and the OpenTimestamps
+            No Beleg-hosted tool required. Just SHA-256 and the OpenTimestamps
             client.
           </p>
         </header>
@@ -31,11 +31,11 @@ export default function VerifyGuidePage() {
 
           <h3>Verifying the chain by hand</h3>
           <p>
-            Entries are serialized as a JSON array in fixed order —{" "}
+            Entries are serialized as a JSON array in fixed order (
             <code>
               [venture_id, seq, kind, title, body, occurred_at, recorded_at]
-            </code>{" "}
-            — with null values as empty strings and <code>recorded_at</code>{" "}
+            </code>
+            ), with null values as empty strings and <code>recorded_at</code>{" "}
             normalized to ISO 8601 with a <code>Z</code> suffix. That string is
             hashed with SHA-256 to produce the content seal. The chain seal is{" "}
             <code>SHA-256(previous_chain_seal + content_seal)</code>.
@@ -76,7 +76,7 @@ ots verify yourfile.ots`}</code>
           <h3>Getting the raw data</h3>
           <p>
             Any public proof page&apos;s entry data is available as JSON at{" "}
-            <code>/api/public/[slug]/entries</code> — the same record the proof
+            <code>/api/public/[slug]/entries</code>, the same record the proof
             page renders, in machine-readable form.
           </p>
         </div>

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Footer } from "@/app/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Contact — Beleg",
+  title: "Contact · Beleg",
   description: "Get in touch about bugs, security issues, or data deletion.",
 };
 
@@ -22,7 +22,7 @@ export default function ContactPage() {
             anything: bugs, security issues, data deletion requests, questions.
           </p>
           <p>
-            Replies may take a few days. There is no contact form — a real
+            Replies may take a few days. There is no contact form. A real
             inbox works better.
           </p>
         </div>

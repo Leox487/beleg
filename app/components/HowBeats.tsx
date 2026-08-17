@@ -71,7 +71,7 @@ export default function HowBeats() {
         <div className="beat-slot">
           <span className="beat-bubble beat-broken">
             <span className="beat-bubble-glyph">&#9888;</span>
-            Chain broken at #01 &mdash; and everything after it
+            Chain broken at #01, and everything after it
           </span>
           <span className="beat-bubble beat-anchor">
             <span className="beat-bubble-glyph">&#9875;</span>

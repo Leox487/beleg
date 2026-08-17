@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Footer } from "@/app/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Beleg",
+  title: "Terms of Service · Beleg",
   description:
     "The terms you agree to when using Beleg, including what the ledger does and does not prove.",
 };
@@ -36,10 +36,10 @@ export default function TermsPage() {
             Beleg proves that entries were recorded at a specific time and have
             not been altered since. It does not prove that the underlying claims
             in those entries are true. A sealed entry saying &quot;signed a $50K
-            contract&quot; proves you recorded that sentence on that date — not
+            contract&quot; proves you recorded that sentence on that date, not
             that the contract exists. Attestations prove that a named person
-            confirmed a statement — not that the statement is factually correct.
-            Bitcoin anchoring proves the chain existed at a specific time — not
+            confirmed a statement, not that the statement is factually correct.
+            Bitcoin anchoring proves the chain existed at a specific time, not
             that the contents are accurate. Do not represent Beleg records as
             legal proof, certified documents, or audited statements.
           </p>
@@ -59,7 +59,7 @@ export default function TermsPage() {
             their name on a public record. Do not request attestations from
             people who have not agreed to participate. Do not fabricate attester
             identities. Attesters confirm voluntarily and their confirmations
-            cannot be retracted — they should only confirm what they know to be
+            cannot be retracted. They should only confirm what they know to be
             true.
           </p>
 

@@ -7,7 +7,7 @@ import { Footer } from "@/app/components/Footer";
 import HowBeats from "@/app/components/HowBeats";
 
 export const metadata: Metadata = {
-  title: "How Beleg Works — Beleg",
+  title: "How Beleg Works · Beleg",
   description:
     "The cryptography behind Beleg in plain English: hash chains, in-browser verification, and Bitcoin anchoring.",
 };
@@ -24,7 +24,7 @@ export default function HowItWorksPage() {
             linked to the one before it, so nothing in the past can be quietly
             rewritten. The people who were there can confirm entries themselves,
             and anyone you share the record with can check every seal in their
-            own browser &mdash; without taking your word for it, or ours.
+            own browser, without taking your word for it, or ours.
           </p>
         </header>
 
@@ -60,7 +60,7 @@ export default function HowItWorksPage() {
             <div className="how-accordion">
               <Accordion title="The chain">
                 <p>
-                  Every entry you add gets a &quot;hash&quot; — a digital
+                  Every entry you add gets a &quot;hash&quot;: a digital
                   fingerprint created by running the entry&apos;s contents
                   (title, body, date, timestamp) through a mathematical function
                   called SHA-256. The same input always produces the same
@@ -77,9 +77,9 @@ export default function HowItWorksPage() {
                 <p>
                   If anyone changed entry #1 after the fact, its hash would
                   change. But entry #2&apos;s hash depends on entry #1&apos;s
-                  hash — so entry #2&apos;s hash would also change. And entry #3
+                  hash, so entry #2&apos;s hash would also change. And entry #3
                   depends on entry #2. The entire chain after the edit breaks.
-                  That&apos;s why it&apos;s called &quot;append-only&quot; — you
+                  That&apos;s why it&apos;s called &quot;append-only&quot;: you
                   can only add to the end, never change the past.
                 </p>
               </Accordion>
@@ -91,14 +91,14 @@ export default function HowItWorksPage() {
                   entry&apos;s data, recomputes every hash from scratch using the
                   same SHA-256 function, and checks that every link holds. If
                   everything matches, you see a green banner. If anything was
-                  tampered with, you see red — and it tells you exactly which
+                  tampered with, you see red, and it tells you exactly which
                   entry broke.
                 </p>
                 <p>
                   This is important: the verification does not trust Beleg&apos;s
                   server. Your browser does the math independently. Even if
                   Beleg&apos;s database were compromised, the verifier would
-                  catch it — because the attacker would need to recompute every
+                  catch it, because the attacker would need to recompute every
                   hash in the chain to make a forgery pass, and the anchoring
                   (below) makes even that impossible.
                 </p>
@@ -109,7 +109,7 @@ export default function HowItWorksPage() {
                   When a third party confirms an entry, their confirmation is
                   itself added to the chain as a new sealed entry. It gets its
                   own hash, linking to whatever came before it. So attestations
-                  carry the same tamper-evidence as everything else — they
+                  carry the same tamper-evidence as everything else. They
                   can&apos;t be edited, backdated, or removed after the fact.
                 </p>
               </Accordion>
@@ -117,11 +117,11 @@ export default function HowItWorksPage() {
               <Accordion title="Bitcoin anchoring">
                 <p>
                   Periodically, the latest hash in your chain is submitted to the
-                  Bitcoin blockchain via OpenTimestamps — a free, open protocol.
+                  Bitcoin blockchain via OpenTimestamps, a free, open protocol.
                   Bitcoin&apos;s blockchain is a public ledger maintained by
                   thousands of independent computers worldwide. Once your hash is
                   recorded there, it is provably timestamped against
-                  infrastructure that nobody — not Beleg, not you, not anyone —
+                  infrastructure that nobody (not Beleg, not you, not anyone)
                   controls or can rewrite.
                 </p>
                 <p>
@@ -137,8 +137,8 @@ export default function HowItWorksPage() {
                   Beleg proves integrity (nothing changed) and timing (when it
                   was recorded). It does not prove truth (whether the claim is
                   accurate). A sealed entry saying &quot;shipped the
-                  prototype&quot; proves you wrote those words on that date —
-                  proving the prototype actually shipped requires witnesses
+                  prototype&quot; proves you wrote those words on that date.
+                  Proving the prototype actually shipped requires witnesses
                   (attestations) and evidence (which future versions will support
                   through verified email ingestion and payment connectors).
                 </p>
@@ -146,7 +146,7 @@ export default function HowItWorksPage() {
 
               <Accordion title="Open verification">
                 <p>
-                  The SHA-256 hash function is a public standard — anyone can
+                  The SHA-256 hash function is a public standard. Anyone can
                   implement it. The chain structure is a standard Merkle-style
                   linked list. OpenTimestamps is open source. Nothing about
                   Beleg&apos;s verification requires proprietary software or

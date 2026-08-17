@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { Footer } from "@/app/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Beleg",
+  title: "Privacy Policy · Beleg",
   description:
-    "What data Beleg collects, why, and how it is handled — in plain English.",
+    "What data Beleg collects, why, and how it is handled, in plain English.",
 };
 
 export default function PrivacyPage() {
@@ -32,20 +32,20 @@ export default function PrivacyPage() {
           <p>
             <strong>Venture data:</strong> the venture names, entry titles,
             entry bodies, dates, and hash values you create. This is the core of
-            what Beleg does — recording your milestones in a sealed, append-only
+            what Beleg does: recording your milestones in a sealed, append-only
             chain.
           </p>
           <p>
             <strong>Attestation data:</strong> when you request an attestation,
             we store the attester&apos;s name and email, their confirmation
             statement, and the confirmation timestamp. Attesters do not create
-            accounts — their data is limited to what they provide through the
+            accounts. Their data is limited to what they provide through the
             attestation link.
           </p>
           <p>
             <strong>Anchoring data:</strong> when you anchor your ledger, we
             submit a cryptographic hash (not your content) to public Bitcoin
-            timestamp servers via OpenTimestamps. The hash is a fingerprint — it
+            timestamp servers via OpenTimestamps. The hash is a fingerprint. It
             cannot be reversed to reveal your entries.
           </p>
           <p>
@@ -74,13 +74,13 @@ export default function PrivacyPage() {
             at a URL you control. Anyone with that URL can view your venture
             name, tagline, entry titles, entry bodies, dates, hash values, and
             confirmed attestations. Pending attestations are never shown
-            publicly. You choose what to record and when to share the link —
+            publicly. You choose what to record and when to share the link.
             Beleg does not publish or index your proof page without your action.
           </p>
 
           <h2>Data retention and deletion</h2>
           <p>
-            Entries are append-only by design — this is a core product feature,
+            Entries are append-only by design. This is a core product feature,
             not a limitation. You cannot edit or delete individual entries
             because the integrity of the chain depends on every entry remaining
             as recorded. If you want your entire venture and all its data

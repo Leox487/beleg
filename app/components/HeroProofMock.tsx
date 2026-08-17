@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 
 /**
  * Fully rendered HTML/CSS mock of a Beleg public proof page.
- * Sits in the hero as the product visual — not an illustration.
+ * Sits in the hero as the product visual, not an illustration.
  * Entries seal in sequence so the mock feels like a living chain.
  */
 export function HeroProofMock() {
@@ -35,7 +35,7 @@ export function HeroProofMock() {
             <li className="hero-mock-entry" style={seal("0.4s")}>
               <span className="hero-mock-seq">#06</span>
               <div>
-                <p className="hero-mock-title">Grant received — $12,000</p>
+                <p className="hero-mock-title">Grant received: $12,000</p>
                 <p className="hero-mock-hash">
                   <span className="hero-mock-seal-label">SEAL</span>
                   a3f81c94b7d0e29b1c4a
@@ -46,7 +46,7 @@ export function HeroProofMock() {
               <span className="hero-mock-seq">#07</span>
               <div>
                 <p className="hero-mock-title">
-                  Confirmed by Maya Chen — Civic Innovation Fund
+                  Confirmed by Maya Chen, Civic Innovation Fund
                 </p>
                 <p className="hero-mock-hash">
                   <span className="hero-mock-seal-label">SEAL</span>

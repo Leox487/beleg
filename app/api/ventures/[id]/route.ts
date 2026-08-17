@@ -59,7 +59,7 @@ export async function PATCH(
     return NextResponse.json(
       {
         error:
-          "Name and URL cannot be changed — this protects existing proof page links",
+          "Name and URL cannot be changed. This protects existing proof page links",
       },
       { status: 400 },
     );

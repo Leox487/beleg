@@ -44,12 +44,12 @@ export const FEATURED_IDS = [
 ];
 
 export const USE_CASES: UseCase[] = [
-  // ——— Founders & startups ———
+  // --- Founders & startups ---
   {
     id: "startup-founder",
     label: "Startup founder",
     category: "Founders & startups",
-    how: "You record each milestone the day it happens — first revenue, first hire, pilot signed — instead of reconstructing a timeline from memory when a term sheet conversation starts.",
+    how: "You record each milestone the day it happens (first revenue, first hire, pilot signed) instead of reconstructing a timeline from memory when a term sheet conversation starts.",
     entry: {
       title: "First paying customer signed",
       detail:
@@ -109,7 +109,7 @@ export const USE_CASES: UseCase[] = [
     imageAlt: "Hardware engineer adjusting a prototype on a lab bench",
   },
 
-  // ——— Small business & trades ———
+  // --- Small business & trades ---
   {
     id: "small-business-owner",
     label: "Small business owner",
@@ -142,14 +142,14 @@ export const USE_CASES: UseCase[] = [
     imageAlt: "General contractor reviewing blueprints on a job site",
   },
 
-  // ——— Grants, nonprofits & research ———
+  // --- Grants, nonprofits & research ---
   {
     id: "grant-applicant",
     label: "Grant applicant",
     category: "Grants, nonprofits & research",
     how: "Reviewers read hundreds of polished essays. You give them something none of the others have: a sealed record with the funder's own confirmation in it.",
     entry: {
-      title: "Grant received — $12,000",
+      title: "Grant received: $12,000",
       detail:
         "Awarded by the Civic Innovation Fund for the neighborhood mapping pilot.",
     },
@@ -237,7 +237,7 @@ export const USE_CASES: UseCase[] = [
     id: "oss-maintainer",
     label: "Open-source maintainer",
     category: "Grants, nonprofits & research",
-    how: "Your most valuable adoption is invisible — companies run your code in private and never say so publicly. You seal those confirmations so sponsorship conversations rest on more than a star count.",
+    how: "Your most valuable adoption is invisible: companies run your code in private and never say so publicly. You seal those confirmations so sponsorship conversations rest on more than a star count.",
     entry: {
       title: "Adopted by a Fortune 500 in production",
       detail:
@@ -249,7 +249,7 @@ export const USE_CASES: UseCase[] = [
     imageAlt: "Open-source maintainer at a dual-monitor desk",
   },
 
-  // ——— Freelance & client work ———
+  // --- Freelance & client work ---
   {
     id: "freelance-developer",
     label: "Freelance developer",
@@ -296,7 +296,7 @@ export const USE_CASES: UseCase[] = [
     imageAlt: "Freelance writer working in a notebook at a desk",
   },
 
-  // ——— Students & new graduates ———
+  // --- Students & new graduates ---
   {
     id: "high-school-student",
     label: "High school student",
@@ -343,7 +343,7 @@ export const USE_CASES: UseCase[] = [
     imageAlt: "Bootcamp graduate demoing software to a client",
   },
 
-  // ——— Professional services ———
+  // --- Professional services ---
   {
     id: "consultant",
     label: "Consultant",
@@ -363,7 +363,7 @@ export const USE_CASES: UseCase[] = [
     id: "coach",
     label: "Business / executive coach",
     category: "Professional services",
-    how: "Coaching outcomes are notoriously unverifiable — anonymous testimonials are the industry standard because nothing better exists. You seal client milestones, with their permission and confirmation, into a real record.",
+    how: "Coaching outcomes are notoriously unverifiable. Anonymous testimonials are the industry standard because nothing better exists. You seal client milestones, with their permission and confirmation, into a real record.",
     entry: {
       title: "Client closed their Series A",
       detail:
@@ -376,7 +376,7 @@ export const USE_CASES: UseCase[] = [
     imageAlt: "Executive coach talking with a founder in a cafe",
   },
 
-  // ——— Inside a company ———
+  // --- Inside a company ---
   {
     id: "product-manager",
     label: "Product manager",

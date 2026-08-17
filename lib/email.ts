@@ -68,11 +68,11 @@ export async function sendAttestationEmail({
         </div>
         <a href="${safeUrl}" style="display: inline-block; background: #2DD4A0; color: #06231A; font-weight: 600; font-size: 15px; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin: 8px 0 24px;">Confirm this entry</a>
         <p style="font-size: 13px; color: #888; line-height: 1.6;">
-          Your confirmation will be publicly visible on their proof page, linked to your name and email. You can only confirm once. There is no account to create — just click and confirm.
+          Your confirmation will be publicly visible on their proof page, linked to your name and email. You can only confirm once. There is no account to create. Just click and confirm.
         </p>
         <hr style="border: none; border-top: 1px solid #e4e0d8; margin: 24px 0;" />
         <p style="font-size: 12px; color: #aaa; line-height: 1.6;">
-          Beleg is a sealed record of what ventures actually did — verifiable by anyone. This email was sent because ${safeFounder} listed your email as a witness. If this wasn't expected, you can ignore it.
+          Beleg is a sealed record of what ventures actually did, verifiable by anyone. This email was sent because ${safeFounder} listed your email as a witness. If this wasn't expected, you can ignore it.
         </p>
         <p style="font-size: 12px; color: #aaa; line-height: 1.6; word-break: break-all;">
           If the button doesn't work, paste this into your browser:<br />

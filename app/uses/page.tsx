@@ -8,7 +8,7 @@ import { CATEGORIES, USE_CASES, useCasesByCategory } from "@/lib/use-cases";
 export const metadata: Metadata = {
   title: "Who Beleg is for",
   description:
-    "Founders, small business owners, contractors, freelancers, researchers, students, and consultants. Pick your profession and see exactly how a sealed ledger applies to your work — and where it doesn't help.",
+    "Founders, small business owners, contractors, freelancers, researchers, students, and consultants. Pick your profession and see exactly how a sealed ledger applies to your work, and where it doesn't help.",
 };
 
 export default function UsesPage() {
@@ -21,7 +21,7 @@ export default function UsesPage() {
           <h1 className="h1 doc-title">Who Beleg is for</h1>
           <p className="lead">
             Anyone whose best work is real but invisible to the stranger
-            evaluating them. This is a short list on purpose —{" "}
+            evaluating them. This is a short list on purpose:{" "}
             {USE_CASES.length} cases where a sealed ledger genuinely beats the
             alternatives, and an honest note about where it doesn&apos;t.
           </p>

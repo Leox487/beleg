@@ -83,7 +83,7 @@ export default async function VentureSettingsPage({
         <header className="ledger-header">
           <h1 className="page-title">{venture.name}</h1>
           <p className="muted settings-immutable-note">
-            Name and URL cannot be changed — this protects the integrity of
+            Name and URL cannot be changed. This protects the integrity of
             existing proof page links.
           </p>
           <div className="public-link">

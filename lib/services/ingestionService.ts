@@ -121,7 +121,7 @@ async function resolveVenture(recipient: string): Promise<{
       "expected",
       expected,
     );
-    // Still allow match by slug — Resend may rewrite/forward; local-part is source of truth.
+    // Still allow match by slug. Resend may rewrite/forward; local-part is source of truth.
   }
 
   const ventures = await sql`
@@ -192,7 +192,7 @@ export async function processIncomingEmail(
       };
   if (!dkim.verified) {
     console.warn(
-      "ingest: DKIM failed or absent — continuing (v1 soft gate)",
+      "ingest: DKIM failed or absent; continuing (v1 soft gate)",
       dkim.error,
     );
   }

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Footer } from "@/app/components/Footer";
 
 export const metadata: Metadata = {
-  title: "About — Beleg",
+  title: "About · Beleg",
   description:
     "Why Beleg exists: in a world where every application sounds perfect, the scarce resource is proof.",
 };
@@ -24,17 +24,17 @@ export default function AboutPage() {
 
           <h2>The problem</h2>
           <p>
-            Applications — for grants, competitions, accelerators, investment —
+            Applications for grants, competitions, accelerators, and investment
             are drowning in AI-polished claims. Everyone&apos;s traction sounds
             perfect because everyone&apos;s essay was written by the same
             models. When claims are free to fabricate, the scarce resource is no
-            longer persuasion — it&apos;s proof.
+            longer persuasion. It&apos;s proof.
           </p>
 
           <h2>What Beleg does</h2>
           <p>
             You record milestones as they happen. Each entry is
-            cryptographically sealed and linked to the one before it — editing,
+            cryptographically sealed and linked to the one before it. Editing,
             deleting, or reordering anything would break every seal after it.
             You can invite witnesses to confirm entries with one click, and
             their confirmations are sealed into the same chain. The whole ledger
@@ -43,7 +43,7 @@ export default function AboutPage() {
             controls.
           </p>
           <p>
-            The result is a single shareable link — your public proof page —
+            The result is a single shareable link (your public proof page)
             where anyone evaluating you can independently verify your record in
             their own browser, without trusting Beleg or trusting you.
           </p>
@@ -52,7 +52,7 @@ export default function AboutPage() {
           <p>
             Beleg does not prove your claims are true. It proves when they were
             recorded and that they haven&apos;t changed. Truth comes from the
-            witnesses who attest and the evidence you accumulate — the chain
+            witnesses who attest and the evidence you accumulate. The chain
             just makes sure nobody (including you) can rewrite the history after
             the fact.
           </p>

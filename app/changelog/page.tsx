@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { Footer } from "@/app/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Changelog — Beleg",
+  title: "Changelog · Beleg",
   description:
-    "What shipped, when, and what broke along the way — the honest build history of Beleg.",
+    "What shipped, when, and what broke along the way. The honest build history of Beleg.",
 };
 
 const ENTRIES = [
@@ -75,7 +75,7 @@ export default function ChangelogPage() {
         </div>
 
         <p className="doc-note">
-          This changelog is the honest version — including the bugs.
+          This changelog is the honest version, including the bugs.
         </p>
       </div>
 

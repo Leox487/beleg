@@ -30,7 +30,7 @@ const MAX_RETRIES = 3;
  * Reads the chain tip (highest seq + its chain_hash, GENESIS_HASH if empty),
  * stamps recorded_at server-side, computes content_hash and chain_hash via
  * lib/hash.ts, and inserts with seq = last + 1. On a unique-constraint
- * violation of (venture_id, seq) — a concurrent append race — it re-reads the
+ * violation of (venture_id, seq), a concurrent append race, it re-reads the
  * tip and retries up to MAX_RETRIES times.
  *
  * Caller is responsible for authorization (verifying the venture belongs to

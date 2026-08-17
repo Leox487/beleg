@@ -87,7 +87,7 @@ async function verifyEntries(entries: Entry[]): Promise<Result> {
     };
 
     if (e.seq !== expectedSeq) {
-      return fail(`sequence gap — expected #${expectedSeq}, found #${e.seq}`);
+      return fail(`sequence gap: expected #${expectedSeq}, found #${e.seq}`);
     }
     if (computedContent !== e.content_hash) {
       return fail("content hash does not match (an entry's data was altered)");
@@ -205,13 +205,13 @@ export function VerifyTool() {
 
           {result.state === "ok" ? (
             <div className="verify-banner verify-ok verify-success">
-              ✓ Chain verified — {result.count}{" "}
+              ✓ Chain verified: {result.count}{" "}
               {result.count === 1 ? "entry" : "entries"}, unbroken since{" "}
               {new Date(result.firstRecordedAt).toLocaleString()}
             </div>
           ) : (
             <div className="verify-banner verify-broken">
-              ✗ Chain broken at entry #{result.seq} — {result.reason}
+              ✗ Chain broken at entry #{result.seq}: {result.reason}
             </div>
           )}
 

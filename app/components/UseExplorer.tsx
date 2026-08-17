@@ -122,7 +122,7 @@ export function UseExplorer() {
               <div className="uses-menu-scroll">
                 {groups.length === 0 ? (
                   <p className="uses-empty small">
-                    No match — but Beleg works for anyone who gets asked to
+                    No match, but Beleg works for anyone who gets asked to
                     prove something happened.
                   </p>
                 ) : (

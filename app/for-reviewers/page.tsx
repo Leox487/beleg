@@ -5,9 +5,9 @@ import { Footer } from "@/app/components/Footer";
 import { USE_CASES } from "@/lib/use-cases";
 
 export const metadata: Metadata = {
-  title: "For Reviewers — Beleg",
+  title: "For Reviewers · Beleg",
   description:
-    "Ask founders for their Beleg link. Verify a sealed timeline in your browser in about two seconds — no account, no trust required.",
+    "Ask founders for their Beleg link. Verify a sealed timeline in your browser in about two seconds. No account, no trust required.",
 };
 
 const STEPS = [
@@ -19,7 +19,7 @@ const STEPS = [
   {
     n: "02",
     title: "Click Verify",
-    text: "Open the page and run verification in your own browser. The check is local cryptography — not a badge Beleg issues from a server.",
+    text: "Open the page and run verification in your own browser. The check is local cryptography, not a badge Beleg issues from a server.",
   },
   {
     n: "03",
@@ -34,7 +34,7 @@ export default function ForReviewersPage() {
       <div className="page-inner doc doc-wide">
         <header className="doc-header">
           <h1 className="h1 doc-title">
-            For Reviewers – Verify in 2 Seconds
+            For Reviewers: Verify in 2 Seconds
           </h1>
           <p className="lead">
             Grant officers, accelerator screens, angel investors, and anyone
@@ -69,7 +69,7 @@ export default function ForReviewersPage() {
           <h2 className="h2">Who you&apos;ll see using Beleg</h2>
           <p className="small uses-index-help">
             The same {USE_CASES.length} professions from{" "}
-            <Link href="/uses">Who it&apos;s for</Link> — founders and builders
+            <Link href="/uses">Who it&apos;s for</Link>: founders and builders
             who need to prove work that doesn&apos;t leave an official paper
             trail.
           </p>

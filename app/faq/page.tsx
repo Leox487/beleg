@@ -5,7 +5,7 @@ import Accordion from "@/app/components/Accordion";
 import { Footer } from "@/app/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Questions — Beleg",
+  title: "Questions · Beleg",
   description:
     "Straight answers about what Beleg proves, what it doesn't, and what happens if it shuts down.",
 };
@@ -33,7 +33,7 @@ export default function FaqPage() {
             <p>
               No, and that&apos;s the point. If entries could be changed, the
               proof would be meaningless. If you made a mistake, add a new entry
-              correcting it — the original stays, the correction is visible, and
+              correcting it. The original stays, the correction is visible, and
               the chain stays intact. That&apos;s how amendments work in real
               records.
             </p>
@@ -43,7 +43,7 @@ export default function FaqPage() {
             <p>
               It recomputes every seal from scratch in your browser and confirms
               every link in the chain holds. If anything changed, it tells you
-              exactly which entry broke. Your browser does the math — it
+              exactly which entry broke. Your browser does the math. It
               doesn&apos;t ask our server for the answer.
             </p>
           </Accordion>
@@ -54,7 +54,7 @@ export default function FaqPage() {
               hasn&apos;t changed since. Truth comes from the witnesses who
               attest and the evidence behind it. A sealed entry saying
               &quot;signed a contract&quot; proves you wrote that sentence on
-              that date — not that the contract exists.
+              that date, not that the contract exists.
             </p>
           </Accordion>
 

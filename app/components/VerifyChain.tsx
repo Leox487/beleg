@@ -100,7 +100,7 @@ export function VerifyChain({
         setStatus({
           state: "broken",
           seq: e.seq,
-          reason: `sequence gap — expected #${expectedSeq}, found #${e.seq}`,
+          reason: `sequence gap: expected #${expectedSeq}, found #${e.seq}`,
           rows,
         });
         return false;
@@ -223,7 +223,7 @@ export function VerifyChain({
       if (result.verified) {
         setBitcoin({
           state: "ok",
-          message: `Bitcoin-anchored at block #${result.blockHeight} — mathematically proven existence.`,
+          message: `Bitcoin-anchored at block #${result.blockHeight}. Mathematically proven existence.`,
         });
       } else {
         setBitcoin({
@@ -283,7 +283,7 @@ export function VerifyChain({
         </button>
         <p className="verify-note">
           Your browser recomputes every hash, then checks the Bitcoin
-          OpenTimestamps proof against public block headers — this server is
+          OpenTimestamps proof against public block headers. This server is
           not trusted with the chain answer.
         </p>
       </div>
@@ -298,8 +298,8 @@ export function VerifyChain({
       {status.state === "ok" ? (
         <div className="verify-banner verify-ok verify-success">
           {status.count === 0
-            ? "✓ Nothing to verify yet — this ledger has no entries."
-            : `✓ Chain verified — ${status.count} ${
+            ? "✓ Nothing to verify yet. This ledger has no entries."
+            : `✓ Chain verified: ${status.count} ${
                 status.count === 1 ? "entry" : "entries"
               }, unbroken since ${new Date(
                 status.firstRecordedAt,
@@ -309,7 +309,7 @@ export function VerifyChain({
 
       {status.state === "broken" ? (
         <div className="verify-banner verify-broken">
-          ✗ Chain broken at entry #{status.seq} — {status.reason}
+          ✗ Chain broken at entry #{status.seq}: {status.reason}
         </div>
       ) : null}
 

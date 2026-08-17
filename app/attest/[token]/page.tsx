@@ -66,7 +66,7 @@ export default async function AttestPage({
             {attestation.confirmed_at
               ? ` on ${formatDateTime(attestation.confirmed_at)}`
               : ""}
-            . Nothing more to do — thanks.
+            . Nothing more to do. Thanks.
           </p>
           {attestation.attester_note ? (
             <div className="attest-statement">

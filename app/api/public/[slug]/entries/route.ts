@@ -3,7 +3,7 @@ import sql from "@/lib/supabase";
 import type { Entry, Venture } from "@/lib/types";
 
 // PUBLIC, read-only. Returns exactly the data the proof page at /p/[slug]
-// already renders, so this exposes nothing new — it just makes the same record
+// already renders, so this exposes nothing new. It just makes the same record
 // machine-readable for independent verifiers.
 export async function GET(
   _req: Request,

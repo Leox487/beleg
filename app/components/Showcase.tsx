@@ -146,7 +146,7 @@ const MOCKS = [<RecordMock key="r" />, <WitnessMock key="w" />, <ShareMock key="
 
 /**
  * Vertical accordion: hover/focus/click opens one step and plays its demo.
- * The open step stays open when the pointer leaves — resetting on mouseleave
+ * The open step stays open when the pointer leaves. Resetting on mouseleave
  * collapses the panel, jumps the layout, and fights the outlink below.
  */
 export function Showcase() {

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import sql from "@/lib/supabase";
 
 /**
- * Public: returns the data a browser needs to verify a Bitcoin anchor —
+ * Public: returns the data a browser needs to verify a Bitcoin anchor:
  * the stored .ots proof and the chain tip hash that was stamped.
  */
 export async function GET(

@@ -2,7 +2,7 @@
 
 /**
  * Beleg-native hero atmosphere: a living hash-chain field.
- * Soft linked seals + drifting arcs — not a Neon clone.
+ * Soft linked seals + drifting arcs. Not a Neon clone.
  */
 export function ChainField() {
   return (

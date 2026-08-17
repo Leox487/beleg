@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Footer } from "@/app/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Security — Beleg",
+  title: "Security · Beleg",
   description:
     "What Beleg protects, what it stores, where it runs, and the threats it explicitly does not defend against.",
 };
@@ -17,7 +17,7 @@ export default function SecurityPage() {
           <p className="doc-eyebrow">Security</p>
           <h1 className="h1 doc-title">Security</h1>
           <p className="doc-lead">
-            What Beleg actually defends against — and what it doesn&apos;t.
+            What Beleg actually defends against, and what it doesn&apos;t.
           </p>
         </header>
 
@@ -45,7 +45,7 @@ export default function SecurityPage() {
             server routes.
           </p>
 
-          <h3>Threat model — what Beleg defends against</h3>
+          <h3>Threat model: what Beleg defends against</h3>
           <p>
             Silent alteration of past entries, backdating entries, reordering
             history, forging a witness confirmation after the fact.

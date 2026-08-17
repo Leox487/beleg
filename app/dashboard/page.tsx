@@ -50,7 +50,7 @@ export default async function DashboardPage() {
         <div className="empty-state">
           <h1 className="empty-title">Start your first ledger</h1>
           <p className="empty-help">
-            A venture is the thing you&apos;re building — a company, a product, a
+            A venture is the thing you&apos;re building: a company, a product, a
             project. You&apos;ll add milestones as they happen, and share one
             public link with reviewers, judges, or investors.
           </p>

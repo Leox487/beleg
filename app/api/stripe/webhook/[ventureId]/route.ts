@@ -60,7 +60,7 @@ function entryFromEvent(
     const id = asString(obj.id) ?? "unknown";
     return {
       kind: "revenue",
-      title: `Payment received — ${formatStripeMoney(amount, currency)}`,
+      title: `Payment received: ${formatStripeMoney(amount, currency)}`,
       body: `Customer: ${email}. Payment ID: ${id}.`,
     };
   }
@@ -74,7 +74,7 @@ function entryFromEvent(
     const id = asString(obj.id) ?? "unknown";
     return {
       kind: "revenue",
-      title: `Payment received — ${formatStripeMoney(amount, currency)}`,
+      title: `Payment received: ${formatStripeMoney(amount, currency)}`,
       body: `Customer: ${email}. Payment ID: ${id}.`,
     };
   }
@@ -87,7 +87,7 @@ function entryFromEvent(
     const id = asString(obj.id) ?? "unknown";
     return {
       kind: "revenue",
-      title: `Invoice paid — ${formatStripeMoney(amount, currency)}`,
+      title: `Invoice paid: ${formatStripeMoney(amount, currency)}`,
       body: `Invoice ${id}. Customer: ${email}.`,
     };
   }
@@ -97,7 +97,7 @@ function entryFromEvent(
     const customer = asString(obj.customer) ?? "unknown";
     return {
       kind: "revenue",
-      title: `New subscription started — $${(plan.amount / 100).toFixed(2)}/${plan.interval}`,
+      title: `New subscription started: $${(plan.amount / 100).toFixed(2)}/${plan.interval}`,
       body: `Plan: ${plan.nickname ?? plan.planId}. Customer: ${customer}.`,
     };
   }

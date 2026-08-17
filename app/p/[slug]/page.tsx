@@ -54,7 +54,7 @@ export default async function PublicProofPage({
   `;
 
   // Oldest-first: a reader wants the story in order. Confirmations are no longer
-  // read from the attestations table — they are sealed into the chain as
+  // read from the attestations table. They are sealed into the chain as
   // 'attestation'-kind entries, so they carry the same tamper-evidence as every
   // other entry and the in-browser verifier covers them too.
   const entries = entryRows.map((row) =>
@@ -116,7 +116,7 @@ export default async function PublicProofPage({
             </span>
             <div className="anchor-proof-body">
             <p className="anchor-proof-headline">
-              ✓ Anchored to Bitcoin — entries #1–{confirmedAnchor.anchored_seq}{" "}
+              ✓ Anchored to Bitcoin. Entries #1 to #{confirmedAnchor.anchored_seq}{" "}
               provably existed as of{" "}
               {formatDateTime(
                 confirmedAnchor.upgraded_at ?? confirmedAnchor.created_at,
@@ -126,7 +126,7 @@ export default async function PublicProofPage({
             <p className="anchor-proof-explainer">
               This ledger&apos;s fingerprint was committed to the Bitcoin
               blockchain, which means its contents provably existed at that time
-              and cannot be backdated — verifiable without trusting this
+              and cannot be backdated, verifiable without trusting this
               website.
             </p>
             <a
@@ -201,12 +201,12 @@ export default async function PublicProofPage({
           <p>
             Each entry is cryptographically sealed and linked to the one before
             it. Editing, deleting, or reordering any past entry would break every
-            seal after it. Verification runs in your browser — this server is not
+            seal after it. Verification runs in your browser. This server is not
             trusted with the answer.
           </p>
           <p>
             Confirmations from third parties are themselves recorded as sealed
-            entries in the chain — they carry the same protection as everything
+            entries in the chain. They carry the same protection as everything
             else, and the verifier above checks them too.
           </p>
           <p className="proof-footer-fine muted">

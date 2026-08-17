@@ -11,7 +11,7 @@ type Body = {
 
 /**
  * Runs OpenTimestamps Bitcoin verification. Invoked from the browser proof
- * page after the client has fetched ots_file_base64 + latest_hash — the
+ * page after the client has fetched ots_file_base64 + latest_hash. The
  * opentimestamps package is Node-only (bitcore/request), so the heavy lift
  * happens here while chain hashing stays in the browser.
  */

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Footer } from "@/app/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Glossary — Beleg",
+  title: "Glossary · Beleg",
   description:
     "Plain-English definitions for every term Beleg uses: hash, seal, chain, anchoring, and more.",
 };

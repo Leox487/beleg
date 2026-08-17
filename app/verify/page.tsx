@@ -5,7 +5,7 @@ import { Footer } from "@/app/components/Footer";
 import { VerifyTool } from "@/app/components/VerifyTool";
 
 export const metadata: Metadata = {
-  title: "Verify a ledger — Beleg",
+  title: "Verify a ledger · Beleg",
   description:
     "Paste a Beleg proof page link and verify its chain entirely in your own browser.",
 };
@@ -19,7 +19,7 @@ export default function VerifyPage() {
           <h1 className="h1 doc-title">Verify any Beleg ledger.</h1>
           <p className="doc-lead">
             Paste a public proof page URL below. Verification runs entirely in
-            your browser — nothing is sent to our servers.
+            your browser. Nothing is sent to our servers.
           </p>
         </header>
 

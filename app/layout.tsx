@@ -30,9 +30,9 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Beleg — Proof, not prose.",
+  title: "Beleg. Proof, not prose.",
   description:
-    "Beleg gives your traction a cryptographically sealed timeline — recorded as it happens, witnessed by real people, and provable to anyone reading.",
+    "Beleg gives your traction a cryptographically sealed timeline, recorded as it happens, witnessed by real people, and provable to anyone reading.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
