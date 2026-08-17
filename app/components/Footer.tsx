@@ -51,12 +51,7 @@ export function Footer() {
             <p className="site-footer-tagline">
               A sealed record of what you actually did.
             </p>
-            <p className="site-footer-anchor">
-              <span className="site-footer-anchor-glyph" aria-hidden="true">
-                ⚓
-              </span>
-              Anchored to Bitcoin
-            </p>
+            <p className="site-footer-anchor">Anchored to Bitcoin</p>
           </div>
 
           {COLUMNS.map((column) => (

@@ -1,6 +1,30 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+
+function useInView(threshold = 0.35) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [on, setOn] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setOn(true);
+      return;
+    }
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        setOn(entry.isIntersecting);
+      },
+      { threshold, rootMargin: "0px 0px -12% 0px" },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+
+  return { ref, on };
+}
 
 function StageFrame({
   className,
@@ -9,14 +33,19 @@ function StageFrame({
   className: string;
   children: ReactNode;
 }) {
+  const { ref, on } = useInView();
   return (
-    <div className={`${className} is-on`} aria-hidden="true">
+    <div
+      ref={ref}
+      className={`${className}${on ? " is-on" : ""}`}
+      aria-hidden="true"
+    >
       {children}
     </div>
   );
 }
 
-/** Hash-chain: entries lock in sequence, then the cycle restarts. */
+/** Hash-chain: entries lock in sequence once the section is on screen. */
 export function StageSeal() {
   return (
     <StageFrame className="hs hs-seal">
@@ -41,7 +70,6 @@ export function StageSeal() {
   );
 }
 
-/** Attestation: a witness confirms, then the confirm seals. */
 export function StageWitness() {
   return (
     <StageFrame className="hs hs-witness">
@@ -62,7 +90,6 @@ export function StageWitness() {
   );
 }
 
-/** In-browser verify: button, scan, green intact banner. */
 export function StageVerify() {
   return (
     <StageFrame className="hs hs-verify">
@@ -115,7 +142,7 @@ export function StageNda() {
   return (
     <StageFrame className="hs hs-mini hs-nda">
       <span className="hs-nda-file">Payments integration</span>
-      <span className="hs-nda-lock">NDA — code hidden</span>
+      <span className="hs-nda-lock">NDA, code hidden</span>
       <span className="hs-nda-confirm">Client confirmed</span>
     </StageFrame>
   );
