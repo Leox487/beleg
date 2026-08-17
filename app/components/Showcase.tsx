@@ -37,7 +37,7 @@ function WindowBar({ title }: { title: string }) {
 function RecordMock() {
   return (
     <div className="mock mock-record" aria-hidden="true">
-      <WindowBar title="New entry — Northstar" />
+      <WindowBar title="New entry: Northstar" />
       <div className="mock-body">
         <div className="mock-row">
           <span className="mock-lbl">Kind</span>
@@ -47,7 +47,7 @@ function RecordMock() {
         <div className="mock-row">
           <span className="mock-lbl">Title</span>
           <span className="mock-field mock-field-typing">
-            <span className="mock-typed">Grant received — $12,000</span>
+            <span className="mock-typed">Grant received: $12,000</span>
             <span className="mock-caret" />
           </span>
         </div>
@@ -78,7 +78,7 @@ function WitnessMock() {
       <div className="mock-body">
         <div className="mock-ref">
           <span className="mock-ref-label">You&apos;re confirming</span>
-          <span className="mock-ref-title">Grant received — $12,000</span>
+          <span className="mock-ref-title">Grant received: $12,000</span>
         </div>
 
         <div className="mock-who">
@@ -101,7 +101,7 @@ function WitnessMock() {
 
         <div className="mock-result mock-result-witness">
           <span className="mock-check">✓</span>
-          Confirmed — sealed into the chain
+          Confirmed, sealed into the chain
         </div>
       </div>
       <span className="mock-cursor mock-cursor-witness" />
@@ -121,7 +121,7 @@ function ShareMock() {
 
         <div className="mock-entries">
           <span className="mock-entry">
-            <b>#07</b> Grant received — $12,000
+            <b>#07</b> Grant received: $12,000
           </span>
           <span className="mock-entry">
             <b>#08</b> Confirmed by Maya Chen

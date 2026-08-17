@@ -9486,7 +9486,7 @@ html {
 
 /* --- Homepage stages: unique product scenes per section --- */
 .home-kicker {
-  margin: 0 0 36px;
+  margin: 0 0 28px;
   max-width: 40rem;
   font-size: clamp(1.15rem, 2.4vw, 1.5rem);
   line-height: 1.45;
@@ -9500,33 +9500,251 @@ html {
   text-align: center;
 }
 
-.land-reviewers-inner .home-kicker {
-  margin-top: 8px;
-  margin-bottom: 28px;
+.home-lede {
+  margin: -12px 0 28px;
+  max-width: 40rem;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-2);
 }
 
-.home-prims {
-  list-style: none;
+.home-detail {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-2);
+}
+
+.home-problem {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin: 40px 0 0;
-  padding: 0;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px 48px;
 }
 
-.home-prim-card {
-  height: 100%;
-  padding: 18px 18px 22px;
-  border-radius: 12px;
-  background: #141518;
-  border: 1px solid #232733;
+.home-problem-label {
+  margin: 0 0 10px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
 }
 
-.home-prim-text {
+.home-features {
+  display: flex;
+  flex-direction: column;
+  gap: 72px;
+  margin-top: 8px;
+}
+
+.home-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 36px 48px;
+  align-items: center;
+}
+
+.home-feature.is-flip {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+}
+
+.home-feature.is-flip .home-feature-copy {
+  order: 2;
+}
+
+.home-feature.is-flip .home-feature-stage {
+  order: 1;
+}
+
+.home-feature-kicker {
+  margin: 0 0 10px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.home-feature-title {
+  margin: 0 0 14px;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
+  font-weight: 550;
+  letter-spacing: -0.03em;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.home-feature-aside {
   margin: 16px 0 0;
+  padding-left: 12px;
+  border-left: 1px solid rgba(45, 212, 160, 0.35);
   font-size: 14px;
   line-height: 1.55;
   color: var(--text-2);
+}
+
+.home-feature-stage .hs {
+  min-height: 220px;
+}
+
+.home-spec-wrap {
+  overflow-x: auto;
+  border: 1px solid #232733;
+  border-radius: 10px;
+  background: #141518;
+}
+
+.home-spec {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.home-spec th,
+.home-spec td {
+  padding: 13px 16px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #1e2028;
+}
+
+.home-spec tr:last-child td {
+  border-bottom: none;
+}
+
+.home-spec th {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  background: #0f1114;
+}
+
+.home-spec td:first-child,
+.home-spec td:last-child {
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.home-spec td:nth-child(2) {
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.home-cases {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.home-case {
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr);
+  gap: 20px 32px;
+  padding: 28px 0;
+  border-top: 1px solid #1e2028;
+}
+
+.home-case:last-child {
+  border-bottom: 1px solid #1e2028;
+}
+
+.home-case-who {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 550;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.home-case-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 24px;
+}
+
+.home-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px 36px;
+}
+
+.home-step {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.home-step-n {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  padding-top: 3px;
+}
+
+.home-step-title {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 550;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.home-honest {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: #232733;
+  border: 1px solid #232733;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.home-honest-col {
+  background: #141518;
+  padding: 28px 24px;
+}
+
+.home-honest-list {
+  margin: 0;
+  padding: 0 0 0 18px;
+  display: grid;
+  gap: 10px;
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.land-reviewers-inner .home-kicker,
+.land-cta-inner .home-kicker {
+  margin-bottom: 32px;
+}
+
+@media (max-width: 900px) {
+  .home-problem,
+  .home-feature,
+  .home-feature.is-flip,
+  .home-case,
+  .home-case-grid,
+  .home-steps,
+  .home-honest {
+    grid-template-columns: 1fr;
+  }
+
+  .home-feature.is-flip .home-feature-copy,
+  .home-feature.is-flip .home-feature-stage {
+    order: unset;
+  }
+
+  .home-prims {
+    grid-template-columns: 1fr;
+  }
 }
 
 .hs {
