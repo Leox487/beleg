@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
 import { processIncomingEmail } from "@/lib/services/ingestionService";
+import { claimWebhookEvent } from "@/lib/webhookIdempotency";
 
 export const runtime = "nodejs";
 
@@ -138,6 +139,14 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Resend webhook verification failed:", error);
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+  }
+
+  const svixId = request.headers.get("svix-id")?.trim() ?? "";
+  if (svixId) {
+    const firstDelivery = await claimWebhookEvent(`svix:${svixId}`);
+    if (!firstDelivery) {
+      return NextResponse.json({ ok: true, duplicate: true });
+    }
   }
 
   if (event.type !== "email.received") {

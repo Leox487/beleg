@@ -10,10 +10,12 @@ import {
   unixToDateOnly,
   verifyStripeSignature,
 } from "@/lib/stripeWebhook";
+import { claimWebhookEvent } from "@/lib/webhookIdempotency";
 
 export const runtime = "nodejs";
 
 type StripeEvent = {
+  id?: string;
   type?: string;
   created?: number;
   data?: { object?: Record<string, unknown> };
@@ -148,6 +150,14 @@ export async function POST(
     event = JSON.parse(rawBody) as StripeEvent;
   } catch {
     return NextResponse.json({ received: true }, { status: 200 });
+  }
+
+  const eventId = typeof event.id === "string" ? event.id : "";
+  if (eventId) {
+    const firstDelivery = await claimWebhookEvent(`stripe:${eventId}`);
+    if (!firstDelivery) {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
   }
 
   const mapped = entryFromEvent(event);

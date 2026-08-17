@@ -127,3 +127,10 @@ create table if not exists public.stripe_connections (
 );
 create index if not exists stripe_connections_venture_idx
   on public.stripe_connections (venture_id);
+
+-- Dedup Stripe / Resend (Svix) webhook deliveries so retries do not
+-- append duplicate ledger entries.
+create table if not exists public.processed_webhook_ids (
+  id text primary key,
+  processed_at timestamptz not null default now()
+);
