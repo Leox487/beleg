@@ -1,4 +1,5 @@
 import { SignUp } from "@clerk/nextjs";
+import Link from "next/link";
 
 export default function SignUpPage() {
   return (
@@ -13,6 +14,11 @@ export default function SignUpPage() {
           signInUrl="/sign-in"
           fallbackRedirectUrl="/dashboard"
         />
+        <p className="auth-legal">
+          By signing up, you agree to our{" "}
+          <Link href="/terms">Terms of Service</Link> and{" "}
+          <Link href="/privacy">Privacy Policy</Link>.
+        </p>
       </div>
     </main>
   );

@@ -14,7 +14,7 @@ export default function PrivacyPage() {
       <div className="page-inner doc">
         <header className="doc-header">
           <h1 className="h1 doc-title">Privacy Policy</h1>
-          <p className="small">Last updated: July 31, 2026</p>
+          <p className="small">Last updated: August 18, 2026</p>
         </header>
 
         <div className="card doc-body">
@@ -90,6 +90,16 @@ export default function PrivacyPage() {
             attestations, and your account within 30 days.
           </p>
 
+          <h2>Your rights</h2>
+          <p>
+            You may request access to, correction of, or deletion of your
+            personal data at any time by emailing{" "}
+            <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a>. We
+            will respond within 30 days. For EU residents, you have additional
+            rights under GDPR including the right to data portability and the
+            right to lodge a complaint with your supervisory authority.
+          </p>
+
           <h2>Third-party services</h2>
           <p>
             Clerk (authentication), Supabase (database), Vercel (hosting),
@@ -107,6 +117,12 @@ export default function PrivacyPage() {
           <p>
             If this policy changes, the updated version will be posted here with
             a new &quot;Last updated&quot; date.
+          </p>
+
+          <h2>Cookies</h2>
+          <p>
+            We use session cookies through Clerk for authentication. We do not
+            use advertising, tracking, or analytics cookies.
           </p>
 
           <h2>Contact</h2>

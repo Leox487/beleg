@@ -14,13 +14,20 @@ export default function TermsPage() {
       <div className="page-inner doc">
         <header className="doc-header">
           <h1 className="h1 doc-title">Terms of Service</h1>
-          <p className="small">Last updated: July 31, 2026</p>
+          <p className="small">Last updated: August 18, 2026</p>
         </header>
 
         <div className="card doc-body">
           <p>
             By using Beleg, you agree to these terms. If you disagree,
             don&apos;t use the service.
+          </p>
+
+          <h2>Age requirement</h2>
+          <p>
+            You must be at least 13 years old to use Beleg. If you are under
+            18, you represent that you have your parent or guardian&apos;s
+            permission to use the service.
           </p>
 
           <h2>What Beleg is</h2>

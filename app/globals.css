@@ -2858,6 +2858,15 @@ a {
   text-align: center;
 }
 
+.auth-legal {
+  margin-top: 16px;
+  max-width: 360px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
 /* Instant loading UI for auth routes so navigation feels responsive while
    Clerk's client widget loads. */
 .auth-spinner {
@@ -7310,6 +7319,10 @@ select:focus {
 }
 
 .auth-note {
+  color: var(--text-3);
+}
+
+.auth-legal {
   color: var(--text-3);
 }
 
