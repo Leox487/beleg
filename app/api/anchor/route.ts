@@ -36,17 +36,12 @@ export async function POST(req: Request) {
     );
   }
 
-  // Verify the venture exists and belongs to the authenticated user.
   const ventureRows = await sql`
-    SELECT id, clerk_user_id FROM ventures
-    WHERE id = ${ventureId}
+    SELECT id FROM ventures
+    WHERE id = ${ventureId} AND clerk_user_id = ${userId}
     LIMIT 1
   `;
-  const venture = ventureRows[0] as
-    | { id: string; clerk_user_id: string }
-    | undefined;
-
-  if (!venture || venture.clerk_user_id !== userId) {
+  if (!ventureRows[0]) {
     return NextResponse.json({ error: "Venture not found" }, { status: 404 });
   }
 

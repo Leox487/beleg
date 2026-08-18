@@ -2,6 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { appendEntry } from "@/lib/chain";
+import { rateLimitOk, tooManyRequests } from "@/lib/rateLimit";
+import { sanitizeText } from "@/lib/sanitize";
 import sql from "@/lib/supabase";
 
 type Body = Record<string, unknown>;
@@ -35,6 +37,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  if (!rateLimitOk(`entries-post:${userId}`, 60, 60 * 60 * 1000)) {
+    return tooManyRequests(3600);
+  }
+
   let body: Body;
   try {
     body = (await req.json()) as Body;
@@ -50,12 +56,12 @@ export async function POST(req: Request) {
     );
   }
 
-  const title = asTrimmedString(body.title);
+  const title = sanitizeText(asTrimmedString(body.title));
   if (!title) {
     return NextResponse.json({ error: "title is required" }, { status: 400 });
   }
 
-  const bodyText = asTrimmedString(body.body);
+  const bodyText = sanitizeText(asTrimmedString(body.body));
   const entryBody: string | null = bodyText.length > 0 ? bodyText : null;
 
   const occurredRaw = asTrimmedString(body.occurred_at);
@@ -76,18 +82,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid kind" }, { status: 400 });
   }
 
-  // Verify the venture exists and belongs to the authenticated user.
   const ventures = await sql`
-    SELECT id, clerk_user_id FROM ventures
-    WHERE id = ${ventureId}
+    SELECT id FROM ventures
+    WHERE id = ${ventureId} AND clerk_user_id = ${userId}
     LIMIT 1
   `;
-  const venture = ventures[0] as
-    | { id: string; clerk_user_id: string }
-    | undefined;
-
-  if (!venture || venture.clerk_user_id !== userId) {
-    // Do not leak existence of other users' ventures.
+  if (!ventures[0]) {
     return NextResponse.json({ error: "Venture not found" }, { status: 404 });
   }
 

@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+import { sanitizeText } from "@/lib/sanitize";
 import sql from "@/lib/supabase";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -64,7 +65,7 @@ export async function POST(req: Request) {
     typeof body.ventureId === "string" ? body.ventureId.trim() : "";
   const senderEmail =
     typeof body.senderEmail === "string"
-      ? body.senderEmail.trim().toLowerCase()
+      ? sanitizeText(body.senderEmail).toLowerCase()
       : "";
 
   if (!ventureId) {

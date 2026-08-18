@@ -8,6 +8,7 @@ import {
   type EntryContent,
 } from "./hash";
 import { mapEntry } from "./row";
+import { sanitizeText } from "./sanitize";
 import type { Entry } from "./types";
 
 export interface AppendEntryInput {
@@ -37,6 +38,10 @@ const MAX_RETRIES = 3;
  * the requester) before calling this.
  */
 export async function appendEntry(input: AppendEntryInput): Promise<Entry> {
+  const title = sanitizeText(input.title);
+  const body =
+    input.body == null ? null : sanitizeText(input.body) || null;
+
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     const tip = await sql`
       SELECT seq, chain_hash FROM entries
@@ -53,8 +58,8 @@ export async function appendEntry(input: AppendEntryInput): Promise<Entry> {
       venture_id: input.venture_id,
       seq: lastSeq + 1,
       kind: input.kind,
-      title: input.title,
-      body: input.body,
+      title,
+      body,
       occurred_at: input.occurred_at,
       recorded_at,
     };
@@ -73,8 +78,8 @@ export async function appendEntry(input: AppendEntryInput): Promise<Entry> {
           content_hash, prev_hash, chain_hash, source, dkim_verified
         )
         VALUES (
-          ${input.venture_id}, ${lastSeq + 1}, ${input.kind}, ${input.title},
-          ${input.body}, ${input.occurred_at}, ${recorded_at},
+          ${input.venture_id}, ${lastSeq + 1}, ${input.kind}, ${title},
+          ${body}, ${input.occurred_at}, ${recorded_at},
           ${cHash}, ${prevChainHash}, ${chHash},
           ${source}, ${dkimVerified}
         )

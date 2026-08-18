@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { mapVenture } from "@/lib/row";
+import { sanitizeText } from "@/lib/sanitize";
 import sql from "@/lib/supabase";
 
 async function getOwnedVenture(id: string, userId: string) {
@@ -78,7 +79,7 @@ export async function PATCH(
     taglineRaw == null
       ? null
       : typeof taglineRaw === "string"
-        ? taglineRaw.trim() || null
+        ? sanitizeText(taglineRaw) || null
         : null;
 
   if (tagline && tagline.length > 280) {

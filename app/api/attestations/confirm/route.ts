@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { appendEntry } from "@/lib/chain";
+import { clientIp, rateLimitOk, tooManyRequests } from "@/lib/rateLimit";
+import { sanitizeText } from "@/lib/sanitize";
 import sql from "@/lib/supabase";
 
 type Body = Record<string, unknown>;
@@ -11,6 +13,10 @@ function asTrimmedString(v: unknown): string {
 
 // PUBLIC route: the unguessable token IS the authentication. No auth() here.
 export async function POST(req: Request) {
+  if (!rateLimitOk(`attest-confirm:${clientIp(req)}`, 5, 60 * 1000)) {
+    return tooManyRequests(60);
+  }
+
   let body: Body;
   try {
     body = (await req.json()) as Body;
@@ -23,10 +29,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing token" }, { status: 400 });
   }
 
-  const attesterNameRaw = asTrimmedString(body.attester_name);
+  const attesterNameRaw = sanitizeText(asTrimmedString(body.attester_name));
   const attesterName = attesterNameRaw.length > 0 ? attesterNameRaw : null;
 
-  const attesterNoteRaw = asTrimmedString(body.attester_note);
+  const attesterNoteRaw = sanitizeText(asTrimmedString(body.attester_note));
   if (attesterNoteRaw.length > 2000) {
     return NextResponse.json(
       { error: "Details must be 2,000 characters or fewer." },

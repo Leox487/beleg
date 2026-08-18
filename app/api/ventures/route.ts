@@ -2,7 +2,9 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { ingestAddressForSlug } from "@/lib/ingestEmail";
+import { rateLimitOk, tooManyRequests } from "@/lib/rateLimit";
 import { mapVenture } from "@/lib/row";
+import { sanitizeText } from "@/lib/sanitize";
 import sql from "@/lib/supabase";
 
 type Body = Record<string, unknown>;
@@ -44,6 +46,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  if (!rateLimitOk(`ventures-post:${userId}`, 10, 60 * 60 * 1000)) {
+    return tooManyRequests(3600);
+  }
+
   let body: Body;
   try {
     body = (await req.json()) as Body;
@@ -51,7 +57,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const name = typeof body.name === "string" ? body.name.trim() : "";
+  const name =
+    typeof body.name === "string" ? sanitizeText(body.name) : "";
   if (!name) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }
@@ -62,7 +69,8 @@ export async function POST(req: Request) {
     );
   }
 
-  const taglineRaw = typeof body.tagline === "string" ? body.tagline.trim() : "";
+  const taglineRaw =
+    typeof body.tagline === "string" ? sanitizeText(body.tagline) : "";
   const tagline = taglineRaw.length > 0 ? taglineRaw : null;
 
   // Retry on the (unlikely) slug collision from the random suffix.

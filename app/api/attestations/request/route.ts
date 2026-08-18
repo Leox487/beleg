@@ -4,6 +4,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { sendAttestationEmail } from "@/lib/email";
+import { sanitizeText } from "@/lib/sanitize";
 import sql from "@/lib/supabase";
 
 type Body = Record<string, unknown>;
@@ -59,10 +60,10 @@ export async function POST(req: Request) {
     );
   }
 
-  const attesterNameRaw = asTrimmedString(body.attester_name);
+  const attesterNameRaw = sanitizeText(asTrimmedString(body.attester_name));
   const attesterName = attesterNameRaw.length > 0 ? attesterNameRaw : null;
 
-  const statement = asTrimmedString(body.statement);
+  const statement = sanitizeText(asTrimmedString(body.statement));
   if (!statement) {
     return NextResponse.json(
       { error: "A statement is required" },
@@ -76,32 +77,23 @@ export async function POST(req: Request) {
     );
   }
 
-  const entryRows = await sql`
-    SELECT id, venture_id, title FROM entries
-    WHERE id = ${entryId}
+  const owned = await sql`
+    SELECT e.id, e.venture_id, e.title, v.id AS venture_pk, v.name
+    FROM entries e
+    INNER JOIN ventures v ON v.id = e.venture_id
+    WHERE e.id = ${entryId} AND v.clerk_user_id = ${userId}
     LIMIT 1
   `;
-  const entry = entryRows[0] as
-    | { id: string; venture_id: string; title: string }
+  const row = owned[0] as
+    | { id: string; venture_id: string; title: string; name: string }
     | undefined;
 
-  if (!entry) {
+  if (!row) {
     return NextResponse.json({ error: "Entry not found" }, { status: 404 });
   }
 
-  const ventureRows = await sql`
-    SELECT id, clerk_user_id, name FROM ventures
-    WHERE id = ${entry.venture_id}
-    LIMIT 1
-  `;
-  const venture = ventureRows[0] as
-    | { id: string; clerk_user_id: string; name: string }
-    | undefined;
-
-  if (!venture || venture.clerk_user_id !== userId) {
-    // Don't leak existence of other users' entries.
-    return NextResponse.json({ error: "Entry not found" }, { status: 404 });
-  }
+  const entry = { id: row.id, venture_id: row.venture_id, title: row.title };
+  const venture = { id: row.venture_id, name: row.name };
 
   const token = makeToken();
 
