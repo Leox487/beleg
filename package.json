@@ -16,7 +16,7 @@
     "dkim-verifier": "^0.0.11",
     "dompurify": "^3.4.13",
     "jsdom": "^29.1.1",
-    "mailparser": "^3.9.15",
+    "mailparser": "3.9.8",
     "next": "16.2.11",
     "opentimestamps": "^0.4.9",
     "postgres": "^3.4.9",
