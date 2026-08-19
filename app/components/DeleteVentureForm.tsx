@@ -28,7 +28,9 @@ export function DeleteVentureForm({
     setError(null);
     try {
       const res = await fetch(`/api/ventures/${ventureId}`, {
-        method: "DELETE",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: CONFIRM_WORD }),
       });
       if (!res.ok) {
         setError(await readError(res));
