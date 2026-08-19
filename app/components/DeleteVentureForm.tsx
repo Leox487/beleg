@@ -1,17 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
+
+import { deleteVentureAction } from "@/lib/actions/deleteVenture";
 
 const CONFIRM_WORD = "Confirm";
-
-async function readError(res: Response): Promise<string> {
-  try {
-    const d = (await res.json()) as { error?: string };
-    return d.error ?? "Failed to delete";
-  } catch {
-    return "Failed to delete";
-  }
-}
 
 export function DeleteVentureForm({
   ventureId,
@@ -19,33 +12,13 @@ export function DeleteVentureForm({
   ventureId: string;
 }) {
   const [confirm, setConfirm] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function onDelete() {
-    if (confirm !== CONFIRM_WORD) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/ventures/${ventureId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ confirm: CONFIRM_WORD }),
-      });
-      if (!res.ok) {
-        setError(await readError(res));
-        return;
-      }
-      window.location.assign("/dashboard");
-    } catch {
-      setError("Failed to delete");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const [state, formAction, pending] = useActionState(deleteVentureAction, {
+    error: null,
+  });
 
   return (
-    <div className="danger-zone">
+    <form action={formAction} className="danger-zone">
+      <input type="hidden" name="ventureId" value={ventureId} />
       <p className="muted">
         Permanently delete this venture and its entire ledger. This cannot be
         undone.
@@ -55,6 +28,7 @@ export function DeleteVentureForm({
       </label>
       <input
         id="confirm-delete"
+        name="confirm"
         value={confirm}
         onChange={(e) => setConfirm(e.target.value)}
         className="settings-input"
@@ -63,14 +37,13 @@ export function DeleteVentureForm({
         placeholder={CONFIRM_WORD}
       />
       <button
-        type="button"
+        type="submit"
         className="btn btn-danger"
-        disabled={loading || confirm !== CONFIRM_WORD}
-        onClick={() => void onDelete()}
+        disabled={pending || confirm !== CONFIRM_WORD}
       >
-        {loading ? "Deleting…" : "Delete venture"}
+        {pending ? "Deleting…" : "Delete venture"}
       </button>
-      {error ? <p className="settings-error">{error}</p> : null}
-    </div>
+      {state.error ? <p className="settings-error">{state.error}</p> : null}
+    </form>
   );
 }

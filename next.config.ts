@@ -13,12 +13,12 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.com https://*.clerk.accounts.dev",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.com https://*.clerk.com https://*.clerk.accounts.dev",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https:",
-      "connect-src 'self' https://api.resend.com https://*.clerk.accounts.dev https://neon.tech",
-      "frame-src https://clerk.com https://*.clerk.accounts.dev",
+      "connect-src 'self' https://api.resend.com https://api.clerk.com https://*.clerk.com https://*.clerk.accounts.dev https://neon.tech",
+      "frame-src https://clerk.com https://*.clerk.com https://*.clerk.accounts.dev",
     ].join("; "),
   },
 ];

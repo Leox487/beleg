@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { mapVenture } from "@/lib/row";
 import { sanitizeText } from "@/lib/sanitize";
+import { deleteOwnedVenture, formatDeleteError } from "@/lib/deleteVenture";
 import sql from "@/lib/supabase";
 
 export const runtime = "nodejs";
@@ -113,82 +114,17 @@ export async function DELETE(
   }
 
   const { id } = await params;
-  return deleteOwnedVenture(id, userId);
-}
-
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  let body: Record<string, unknown> = {};
   try {
-    body = (await req.json()) as Record<string, unknown>;
-  } catch {
-    body = {};
-  }
-  if (body.confirm !== "Confirm") {
-    return NextResponse.json(
-      { error: "Type Confirm to delete" },
-      { status: 400 },
-    );
-  }
-
-  const { id } = await params;
-  return deleteOwnedVenture(id, userId);
-}
-
-async function deleteOwnedVenture(id: string, userId: string) {
-  try {
-    const venture = await getOwnedVenture(id, userId);
-    if (!venture) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
-
-    // Sequential deletes (no sql.begin): Neon's transaction-mode pooler
-    // can fail reserved connections on Vercel. FK order still holds.
-    await sql`DELETE FROM email_whitelist WHERE venture_id = ${id}`;
-    await sql`
-      UPDATE ingested_emails
-      SET milestone_id = NULL
-      WHERE endpoint_id IN (
-        SELECT id FROM inbound_endpoints WHERE venture_id = ${id}
-      )
-    `;
-    await sql`
-      DELETE FROM ingested_emails
-      WHERE endpoint_id IN (
-        SELECT id FROM inbound_endpoints WHERE venture_id = ${id}
-      )
-    `;
-    await sql`DELETE FROM inbound_endpoints WHERE venture_id = ${id}`;
-    await sql`DELETE FROM stripe_connections WHERE venture_id = ${id}`;
-    await sql`DELETE FROM attestations WHERE venture_id = ${id}`;
-    await sql`DELETE FROM entries WHERE venture_id = ${id}`;
-    await sql`DELETE FROM anchors WHERE venture_id = ${id}`;
-    const removed = await sql`
-      DELETE FROM ventures
-      WHERE id = ${id} AND clerk_user_id = ${userId}
-      RETURNING id
-    `;
-    if (!removed[0]) {
-      return NextResponse.json(
-        { error: "Failed to delete venture" },
-        { status: 500 },
-      );
-    }
-
+    await deleteOwnedVenture(id, userId);
     return NextResponse.json({ deleted: true });
   } catch (e) {
     console.error("Venture delete failed:", e);
-    const message =
-      e instanceof Error && e.message
-        ? e.message
-        : "Failed to delete venture";
-    return NextResponse.json({ error: message }, { status: 500 });
+    if (e instanceof Error && e.message === "Venture not found") {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+    return NextResponse.json(
+      { error: formatDeleteError(e) },
+      { status: 500 },
+    );
   }
 }
