@@ -147,10 +147,7 @@ export default async function VentureSettingsPage({
 
         <section className="settings-section settings-danger">
           <h2 className="section-title">Danger zone</h2>
-          <DeleteVentureForm
-            ventureId={venture.id}
-            ventureName={venture.name}
-          />
+          <DeleteVentureForm ventureId={venture.id} />
         </section>
       </div>
     </main>

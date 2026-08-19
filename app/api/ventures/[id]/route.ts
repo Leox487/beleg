@@ -5,6 +5,8 @@ import { mapVenture } from "@/lib/row";
 import { sanitizeText } from "@/lib/sanitize";
 import sql from "@/lib/supabase";
 
+export const runtime = "nodejs";
+
 async function getOwnedVenture(id: string, userId: string) {
   const rows = await sql`
     SELECT id, clerk_user_id, name, slug, tagline, created_at
@@ -116,22 +118,44 @@ export async function DELETE(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  // Clear inbound audit tables first (they reference entries / endpoints).
-  await sql`DELETE FROM email_whitelist WHERE venture_id = ${id}`;
-  await sql`
-    DELETE FROM ingested_emails
-    WHERE endpoint_id IN (
-      SELECT id FROM inbound_endpoints WHERE venture_id = ${id}
-    )
-  `;
-  await sql`DELETE FROM inbound_endpoints WHERE venture_id = ${id}`;
-  await sql`DELETE FROM stripe_connections WHERE venture_id = ${id}`;
-
-  // Required FK order: attestations → entries → anchors → venture.
-  await sql`DELETE FROM attestations WHERE venture_id = ${id}`;
-  await sql`DELETE FROM entries WHERE venture_id = ${id}`;
-  await sql`DELETE FROM anchors WHERE venture_id = ${id}`;
-  await sql`DELETE FROM ventures WHERE id = ${id} AND clerk_user_id = ${userId}`;
+  try {
+    await sql.begin(async (tx) => {
+      await tx`DELETE FROM email_whitelist WHERE venture_id = ${id}`;
+      await tx`
+        UPDATE ingested_emails
+        SET milestone_id = NULL
+        WHERE endpoint_id IN (
+          SELECT id FROM inbound_endpoints WHERE venture_id = ${id}
+        )
+      `;
+      await tx`
+        DELETE FROM ingested_emails
+        WHERE endpoint_id IN (
+          SELECT id FROM inbound_endpoints WHERE venture_id = ${id}
+        )
+      `;
+      await tx`DELETE FROM inbound_endpoints WHERE venture_id = ${id}`;
+      await tx`DELETE FROM stripe_connections WHERE venture_id = ${id}`;
+      // Attestations reference entries; clear them before the chain.
+      await tx`DELETE FROM attestations WHERE venture_id = ${id}`;
+      await tx`DELETE FROM entries WHERE venture_id = ${id}`;
+      await tx`DELETE FROM anchors WHERE venture_id = ${id}`;
+      const removed = await tx`
+        DELETE FROM ventures
+        WHERE id = ${id} AND clerk_user_id = ${userId}
+        RETURNING id
+      `;
+      if (!removed[0]) {
+        throw new Error("Venture row was not deleted");
+      }
+    });
+  } catch (e) {
+    console.error("Venture delete failed:", e);
+    return NextResponse.json(
+      { error: "Failed to delete venture" },
+      { status: 500 },
+    );
+  }
 
   return NextResponse.json({ deleted: true });
 }

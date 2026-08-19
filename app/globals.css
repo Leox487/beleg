@@ -3469,6 +3469,20 @@ a {
   gap: 10px;
 }
 
+.danger-confirm-label {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-3);
+}
+
+.confirm-phrase {
+  font-family: inherit;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text);
+}
+
 .settings-input {
   width: 100%;
   padding: 10px 14px;
