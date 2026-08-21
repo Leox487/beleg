@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 // Public surface: landing, public proof pages, attestation pages, the
 // informational/legal pages, and the Clerk auth screens. Everything else
@@ -28,27 +29,34 @@ const isPublicRoute = createRouteMatcher([
   "/api/block-header/(.*)",
   "/api/verify-bitcoin",
   "/api/anchor/(.*)/proof",
-  // Cron: OpenTimestamps upgrade. Guarded by CRON_SECRET, not Clerk.
-  "/api/anchor/upgrade",
-  "/api/anchor/upgrade(.*)",
   // Resend inbound webhook (verified via RESEND_WEBHOOK_SECRET / Svix).
   "/api/ingest/email",
   // Stripe inbound webhooks (verified via per-venture HMAC secret).
   "/api/stripe/webhook/(.*)",
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
+const clerkHandler = clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
     await auth.protect();
   }
 });
 
+export default function middleware(
+  req: NextRequest,
+  event: Parameters<typeof clerkHandler>[1],
+) {
+  // Bypass Clerk entirely. The route verifies CRON_SECRET itself; Clerk
+  // would treat that Bearer token as a JWT and reject the request.
+  if (req.nextUrl.pathname === "/api/anchor/upgrade") {
+    return NextResponse.next();
+  }
+  return clerkHandler(req, event);
+}
+
 export const config = {
   matcher: [
-    // Run Clerk on app pages and API routes, except static files, Next
-    // internals, and the OTS cron. Do not use a separate "/(api|trpc)(.*)"
-    // matcher — that re-includes /api/anchor/upgrade and Clerk then treats
-    // CRON_SECRET Bearer as a JWT.
-    "/((?!.+\\.[\\w]+$|_next|api/anchor/upgrade).*)",
+    "/((?!.+\\.[\\w]+$|_next).*)",
+    "/",
+    "/(api|trpc)(.*)",
   ],
 };
