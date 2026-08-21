@@ -45,11 +45,10 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    // Skip static files, Next internals, and the OTS cron. Clerk must not
-    // touch /api/anchor/upgrade — it treats CRON_SECRET Bearer as a JWT
-    // and strips/rejects it before the route can verify the secret.
+    // Run Clerk on app pages and API routes, except static files, Next
+    // internals, and the OTS cron. Do not use a separate "/(api|trpc)(.*)"
+    // matcher — that re-includes /api/anchor/upgrade and Clerk then treats
+    // CRON_SECRET Bearer as a JWT.
     "/((?!.+\\.[\\w]+$|_next|api/anchor/upgrade).*)",
-    "/",
-    "/(api|trpc)(?!/anchor/upgrade)(.*)",
   ],
 };
