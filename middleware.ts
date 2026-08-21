@@ -28,6 +28,9 @@ const isPublicRoute = createRouteMatcher([
   "/api/block-header/(.*)",
   "/api/verify-bitcoin",
   "/api/anchor/(.*)/proof",
+  // Cron: OpenTimestamps upgrade. Guarded by CRON_SECRET, not Clerk.
+  "/api/anchor/upgrade",
+  "/api/anchor/upgrade(.*)",
   // Resend inbound webhook (verified via RESEND_WEBHOOK_SECRET / Svix).
   "/api/ingest/email",
   // Stripe inbound webhooks (verified via per-venture HMAC secret).
