@@ -44,7 +44,9 @@ export default function UsesPage() {
                 <p className="uses-index-cat mono">{category}</p>
                 <ul className="uses-index-list">
                   {(grouped.get(category) ?? []).map((item) => (
-                    <li key={item.id}>{item.label}</li>
+                    <li key={item.id} id={item.id}>
+                      {item.label}
+                    </li>
                   ))}
                 </ul>
               </div>
