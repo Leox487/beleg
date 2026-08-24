@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 
-import { BelegMark } from "@/app/components/BelegMark";
-import { ChainField } from "@/app/components/ChainField";
 import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
+import { HeroProofMock } from "@/app/components/HeroProofMock";
 import {
   StageSeal,
   StageVerify,
@@ -12,95 +11,41 @@ import {
 } from "@/app/components/HomeStages";
 import { Showcase } from "@/app/components/Showcase";
 
-const FEATURES = [
+const PRIMITIVES = [
   {
-    stage: "seal" as const,
-    kicker: "01  Record",
-    title: "Each entry is hashed and linked to the one before it.",
-    text: "You add a milestone: a grant, a ship, a signed pilot. Beleg stores the title, the detail, the date, and a SHA-256 fingerprint of that payload plus the previous seal. Change anything later and every seal after it no longer matches. There is no edit button. The past stays as you wrote it.",
-    aside: "A reviewer does not have to trust a PDF you exported. They recompute the same hashes in their browser.",
+    title: "Record",
+    text: "Each milestone is hashed and linked to the one before it. There is no edit button.",
+    visual: "record" as const,
   },
   {
-    stage: "witness" as const,
-    kicker: "02  Witness",
-    title: "Someone who was there can confirm it, without an account.",
-    text: "A grant officer, a client, or a mentor gets a one-click link. Their name and statement become a new sealed entry on the same chain, not a screenshot in a slide. If they never confirm, the original record still stands. If they do, the confirmation is as hard to quietly remove as the milestone itself.",
-    aside: "Witnesses are not creating Beleg accounts. They are attaching a statement to a specific entry.",
+    title: "Witness",
+    text: "Someone who was there confirms in one click. They do not need a Beleg account.",
+    visual: "witness" as const,
   },
   {
-    stage: "verify" as const,
-    kicker: "03  Verify",
-    title: "The check runs on the reviewer's machine.",
-    text: "The public page is a timeline plus a Verify button. That button does not call a Beleg API for a badge. It walks the chain locally: each content hash, each previous-hash link, the order of sequence numbers. Intact or broken is a math result, not a status we issue.",
-    aside: "If Beleg disappeared tomorrow, the same check would still work from the published JSON.",
-  },
-];
-
-const SPEC = [
-  {
-    field: "seq",
-    meaning: "Position in the ledger. #01, #02, #03.",
-    mutable: "No",
+    title: "Verify",
+    text: "The public page recomputes every seal in the reviewer’s browser. We do not issue the badge.",
+    visual: "verify" as const,
   },
   {
-    field: "kind",
-    meaning: "What kind of event this is: milestone, grant, revenue, email, attestation.",
-    mutable: "No",
-  },
-  {
-    field: "title / body",
-    meaning: "The words you sealed. This is what a reviewer actually reads.",
-    mutable: "No",
-  },
-  {
-    field: "occurred_at",
-    meaning: "The date you said it happened. Recorded next to when you sealed it.",
-    mutable: "No",
-  },
-  {
-    field: "content_hash",
-    meaning: "SHA-256 of the payload. Same input, same fingerprint.",
-    mutable: "No",
-  },
-  {
-    field: "prev_hash",
-    meaning: "The seal of the entry before this one. That is the chain.",
-    mutable: "No",
-  },
-  {
-    field: "attestation",
-    meaning: "A witness confirmation. It is appended as its own entry, not patched onto the old one.",
-    mutable: "Append only",
+    title: "Timestamp",
+    text: "Pending proofs are anchored with OpenTimestamps, so the chain is dated on Bitcoin.",
+    visual: "stamp" as const,
   },
 ];
 
 const CASES = [
   {
     who: "Grant applicant",
-    record:
-      "The award the day the decision email arrives, including amount, fund name, and date.",
-    witness:
-      "The program officer who issued it. They confirm in one click. No Beleg account.",
-    review:
-      "A reviewer opens your public page, runs Verify, and sees the officer's name on the chain.",
+    text: "Seal the award the day the email arrives. The program officer confirms it. A reviewer sees both on one public page.",
   },
   {
     who: "Solo founder",
-    record:
-      "Ships, first revenue, pilots. Each one sealed when it happened, not reconstructed for a pitch.",
-    witness:
-      "A customer, an accountant, or whoever actually saw the work. Optional, but stronger.",
-    review:
-      "Accelerators get a link instead of a traction slide that cannot be checked.",
+    text: "Ships, first revenue, pilots — recorded when they happened, not reconstructed for a pitch deck.",
   },
   {
     who: "Work under NDA",
-    record:
-      "That an engagement existed, for whom, and when. Not the repo, not the confidential spec.",
-    witness:
-      "The client confirms the engagement. The code never has to leave their side.",
-    review:
-      "A hiring panel or grant desk sees the confirmation, not the source.",
+    text: "Prove an engagement existed, for whom, and when. The client confirms. The confidential spec never leaves their side.",
   },
 ];
 
@@ -108,245 +53,249 @@ const REVIEW_STEPS = [
   {
     n: "01",
     title: "Open the public page",
-    text: "It is a timeline. Sequence, dates, titles, who confirmed what. No login.",
+    text: "A timeline: sequence, dates, titles, who confirmed what. No login.",
   },
   {
     n: "02",
-    title: "Run Verify in your browser",
-    text: "The page recomputes every seal locally. Intact means the hashes still match. Broken names the first entry that does not.",
+    title: "Run Verify in the browser",
+    text: "Intact means the hashes still match. Broken names the first entry that does not.",
   },
   {
     n: "03",
     title: "Read the witnesses",
-    text: "Confirmations are entries on the same chain. A name and a statement, sealed after the fact they describe.",
+    text: "Confirmations are entries on the same chain — a name and a statement, sealed after the fact.",
   },
   {
     n: "04",
     title: "Compare it to the application",
-    text: "Dates and amounts should line up with what they wrote. If they do not, that is the finding. Beleg does not grade the project.",
+    text: "Dates and amounts should line up. Beleg does not grade the project. It shows the trail.",
   },
 ];
+
+function PrimitiveVisual({ kind }: { kind: (typeof PRIMITIVES)[number]["visual"] }) {
+  if (kind === "record") {
+    return (
+      <div className="lp-prim-viz lp-prim-viz-record" aria-hidden="true">
+        <span>#06  Grant received</span>
+        <span>#07  Confirmed by Maya</span>
+        <span>#08  Pilot launched</span>
+      </div>
+    );
+  }
+  if (kind === "witness") {
+    return (
+      <div className="lp-prim-viz lp-prim-viz-witness" aria-hidden="true">
+        <span className="lp-prim-check">✓</span>
+        <span>Maya Chen · Civic Innovation Fund</span>
+      </div>
+    );
+  }
+  if (kind === "verify") {
+    return (
+      <div className="lp-prim-viz lp-prim-viz-verify" aria-hidden="true">
+        <span className="lp-prim-ok">Chain verified</span>
+        <span>8 entries intact</span>
+      </div>
+    );
+  }
+  return (
+    <div className="lp-prim-viz lp-prim-viz-stamp" aria-hidden="true">
+      <span>OpenTimestamps</span>
+      <span>Bitcoin block #883,214</span>
+    </div>
+  );
+}
+
+function LandingActions({
+  href,
+  label,
+}: {
+  href: string;
+  label: string;
+}) {
+  return (
+    <div className="lp-actions">
+      <Link className="lp-btn lp-btn-primary" href={href}>
+        <span>{label}</span>
+        <CtaBadge />
+      </Link>
+      <Link className="lp-btn lp-btn-ghost" href="/how-it-works">
+        See how it works
+      </Link>
+    </div>
+  );
+}
 
 export default async function Home() {
   const { userId } = await auth();
   const signedIn = Boolean(userId);
   const ctaHref = signedIn ? "/dashboard" : "/sign-up";
-  const startLabel = signedIn ? "Go to your ledger" : "Start";
+  const startLabel = signedIn ? "Go to your ledger" : "Get started";
 
   return (
-    <main className="landing">
-      <section className="section-full stage land-hero-prove spotlight spotlight-hero home-scene home-scene-prove">
-        <ChainField />
-        <div className="land-hero-prove-inner">
-          <p className="land-hero-prove-brand">
-            <BelegMark className="land-hero-prove-mark" />
-            Beleg
-          </p>
-          <h1 className="land-hero-prove-title">Start proving traction</h1>
-          <div className="land-hero-prove-actions">
-            <Link className="cta" href={ctaHref}>
-              <span className="cta-label">{startLabel}</span>
-              <CtaBadge />
-            </Link>
-            <Link className="ghost-link land-hero-prove-ghost" href="/how-it-works">
-              See how it works
-            </Link>
+    <main className="landing lp">
+      <section className="lp-hero">
+        <div className="lp-hero-wash" aria-hidden="true" />
+        <div className="lp-shell lp-hero-grid">
+          <div className="lp-hero-copy">
+            <p className="lp-kicker">Append-only · anchored to Bitcoin</p>
+            <h1 className="lp-h1">
+              A sealed timeline of traction anyone can verify.
+            </h1>
+            <p className="lp-lead">
+              Record a grant, a ship, a signed pilot. Someone who was there can
+              confirm it. A reviewer opens the public page and checks the chain
+              in their own browser.
+            </p>
+            <LandingActions href={ctaHref} label={startLabel} />
+          </div>
+          <div className="lp-hero-visual">
+            <HeroProofMock />
           </div>
         </div>
+
+        <ul className="lp-shell lp-primitives">
+          {PRIMITIVES.map((item) => (
+            <li key={item.title} className="lp-prim">
+              <h2 className="lp-prim-title">{item.title}</h2>
+              <p className="lp-prim-text">{item.text}</p>
+              <PrimitiveVisual kind={item.visual} />
+            </li>
+          ))}
+        </ul>
       </section>
 
-      <hr className="rule-fade land-rule land-rule-hero" />
-
-      <section className="section-full land-section">
-        <div className="section-full-inner">
-          <p className="home-kicker">
-            Grant desks, accelerators, and hiring panels still have to take a
-            screenshot&apos;s word for it.
-          </p>
-          <div className="home-problem">
-            <div>
-              <p className="home-problem-label">What they get today</p>
-              <p className="home-detail">
-                A traction slide assembled the night before. A grant letter as a
-                photo. A client name that cannot be checked without an email
-                thread. Memory, PDFs, and whoever is willing to vouch in Slack.
-              </p>
-            </div>
-            <div>
-              <p className="home-problem-label">What a Beleg page is</p>
-              <p className="home-detail">
-                A public timeline of what you recorded, when you recorded it,
-                and who confirmed it. Each line is sealed to the one before it.
-                Anyone can recompute the seals without creating an account or
-                asking us.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <hr className="rule-fade land-rule" />
-
-      <section className="section-full strip-section land-band home-scene home-scene-how">
-        <div className="land-band-inner section-full-inner">
-          <p className="home-kicker">
-            One $12,000 grant, from the day it landed to a public link.
-          </p>
+      <section className="lp-section lp-band">
+        <div className="lp-shell">
+          <p className="lp-eyebrow">From the day it happened</p>
+          <h2 className="lp-h2">
+            One $12,000 grant, sealed, confirmed, and shared as a public link.
+          </h2>
           <Showcase />
-          <p className="section-outlink">
-            <Link className="ghost-link ghost-link-accent" href="/how-it-works">
-              See the cryptography in detail
-            </Link>
+          <p className="lp-outlink">
+            <Link href="/how-it-works">See the cryptography in detail →</Link>
           </p>
         </div>
       </section>
 
-      <hr className="rule-fade land-rule" />
-
-      <section className="section-full land-section">
-        <div className="section-full-inner">
-          <p className="home-kicker">
+      <section className="lp-section">
+        <div className="lp-shell">
+          <p className="lp-eyebrow">How a check actually works</p>
+          <h2 className="lp-h2">
             Three things a reviewer can inspect without taking your word for it.
-          </p>
-          <div className="home-features">
-            {FEATURES.map((item, i) => (
-              <article
-                key={item.stage}
-                className={`home-feature${i % 2 === 1 ? " is-flip" : ""}`}
-              >
-                <div className="home-feature-copy">
-                  <p className="home-feature-kicker">{item.kicker}</p>
-                  <h2 className="home-feature-title">{item.title}</h2>
-                  <p className="home-detail">{item.text}</p>
-                  <p className="home-feature-aside">{item.aside}</p>
-                </div>
-                <div className="home-feature-stage">
-                  {item.stage === "seal" ? (
-                    <StageSeal />
-                  ) : item.stage === "witness" ? (
-                    <StageWitness />
-                  ) : (
-                    <StageVerify />
-                  )}
-                </div>
-              </article>
-            ))}
+          </h2>
+          <div className="lp-features">
+            <article className="lp-feature">
+              <div className="lp-feature-copy">
+                <p className="lp-feature-kicker">01 · Record</p>
+                <h3 className="lp-feature-title">
+                  Each entry is hashed and linked to the one before it.
+                </h3>
+                <p className="lp-body">
+                  Title, detail, date, and a SHA-256 fingerprint of that payload
+                  plus the previous seal. Change anything later and every seal
+                  after it no longer matches.
+                </p>
+              </div>
+              <div className="lp-feature-stage">
+                <StageSeal />
+              </div>
+            </article>
+            <article className="lp-feature lp-feature-flip">
+              <div className="lp-feature-copy">
+                <p className="lp-feature-kicker">02 · Witness</p>
+                <h3 className="lp-feature-title">
+                  A person who was there can confirm it, without an account.
+                </h3>
+                <p className="lp-body">
+                  Their name and statement become a new sealed entry on the same
+                  chain — not a screenshot in a slide. If they never confirm, the
+                  original record still stands.
+                </p>
+              </div>
+              <div className="lp-feature-stage">
+                <StageWitness />
+              </div>
+            </article>
+            <article className="lp-feature">
+              <div className="lp-feature-copy">
+                <p className="lp-feature-kicker">03 · Verify</p>
+                <h3 className="lp-feature-title">
+                  The check runs on the reviewer’s machine.
+                </h3>
+                <p className="lp-body">
+                  Verify does not call a Beleg API for a badge. It walks the
+                  chain locally. Intact or broken is a math result. If Beleg
+                  disappeared, the same check would still work from the published
+                  JSON.
+                </p>
+              </div>
+              <div className="lp-feature-stage">
+                <StageVerify />
+              </div>
+            </article>
           </div>
         </div>
       </section>
 
-      <hr className="rule-fade land-rule" />
-
-      <section className="section-full land-section">
-        <div className="section-full-inner">
-          <p className="home-kicker">What a sealed entry actually contains.</p>
-          <p className="home-lede">
-            This is the payload that gets hashed. None of it can be edited after
-            you record it. A correction is a new entry.
-          </p>
-          <div className="home-spec-wrap">
-            <table className="home-spec">
-              <thead>
-                <tr>
-                  <th>Field</th>
-                  <th>What it is</th>
-                  <th>After sealing</th>
-                </tr>
-              </thead>
-              <tbody>
-                {SPEC.map((row) => (
-                  <tr key={row.field}>
-                    <td className="mono">{row.field}</td>
-                    <td>{row.meaning}</td>
-                    <td className="mono">{row.mutable}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <hr className="rule-fade land-rule" />
-
-      <section className="section-full land-section">
-        <div className="section-full-inner">
-          <p className="home-kicker">
+      <section className="lp-section lp-band">
+        <div className="lp-shell">
+          <p className="lp-eyebrow">Who it is for</p>
+          <h2 className="lp-h2">
             Three situations where a paper trail does not already exist.
-          </p>
-          <ul className="home-cases">
+          </h2>
+          <ul className="lp-cases">
             {CASES.map((c) => (
-              <li key={c.who} className="home-case">
-                <p className="home-case-who">{c.who}</p>
-                <div className="home-case-grid">
-                  <div>
-                    <p className="home-problem-label">You record</p>
-                    <p className="home-detail">{c.record}</p>
-                  </div>
-                  <div>
-                    <p className="home-problem-label">They confirm</p>
-                    <p className="home-detail">{c.witness}</p>
-                  </div>
-                  <div>
-                    <p className="home-problem-label">A reviewer sees</p>
-                    <p className="home-detail">{c.review}</p>
-                  </div>
-                </div>
+              <li key={c.who} className="lp-case">
+                <h3 className="lp-case-who">{c.who}</h3>
+                <p className="lp-body">{c.text}</p>
               </li>
             ))}
           </ul>
-          <p className="section-outlink">
-            <Link className="ghost-link ghost-link-accent" href="/uses">
-              More situations Beleg is built for
-            </Link>
+          <p className="lp-outlink">
+            <Link href="/uses">More situations Beleg is built for →</Link>
           </p>
         </div>
       </section>
 
-      <hr className="rule-fade land-rule" />
-
-      <section className="section-full land-section">
-        <div className="section-full-inner">
-          <p className="home-kicker">
-            For grant officers and accelerators checking traction.
-          </p>
-          <ol className="home-steps">
+      <section className="lp-section">
+        <div className="lp-shell">
+          <p className="lp-eyebrow">For reviewers</p>
+          <h2 className="lp-h2">
+            Grant officers and accelerators checking traction.
+          </h2>
+          <ol className="lp-steps">
             {REVIEW_STEPS.map((step) => (
-              <li key={step.n} className="home-step">
-                <span className="home-step-n mono">{step.n}</span>
-                <div>
-                  <p className="home-step-title">{step.title}</p>
-                  <p className="home-detail">{step.text}</p>
-                </div>
+              <li key={step.n} className="lp-step">
+                <span className="lp-step-n">{step.n}</span>
+                <h3 className="lp-step-title">{step.title}</h3>
+                <p className="lp-body">{step.text}</p>
               </li>
             ))}
           </ol>
-          <p className="section-outlink">
-            <Link className="ghost-link ghost-link-accent" href="/for-reviewers">
-              Learn how reviewers use Beleg
-            </Link>
+          <p className="lp-outlink">
+            <Link href="/for-reviewers">Learn how reviewers use Beleg →</Link>
           </p>
         </div>
       </section>
 
-      <hr className="rule-fade land-rule" />
-
-      <section className="section-full land-section">
-        <div className="section-full-inner">
-          <p className="home-kicker">What the chain proves, and what it does not.</p>
-          <div className="home-honest">
-            <div className="home-honest-col">
-              <p className="home-problem-label">Sealed</p>
-              <ul className="home-honest-list">
+      <section className="lp-section">
+        <div className="lp-shell">
+          <p className="lp-eyebrow">Limits</p>
+          <h2 className="lp-h2">What the chain proves, and what it does not.</h2>
+          <div className="lp-honest">
+            <div className="lp-honest-col">
+              <p className="lp-honest-label">Sealed</p>
+              <ul>
                 <li>The order of entries</li>
                 <li>The words and dates you recorded</li>
                 <li>The SHA-256 seals and previous-hash links</li>
                 <li>Who confirmed an entry, and when that confirmation was sealed</li>
               </ul>
             </div>
-            <div className="home-honest-col">
-              <p className="home-problem-label">Not claimed</p>
-              <ul className="home-honest-list">
+            <div className="lp-honest-col">
+              <p className="lp-honest-label">Not claimed</p>
+              <ul>
                 <li>That the work was good, or the grant deserved</li>
                 <li>That a witness is telling the truth about the world</li>
                 <li>That Beleg has audited your company</li>
@@ -357,22 +306,12 @@ export default async function Home() {
         </div>
       </section>
 
-      <hr className="rule-fade land-rule" />
-
-      <section className="section-full land-section land-cta land-band">
-        <div className="land-band-inner land-cta-inner section-full-inner">
-          <p className="home-kicker home-kicker-center">
+      <section className="lp-section lp-cta">
+        <div className="lp-shell lp-cta-inner">
+          <h2 className="lp-h2 lp-cta-title">
             Start a ledger. Share the link when someone asks you to prove it.
-          </p>
-          <div className="land-hero-prove-actions">
-            <Link className="cta" href={ctaHref}>
-              <span className="cta-label">{startLabel}</span>
-              <CtaBadge />
-            </Link>
-            <Link className="ghost-link land-hero-prove-ghost" href="/how-it-works">
-              See how it works
-            </Link>
-          </div>
+          </h2>
+          <LandingActions href={ctaHref} label={startLabel} />
         </div>
       </section>
 

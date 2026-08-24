@@ -5,12 +5,15 @@ import type { CSSProperties } from "react";
  * Sits in the hero as the product visual, not an illustration.
  * Entries seal in sequence so the mock feels like a living chain.
  */
-export function HeroProofMock() {
+export function HeroProofMock({ className }: { className?: string }) {
   const seal = (delay: string): CSSProperties =>
     ({ "--seal-delay": delay }) as CSSProperties;
 
   return (
-    <div className="hero-mock-wrap" aria-hidden="true">
+    <div
+      className={className ? `hero-mock-wrap ${className}` : "hero-mock-wrap"}
+      aria-hidden="true"
+    >
       <div className="hero-mock-glow" />
       <div className="hero-mock">
         <div className="hero-mock-chrome">
