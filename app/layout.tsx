@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Instrument_Serif, Inter, JetBrains_Mono } from "next/font/google";
 
+import { IdleDim } from "./components/IdleDim";
 import { Navbar } from "./components/Navbar";
 import { ScrollNav } from "./components/ScrollNav";
 import "./globals.css";
@@ -57,16 +58,17 @@ export default function RootLayout({
           appearance={
             {
               variables: {
-                colorBackground: "#12141A",
-                colorText: "#F2F3F5",
+                colorBackground: "#1A1D20",
+                colorText: "#E0E0E0",
                 colorPrimary: "#2DD4A0",
-                colorInputBackground: "#191C24",
-                colorInputText: "#F2F3F5",
+                colorInputBackground: "#22262B",
+                colorInputText: "#E0E0E0",
                 borderRadius: "8px",
               },
             } as ComponentProps<typeof ClerkProvider>["appearance"]
           }
         >
+          <IdleDim />
           <ScrollNav>
             <Navbar />
           </ScrollNav>
