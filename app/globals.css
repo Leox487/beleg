@@ -12475,17 +12475,34 @@ html {
    Inner pages (uses, how-it-works, about)
    ========================================================================= */
 
+.ip .lp-shell {
+  max-width: none;
+  width: calc(100% - 40px);
+  padding: 0;
+}
+
 .ip .lp-h1.ip-h1 {
   max-width: 16ch;
   font-size: clamp(2.5rem, 6vw, 4.35rem);
 }
 
 .ip-hero {
-  padding: 64px 0 8px;
+  padding: 56px 0 48px;
+}
+
+.ip-hero .lp-hero-grid {
+  grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.28fr);
+  align-items: start;
+  gap: 40px 48px;
 }
 
 .ip-hero .lp-lead {
-  max-width: 40rem;
+  max-width: 38rem;
+}
+
+.ip-beats .lp-h2 {
+  max-width: none;
+  margin-bottom: 22px;
 }
 
 .ip-section {
@@ -12494,7 +12511,8 @@ html {
 }
 
 .ip-shell-wide {
-  max-width: 1120px;
+  max-width: none;
+  width: calc(100% - 40px);
 }
 
 .ip-intro {
@@ -12503,7 +12521,11 @@ html {
 }
 
 .ip-read {
-  max-width: 40rem;
+  max-width: none;
+}
+
+.ip-read .lp-body {
+  max-width: 62ch;
 }
 
 .ip-read .lp-h2 {
@@ -12943,11 +12965,13 @@ html {
   color: var(--text-2);
 }
 
-.ip-lab {
-  margin-top: 8px;
-  padding: 8px 0 0;
-  background: transparent;
-  border: 0;
+.ip .lab-chain {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.ip .lab-controls {
+  margin-bottom: 18px;
 }
 
 .ip .lab-entry,
@@ -13192,6 +13216,10 @@ html {
   .ip-contrast,
   .ip-light-split,
   .ip-limits {
+    grid-template-columns: 1fr;
+  }
+
+  .ip .lab-chain {
     grid-template-columns: 1fr;
   }
 

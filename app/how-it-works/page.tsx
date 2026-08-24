@@ -28,23 +28,22 @@ export default async function HowItWorksPage() {
     <main className="landing lp ip">
       <section className="lp-hero ip-hero">
         <div className="lp-hero-wash" aria-hidden="true" />
-        <div className="lp-shell">
-          <p className="lp-kicker">How it works</p>
-          <h1 className="lp-h1 ip-h1">A chain you can break on this page.</h1>
-          <p className="lp-lead">
-            Each milestone is sealed with a fingerprint and linked to the one
-            before it. The people who were there can confirm an entry. Anyone
-            you share the record with can recompute every seal in their own
-            browser. They do not have to take your word for it, or ours.
-          </p>
-        </div>
-      </section>
-
-      <section className="lp-section ip-section ip-anchor" id="beats">
-        <div className="lp-shell">
-          <p className="lp-eyebrow">Twenty seconds</p>
-          <h2 className="lp-h2">Fingerprint, chain, break, timestamp, check.</h2>
-          <HowBeats />
+        <div className="lp-shell lp-hero-grid ip-anchor" id="beats">
+          <div className="lp-hero-copy">
+            <p className="lp-kicker">How it works</p>
+            <h1 className="lp-h1 ip-h1">A chain you can break on this page.</h1>
+            <p className="lp-lead">
+              Each milestone is sealed with a fingerprint and linked to the one
+              before it. The people who were there can confirm an entry. Anyone
+              you share the record with can recompute every seal in their own
+              browser. They do not have to take your word for it, or ours.
+            </p>
+          </div>
+          <div className="ip-beats">
+            <p className="lp-eyebrow">Twenty seconds</p>
+            <h2 className="lp-h2">Fingerprint, chain, break, timestamp, check.</h2>
+            <HowBeats />
+          </div>
         </div>
       </section>
 
