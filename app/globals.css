@@ -12520,6 +12520,86 @@ html {
   margin: 0 0 36px;
 }
 
+.ip-hero .uses {
+  margin-top: 40px;
+}
+
+.ip-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ip-facts-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.ip-facts li {
+  padding: 28px 36px 8px 0;
+  padding-right: 40px;
+}
+
+.ip-facts li + li {
+  padding-left: 36px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ip-facts h2 {
+  margin: 0 0 12px;
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.ip-facts p {
+  margin: 0;
+  max-width: 36ch;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.ip-note {
+  margin: 48px 0 0;
+  max-width: 54ch;
+}
+
+.ip-note a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.ip-note a:hover {
+  color: #ececec;
+}
+
+.ip-quiet-list {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  max-width: 62ch;
+  display: grid;
+  gap: 14px;
+}
+
+.ip-quiet-list li {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.ip-quiet-list strong {
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 600;
+  color: var(--text);
+}
+
 .ip-read {
   max-width: none;
 }
@@ -13221,6 +13301,18 @@ html {
 
   .ip .lab-chain {
     grid-template-columns: 1fr;
+  }
+
+  .ip-facts,
+  .ip-facts-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .ip-facts li + li {
+    padding-left: 0;
+    padding-top: 22px;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .ip .uses-detail-media {

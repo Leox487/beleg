@@ -5,7 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
 import { UseExplorer } from "@/app/components/UseExplorer";
-import { CATEGORIES, USE_CASES, useCasesByCategory } from "@/lib/use-cases";
+import { USE_CASES } from "@/lib/use-cases";
 
 export const metadata: Metadata = {
   title: "Who Beleg is for",
@@ -16,7 +16,6 @@ export const metadata: Metadata = {
 export default async function UsesPage() {
   const { userId } = await auth();
   const signedIn = Boolean(userId);
-  const grouped = useCasesByCategory();
   const ctaHref = signedIn ? "/dashboard" : "/sign-up";
   const ctaLabel = signedIn ? "Go to your ledger" : "Start a ledger";
 
@@ -31,93 +30,38 @@ export default async function UsesPage() {
           </h1>
           <p className="lp-lead">
             Pick a profession. You will see the first entry you would seal, who
-            confirms it, and where the public link actually goes.{" "}
-            {USE_CASES.length} cases where that is useful, and a short list of
-            where it is not.
+            confirms it, and where the public link goes. {USE_CASES.length}{" "}
+            cases where that helps, and a short list of where it does not.
           </p>
-        </div>
-      </section>
-
-      <section className="lp-section ip-section">
-        <div className="lp-shell ip-shell-wide">
           <UseExplorer />
         </div>
       </section>
 
       <section className="lp-section ip-section">
         <div className="lp-shell">
-          <p className="lp-eyebrow">The rest of the list</p>
-          <h2 className="lp-h2">
-            If someone asks you to prove a thing happened, this is the pattern.
-          </h2>
-          <p className="lp-body ip-intro">
-            Record it when it happens. Ask the person who was there to confirm
-            it. Share one link. If that is your problem, Beleg works whether or
-            not your job title is below.
-          </p>
-        </div>
-        <div className="lp-shell ip-shell-wide">
-          <div className="ip-index">
-            {CATEGORIES.map((category) => (
-              <div key={category} className="ip-index-col">
-                <p className="ip-index-cat">{category}</p>
-                <ul className="ip-index-list">
-                  {(grouped.get(category) ?? []).map((item) => (
-                    <li key={item.id}>
-                      <a href={`#${item.id}`}>{item.label}</a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="lp-section lp-light">
-        <div className="lp-light-grid" aria-hidden="true" />
-        <span className="lp-light-scan" aria-hidden="true" />
-        <div className="lp-shell lp-wide">
-          <div className="lp-light-head">
-            <p className="lp-eyebrow">Where it does not help</p>
-            <h2 className="lp-h2">
-              If an official record already answers the question, use that.
-            </h2>
-          </div>
-          <ul className="ip-limits">
+          <p className="lp-eyebrow">Where it does not help</p>
+          <ul className="ip-quiet-list">
             <li>
-              <strong>Licensed trades and clinicians.</strong>
-              State boards verify electricians, plumbers, CPAs, attorneys, and
-              therapists. A licence lookup beats a self-recorded entry saying
-              you renewed yours.
+              <strong>Licensed trades and clinicians.</strong> A state board
+              lookup already answers the question.
             </li>
             <li>
-              <strong>Anything already in a public register.</strong>
-              Court filings, building permits, health inspection scores, property
-              sales, municipal contract awards.
+              <strong>Public registers.</strong> Court filings, permits,
+              inspection scores, property sales.
             </li>
             <li>
-              <strong>Audience numbers on public platforms.</strong>
-              Subscriber and stream counts are visible to anyone. Sealing a
-              number the sponsor can read off the page adds nothing.
+              <strong>Public audience numbers.</strong> Subscriber counts the
+              sponsor can already read off the page.
             </li>
             <li>
-              <strong>Audited financials.</strong>
-              A lender wants tax returns and bank statements. A ledger entry can
-              sit next to that picture. It does not replace it.
+              <strong>Audited financials.</strong> A lender wants tax returns
+              and bank statements.
             </li>
             <li>
-              <strong>Confidential client outcomes.</strong>
-              Where privilege or clinical ethics govern the relationship, asking
-              a client to confirm in public is the wrong move, however useful
-              the confirmation would be.
+              <strong>Confidential client outcomes.</strong> Asking a client to
+              confirm in public is often the wrong move.
             </li>
           </ul>
-          <p className="lp-body ip-limits-close">
-            What is left is work that is real, confirmable by someone who was
-            there, and otherwise invisible to a stranger. That gap is what Beleg
-            is for.
-          </p>
         </div>
       </section>
 
