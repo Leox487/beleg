@@ -21,7 +21,7 @@ export default async function UsesPage() {
 
   return (
     <main className="landing lp ip">
-      <section className="lp-hero ip-hero">
+      <section className="lp-hero ip-hero lp-face-fraunces">
         <div className="lp-hero-wash" aria-hidden="true" />
         <div className="lp-shell">
           <p className="lp-kicker">Who it is for</p>
@@ -37,7 +37,7 @@ export default async function UsesPage() {
         </div>
       </section>
 
-      <section className="lp-section ip-section">
+      <section className="lp-section ip-section lp-face-instrument">
         <div className="lp-shell">
           <p className="lp-eyebrow">Where it does not help</p>
           <ul className="ip-quiet-list">
@@ -65,7 +65,7 @@ export default async function UsesPage() {
         </div>
       </section>
 
-      <section className="lp-section lp-cta">
+      <section className="lp-section lp-cta lp-face-cta">
         <div className="lp-shell lp-cta-inner">
           <h2 className="lp-h2 lp-cta-title">
             Start with one entry. Send the witness link the same day.

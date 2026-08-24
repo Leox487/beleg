@@ -11256,6 +11256,9 @@ html {
 
 .landing.lp {
   --bg: #1a1d20;
+  --lp-head: var(--font-news);
+  --lp-copy: var(--font-sans);
+  --lp-meta: var(--font-mono);
   padding: 0;
   background: #1a1d20;
   min-height: 100vh;
@@ -11319,10 +11322,10 @@ html {
 .lp-kicker,
 .lp-eyebrow {
   margin: 0 0 16px;
-  font-family: var(--font-sans), Inter, system-ui, sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-family: var(--lp-meta, var(--font-mono)), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-3);
 }
@@ -11333,31 +11336,34 @@ html {
 
 .lp-h1 {
   margin: 0;
-  font-family: var(--font-sans), Inter, system-ui, sans-serif;
+  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
   font-size: clamp(3rem, 7vw, 5.15rem);
-  font-weight: 600;
-  letter-spacing: -0.05em;
-  line-height: 1.02;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
   color: var(--text);
   text-wrap: balance;
   max-width: 14ch;
+  font-optical-sizing: auto;
 }
 
 .lp-h2 {
   margin: 0 0 36px;
   max-width: 22ch;
-  font-family: var(--font-sans), Inter, system-ui, sans-serif;
+  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
   font-size: clamp(1.7rem, 3.2vw, 2.35rem);
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 1.15;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.18;
   color: var(--text);
   text-wrap: balance;
+  font-optical-sizing: auto;
 }
 
 .lp-lead {
   margin: 20px 0 0;
   max-width: 34rem;
+  font-family: var(--lp-copy, var(--font-sans)), Inter, sans-serif;
   font-size: 17px;
   line-height: 1.6;
   color: var(--text-2);
@@ -11365,6 +11371,7 @@ html {
 
 .lp-body {
   margin: 0;
+  font-family: var(--lp-copy, var(--font-sans)), Inter, sans-serif;
   font-size: 15px;
   line-height: 1.6;
   color: var(--text-2);
@@ -11520,9 +11527,10 @@ html {
 
 .lp-flow-title {
   margin: 0 0 10px;
-  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
-  font-weight: 600;
-  letter-spacing: -0.04em;
+  font-family: var(--font-pixel), var(--font-sans), sans-serif;
+  font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+  font-weight: 500;
+  letter-spacing: 0.04em;
   color: var(--text);
 }
 
@@ -11545,6 +11553,7 @@ html {
 .lp-flow-text {
   margin: 0;
   max-width: 22ch;
+  font-family: var(--lp-copy, var(--font-sans)), Inter, sans-serif;
   font-size: 14.5px;
   line-height: 1.55;
   color: var(--text-2);
@@ -11709,8 +11718,8 @@ html {
   max-width: 22ch;
   margin-bottom: 0;
   font-size: clamp(2.5rem, 5.4vw, 4.15rem);
-  line-height: 1.05;
-  letter-spacing: -0.05em;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
 }
 
 .lp-light .lp-cases {
@@ -11771,10 +11780,11 @@ html {
 }
 
 .lp-art-grant .lp-art-line em {
+  font-family: var(--font-pixel), var(--font-mono), monospace;
   font-style: normal;
   color: #1a9e76;
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  font-size: 11px;
+  letter-spacing: 0.06em;
 }
 
 .lp-art-grant .lp-art-line:nth-child(1) i {
@@ -11852,6 +11862,7 @@ html {
 }
 
 .lp-art-seal {
+  font-family: var(--font-pixel), var(--font-mono), monospace;
   color: #1a9e76;
   letter-spacing: 0.06em;
 }
@@ -12046,7 +12057,7 @@ html {
 
 .lp-feature-kicker {
   margin: 0 0 10px;
-  font-family: var(--font-mono), ui-monospace, monospace;
+  font-family: var(--lp-meta, var(--font-mono)), ui-monospace, monospace;
   font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -12055,9 +12066,10 @@ html {
 
 .lp-feature-title {
   margin: 0 0 12px;
-  font-size: clamp(1.2rem, 2vw, 1.45rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
+  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
+  font-size: clamp(1.25rem, 2vw, 1.55rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
   line-height: 1.3;
   color: var(--text);
   transition: color 180ms ease;
@@ -12089,9 +12101,10 @@ html {
 
 .lp-case-who {
   margin: 0 0 12px;
-  font-size: clamp(1.2rem, 2vw, 1.45rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
+  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
+  font-size: clamp(1.25rem, 2vw, 1.55rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
   color: var(--text);
 }
 
@@ -12115,19 +12128,20 @@ html {
 .lp-step-n {
   display: block;
   margin-bottom: 14px;
-  font-family: var(--font-sans), Inter, system-ui, sans-serif;
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
-  font-weight: 600;
-  letter-spacing: -0.06em;
+  font-family: var(--font-pixel), var(--font-mono), monospace;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  font-weight: 500;
+  letter-spacing: 0.06em;
   line-height: 1;
-  color: rgba(247, 248, 250, 0.22);
+  color: rgba(247, 248, 250, 0.28);
 }
 
 .lp-step-title {
   margin: 0 0 8px;
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: -0.03em;
+  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
   color: #f7f8fa;
 }
 
@@ -12146,10 +12160,10 @@ html {
 
 .lp-honest-label {
   margin: 0 0 16px;
-  font-family: var(--font-sans), Inter, system-ui, sans-serif;
+  font-family: var(--font-pixel), var(--font-mono), monospace;
   font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-weight: 500;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-3);
 }
@@ -12165,6 +12179,7 @@ html {
 .lp-honest-col li {
   padding-left: 14px;
   position: relative;
+  font-family: var(--lp-copy, var(--font-sans)), Inter, sans-serif;
   font-size: 15px;
   line-height: 1.5;
   color: var(--text-2);
@@ -12214,6 +12229,89 @@ html {
 .lp-cta-title {
   max-width: 18ch;
   margin-bottom: 8px;
+}
+
+.lp-face-news {
+  --lp-head: var(--font-news);
+  --lp-copy: var(--font-sans);
+  --lp-meta: var(--font-mono);
+}
+
+.lp-face-instrument {
+  --lp-head: var(--font-display);
+  --lp-copy: var(--font-sans);
+  --lp-meta: var(--font-mono);
+}
+
+.lp-face-playfair {
+  --lp-head: var(--font-playfair);
+  --lp-copy: var(--font-jakarta);
+  --lp-meta: var(--font-fira);
+}
+
+.lp-face-playfair .lp-h2,
+.lp-face-playfair .lp-feature-title,
+.lp-face-playfair .ip-facts h2 {
+  font-weight: 500;
+}
+
+.lp-face-fraunces {
+  --lp-head: var(--font-fraunces);
+  --lp-copy: var(--font-jakarta);
+  --lp-meta: var(--font-pixel);
+}
+
+.lp-face-fraunces .lp-h1,
+.lp-face-fraunces .lp-h2,
+.lp-face-fraunces .lp-case-who {
+  font-weight: 500;
+}
+
+.lp-face-review {
+  --lp-head: var(--font-news);
+  --lp-copy: var(--font-jakarta);
+  --lp-meta: var(--font-fira);
+}
+
+.lp-face-review .lp-h2 {
+  font-style: italic;
+  font-weight: 400;
+}
+
+.lp-face-review .lp-step-title {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 500;
+}
+
+.lp-face-honest {
+  --lp-head: var(--font-display);
+  --lp-copy: var(--font-sans);
+  --lp-meta: var(--font-pixel);
+}
+
+.lp-face-lab {
+  --lp-head: var(--font-pixel);
+  --lp-copy: var(--font-jakarta);
+  --lp-meta: var(--font-fira);
+}
+
+.lp-face-lab .ip-facts h2,
+.lp-face-lab .ip-quiet-list strong {
+  font-family: var(--font-pixel), var(--font-sans), sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  font-size: 1.15rem;
+}
+
+.lp-face-cta {
+  --lp-head: var(--font-fraunces);
+  --lp-copy: var(--font-sans);
+  --lp-meta: var(--font-mono);
+}
+
+.lp-face-cta .lp-cta-title {
+  font-style: italic;
+  font-weight: 400;
 }
 
 .lp-cta .lp-actions {
@@ -12550,15 +12648,17 @@ html {
 
 .ip-facts h2 {
   margin: 0 0 12px;
-  font-size: clamp(1.2rem, 2vw, 1.55rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
+  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
+  font-size: clamp(1.25rem, 2vw, 1.6rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
   color: var(--text);
 }
 
 .ip-facts p {
   margin: 0;
   max-width: 36ch;
+  font-family: var(--lp-copy, var(--font-sans)), Inter, sans-serif;
   font-size: 15px;
   line-height: 1.55;
   color: var(--text-2);
@@ -12588,6 +12688,7 @@ html {
 }
 
 .ip-quiet-list li {
+  font-family: var(--lp-copy, var(--font-sans)), Inter, sans-serif;
   font-size: 15px;
   line-height: 1.55;
   color: var(--text-2);
@@ -12596,7 +12697,8 @@ html {
 .ip-quiet-list strong {
   display: block;
   margin-bottom: 2px;
-  font-weight: 600;
+  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
+  font-weight: 400;
   color: var(--text);
 }
 
@@ -13165,9 +13267,10 @@ html {
 
 .ip-contrast-label {
   margin: 0 0 16px;
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-family: var(--font-pixel), var(--font-mono), monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-3);
 }
@@ -13250,9 +13353,10 @@ html {
 }
 
 .ip-contrast-row em {
+  font-family: var(--font-pixel), var(--font-mono), monospace;
   font-style: normal;
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  font-size: 11px;
+  letter-spacing: 0.06em;
   color: var(--accent);
   animation: ip-seal 4.2s ease-in-out infinite;
 }

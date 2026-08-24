@@ -53,7 +53,7 @@ export default async function AboutPage() {
 
   return (
     <main className="landing lp ip">
-      <section className="lp-hero ip-hero">
+      <section className="lp-hero ip-hero lp-face-news">
         <div className="lp-hero-wash" aria-hidden="true" />
         <div className="lp-shell lp-hero-grid">
           <div className="lp-hero-copy">
@@ -69,7 +69,7 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className="lp-section ip-section">
+      <section className="lp-section ip-section lp-face-instrument">
         <div className="lp-shell">
           <ol className="ip-facts ip-facts-2">
             <li>
@@ -95,7 +95,7 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className="lp-section lp-cta">
+      <section className="lp-section lp-cta lp-face-cta">
         <div className="lp-shell lp-cta-inner">
           <h2 className="lp-h2 lp-cta-title">
             Start a ledger. Share the link when someone asks you to prove it.
