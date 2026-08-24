@@ -1,29 +1,12 @@
 import type { ComponentProps } from "react";
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import {
-  Fira_Code,
-  Fraunces,
-  Instrument_Serif,
-  Inter,
-  JetBrains_Mono,
-  Newsreader,
-  Pixelify_Sans,
-  Playfair_Display,
-  Plus_Jakarta_Sans,
-} from "next/font/google";
+import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
 
 import { IdleDim } from "./components/IdleDim";
 import { Navbar } from "./components/Navbar";
 import { ScrollNav } from "./components/ScrollNav";
 import "./globals.css";
-
-const sans = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-sans",
-  display: "swap",
-});
 
 const display = Instrument_Serif({
   subsets: ["latin"],
@@ -33,61 +16,11 @@ const display = Instrument_Serif({
   display: "swap",
 });
 
-const news = Newsreader({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-news",
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-playfair",
-  display: "swap",
-  preload: false,
-});
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-fraunces",
-  display: "swap",
-  preload: false,
-});
-
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-jakarta",
-  display: "swap",
-  preload: false,
-});
-
 const mono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-mono",
   display: "swap",
-});
-
-const fira = Fira_Code({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-fira",
-  display: "swap",
-  preload: false,
-});
-
-const pixel = Pixelify_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-pixel",
-  display: "swap",
-  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -109,10 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${sans.variable} ${display.variable} ${news.variable} ${playfair.variable} ${fraunces.variable} ${jakarta.variable} ${mono.variable} ${fira.variable} ${pixel.variable}`}
-    >
+    <html lang="en" className={`${display.variable} ${mono.variable} ${display.className}`}>
       <body>
         <ClerkProvider
           appearance={
@@ -124,6 +54,7 @@ export default function RootLayout({
                 colorInputBackground: "#22262B",
                 colorInputText: "#E0E0E0",
                 borderRadius: "8px",
+                fontFamily: "Instrument Serif, Georgia, serif",
               },
             } as ComponentProps<typeof ClerkProvider>["appearance"]
           }

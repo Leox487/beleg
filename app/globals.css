@@ -75,12 +75,16 @@ body {
   min-height: 100%;
 }
 
+html {
+  --font-sans: var(--font-display);
+  font-synthesis: none;
+}
+
 body {
   position: relative;
   color: var(--text);
   background-color: var(--bg);
-  font-family: var(--font-sans), Inter, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+  font-family: var(--font-display), "Iowan Old Style", Georgia, serif;
   font-size: 15px;
   font-weight: 400;
   line-height: 1.6;
@@ -11212,9 +11216,9 @@ html {
    ========================================================================= */
 
 .wordmark {
-  font-family: var(--font-sans), Inter, system-ui, sans-serif !important;
-  font-size: 15px !important;
-  font-weight: 600 !important;
+  font-family: var(--font-display), Georgia, serif !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
   letter-spacing: -0.03em !important;
 }
 
@@ -11239,9 +11243,9 @@ html {
   filter: none !important;
   height: 34px;
   padding: 0 14px;
-  font-family: var(--font-sans), Inter, system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 14px;
+  font-weight: 400;
   letter-spacing: -0.01em;
   transition: background 180ms ease, transform 140ms ease;
 }
@@ -11256,9 +11260,9 @@ html {
 
 .landing.lp {
   --bg: #1a1d20;
-  --lp-head: var(--font-news);
-  --lp-copy: var(--font-sans);
-  --lp-meta: var(--font-mono);
+  --lp-head: var(--font-display);
+  --lp-copy: var(--font-display);
+  --lp-meta: var(--font-display);
   padding: 0;
   background: #1a1d20;
   min-height: 100vh;
@@ -11322,9 +11326,9 @@ html {
 .lp-kicker,
 .lp-eyebrow {
   margin: 0 0 16px;
-  font-family: var(--lp-meta, var(--font-mono)), ui-monospace, monospace;
-  font-size: 11px;
-  font-weight: 500;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 12px;
+  font-weight: 400;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-3);
@@ -11336,7 +11340,7 @@ html {
 
 .lp-h1 {
   margin: 0;
-  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: clamp(3rem, 7vw, 5.15rem);
   font-weight: 400;
   letter-spacing: -0.03em;
@@ -11344,26 +11348,24 @@ html {
   color: var(--text);
   text-wrap: balance;
   max-width: 14ch;
-  font-optical-sizing: auto;
 }
 
 .lp-h2 {
   margin: 0 0 36px;
   max-width: 22ch;
-  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: clamp(1.7rem, 3.2vw, 2.35rem);
   font-weight: 400;
   letter-spacing: -0.025em;
   line-height: 1.18;
   color: var(--text);
   text-wrap: balance;
-  font-optical-sizing: auto;
 }
 
 .lp-lead {
   margin: 20px 0 0;
   max-width: 34rem;
-  font-family: var(--lp-copy, var(--font-sans)), Inter, sans-serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: 17px;
   line-height: 1.6;
   color: var(--text-2);
@@ -11371,7 +11373,7 @@ html {
 
 .lp-body {
   margin: 0;
-  font-family: var(--lp-copy, var(--font-sans)), Inter, sans-serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: 15px;
   line-height: 1.6;
   color: var(--text-2);
@@ -11393,9 +11395,9 @@ html {
   height: 44px;
   padding: 0 18px;
   border-radius: 999px !important;
-  font-family: var(--font-sans), Inter, system-ui, sans-serif;
-  font-size: 14.5px;
-  font-weight: 600;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 15px;
+  font-weight: 400;
   letter-spacing: -0.01em;
   box-shadow: none !important;
   filter: none !important;
@@ -11527,10 +11529,10 @@ html {
 
 .lp-flow-title {
   margin: 0 0 10px;
-  font-family: var(--font-pixel), var(--font-sans), sans-serif;
-  font-size: clamp(1.15rem, 1.8vw, 1.4rem);
-  font-weight: 500;
-  letter-spacing: 0.04em;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
   color: var(--text);
 }
 
@@ -11553,7 +11555,7 @@ html {
 .lp-flow-text {
   margin: 0;
   max-width: 22ch;
-  font-family: var(--lp-copy, var(--font-sans)), Inter, sans-serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: 14.5px;
   line-height: 1.55;
   color: var(--text-2);
@@ -11780,11 +11782,10 @@ html {
 }
 
 .lp-art-grant .lp-art-line em {
-  font-family: var(--font-pixel), var(--font-mono), monospace;
   font-style: normal;
   color: #1a9e76;
-  font-size: 11px;
-  letter-spacing: 0.06em;
+  font-size: 10px;
+  letter-spacing: 0.08em;
 }
 
 .lp-art-grant .lp-art-line:nth-child(1) i {
@@ -11862,7 +11863,6 @@ html {
 }
 
 .lp-art-seal {
-  font-family: var(--font-pixel), var(--font-mono), monospace;
   color: #1a9e76;
   letter-spacing: 0.06em;
 }
@@ -12057,16 +12057,16 @@ html {
 
 .lp-feature-kicker {
   margin: 0 0 10px;
-  font-family: var(--lp-meta, var(--font-mono)), ui-monospace, monospace;
-  font-size: 11px;
-  letter-spacing: 0.1em;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 12px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent);
 }
 
 .lp-feature-title {
   margin: 0 0 12px;
-  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: clamp(1.25rem, 2vw, 1.55rem);
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -12101,7 +12101,7 @@ html {
 
 .lp-case-who {
   margin: 0 0 12px;
-  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: clamp(1.25rem, 2vw, 1.55rem);
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -12128,17 +12128,17 @@ html {
 .lp-step-n {
   display: block;
   margin-bottom: 14px;
-  font-family: var(--font-pixel), var(--font-mono), monospace;
-  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
   line-height: 1;
-  color: rgba(247, 248, 250, 0.28);
+  color: rgba(247, 248, 250, 0.22);
 }
 
 .lp-step-title {
   margin: 0 0 8px;
-  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: 18px;
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -12160,10 +12160,10 @@ html {
 
 .lp-honest-label {
   margin: 0 0 16px;
-  font-family: var(--font-pixel), var(--font-mono), monospace;
+  font-family: var(--font-display), Georgia, serif;
   font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  font-weight: 400;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-3);
 }
@@ -12179,7 +12179,7 @@ html {
 .lp-honest-col li {
   padding-left: 14px;
   position: relative;
-  font-family: var(--lp-copy, var(--font-sans)), Inter, sans-serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: 15px;
   line-height: 1.5;
   color: var(--text-2);
@@ -12229,89 +12229,6 @@ html {
 .lp-cta-title {
   max-width: 18ch;
   margin-bottom: 8px;
-}
-
-.lp-face-news {
-  --lp-head: var(--font-news);
-  --lp-copy: var(--font-sans);
-  --lp-meta: var(--font-mono);
-}
-
-.lp-face-instrument {
-  --lp-head: var(--font-display);
-  --lp-copy: var(--font-sans);
-  --lp-meta: var(--font-mono);
-}
-
-.lp-face-playfair {
-  --lp-head: var(--font-playfair);
-  --lp-copy: var(--font-jakarta);
-  --lp-meta: var(--font-fira);
-}
-
-.lp-face-playfair .lp-h2,
-.lp-face-playfair .lp-feature-title,
-.lp-face-playfair .ip-facts h2 {
-  font-weight: 500;
-}
-
-.lp-face-fraunces {
-  --lp-head: var(--font-fraunces);
-  --lp-copy: var(--font-jakarta);
-  --lp-meta: var(--font-pixel);
-}
-
-.lp-face-fraunces .lp-h1,
-.lp-face-fraunces .lp-h2,
-.lp-face-fraunces .lp-case-who {
-  font-weight: 500;
-}
-
-.lp-face-review {
-  --lp-head: var(--font-news);
-  --lp-copy: var(--font-jakarta);
-  --lp-meta: var(--font-fira);
-}
-
-.lp-face-review .lp-h2 {
-  font-style: italic;
-  font-weight: 400;
-}
-
-.lp-face-review .lp-step-title {
-  font-family: var(--font-playfair), Georgia, serif;
-  font-weight: 500;
-}
-
-.lp-face-honest {
-  --lp-head: var(--font-display);
-  --lp-copy: var(--font-sans);
-  --lp-meta: var(--font-pixel);
-}
-
-.lp-face-lab {
-  --lp-head: var(--font-pixel);
-  --lp-copy: var(--font-jakarta);
-  --lp-meta: var(--font-fira);
-}
-
-.lp-face-lab .ip-facts h2,
-.lp-face-lab .ip-quiet-list strong {
-  font-family: var(--font-pixel), var(--font-sans), sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  font-size: 1.15rem;
-}
-
-.lp-face-cta {
-  --lp-head: var(--font-fraunces);
-  --lp-copy: var(--font-sans);
-  --lp-meta: var(--font-mono);
-}
-
-.lp-face-cta .lp-cta-title {
-  font-style: italic;
-  font-weight: 400;
 }
 
 .lp-cta .lp-actions {
@@ -12648,7 +12565,7 @@ html {
 
 .ip-facts h2 {
   margin: 0 0 12px;
-  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: clamp(1.25rem, 2vw, 1.6rem);
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -12658,7 +12575,7 @@ html {
 .ip-facts p {
   margin: 0;
   max-width: 36ch;
-  font-family: var(--lp-copy, var(--font-sans)), Inter, sans-serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: 15px;
   line-height: 1.55;
   color: var(--text-2);
@@ -12688,7 +12605,7 @@ html {
 }
 
 .ip-quiet-list li {
-  font-family: var(--lp-copy, var(--font-sans)), Inter, sans-serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: 15px;
   line-height: 1.55;
   color: var(--text-2);
@@ -12697,7 +12614,7 @@ html {
 .ip-quiet-list strong {
   display: block;
   margin-bottom: 2px;
-  font-family: var(--lp-head, var(--font-news)), Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
   font-weight: 400;
   color: var(--text);
 }
@@ -12832,9 +12749,9 @@ html {
 }
 
 .ip .uses-detail-title {
-  font-family: var(--font-sans), Inter, system-ui, sans-serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: clamp(1.45rem, 2.2vw, 1.85rem);
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: -0.03em;
   color: #f7f8fa;
 }
@@ -13267,10 +13184,10 @@ html {
 
 .ip-contrast-label {
   margin: 0 0 16px;
-  font-family: var(--font-pixel), var(--font-mono), monospace;
+  font-family: var(--font-display), Georgia, serif;
   font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  font-weight: 400;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-3);
 }
@@ -13353,10 +13270,10 @@ html {
 }
 
 .ip-contrast-row em {
-  font-family: var(--font-pixel), var(--font-mono), monospace;
+  font-family: var(--font-display), Georgia, serif;
   font-style: normal;
   font-size: 11px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--accent);
   animation: ip-seal 4.2s ease-in-out infinite;
 }
