@@ -34,14 +34,17 @@ const CASES = [
   {
     who: "Grant applicant",
     text: "Seal the award the day the email arrives. The program officer confirms it. A reviewer sees both on one public page.",
+    art: "grant" as const,
   },
   {
     who: "Solo founder",
     text: "Ships, first revenue, pilots — recorded when they happened, not reconstructed for a pitch deck.",
+    art: "founder" as const,
   },
   {
     who: "Work under NDA",
     text: "Prove an engagement existed, for whom, and when. The client confirms. The confidential spec never leaves their side.",
+    art: "nda" as const,
   },
 ];
 
@@ -67,6 +70,55 @@ const REVIEW_STEPS = [
     text: "Dates and amounts should line up. Beleg does not grade the project. It shows the trail.",
   },
 ];
+
+function SegArt({ kind }: { kind: "grant" | "founder" | "nda" }) {
+  if (kind === "grant") {
+    return (
+      <div className="lp-art lp-art-grant" aria-hidden="true">
+        <span className="lp-art-line">
+          <i />
+          <b>Grant · $12,000</b>
+          <em>SEAL</em>
+        </span>
+        <span className="lp-art-line">
+          <i />
+          <b>Maya Chen, Civic Fund</b>
+          <em>OK</em>
+        </span>
+        <span className="lp-art-line">
+          <i />
+          <b>beleg.app/p/northstar</b>
+          <em>LIVE</em>
+        </span>
+      </div>
+    );
+  }
+  if (kind === "founder") {
+    return (
+      <div className="lp-art lp-art-chain" aria-hidden="true">
+        <span>
+          <i />
+          #01 ship
+        </span>
+        <span>
+          <i />
+          #02 first revenue
+        </span>
+        <span>
+          <i />
+          #03 pilot
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div className="lp-art lp-art-nda" aria-hidden="true">
+      <span>Acme Corp · Q3 engagement</span>
+      <span className="lp-art-redact">confidential specification.pdf</span>
+      <span className="lp-art-seal">SEAL 9c2a…f1 · client confirmed</span>
+    </div>
+  );
+}
 
 function LandingActions({
   href,
@@ -201,20 +253,25 @@ export default async function Home() {
       </section>
 
       <section className="lp-section lp-light">
-        <div className="lp-shell">
-          <p className="lp-eyebrow">Who it is for</p>
-          <h2 className="lp-h2">
-            Three situations where a paper trail does not already exist.
-          </h2>
+        <div className="lp-light-grid" aria-hidden="true" />
+        <span className="lp-light-scan" aria-hidden="true" />
+        <div className="lp-shell lp-wide">
+          <div className="lp-light-head">
+            <p className="lp-eyebrow">Who it is for</p>
+            <h2 className="lp-h2">
+              Three situations where a paper trail does not already exist.
+            </h2>
+          </div>
           <ul className="lp-cases">
             {CASES.map((c) => (
               <li key={c.who} className="lp-case">
+                <SegArt kind={c.art} />
                 <h3 className="lp-case-who">{c.who}</h3>
                 <p className="lp-body">{c.text}</p>
               </li>
             ))}
           </ul>
-          <p className="lp-outlink">
+          <p className="lp-outlink lp-seg-foot">
             <Link href="/uses">More situations Beleg is built for →</Link>
           </p>
         </div>
@@ -242,11 +299,23 @@ export default async function Home() {
       </section>
 
       <section className="lp-section lp-light">
-        <div className="lp-shell">
-          <p className="lp-eyebrow">Limits</p>
-          <h2 className="lp-h2">What the chain proves, and what it does not.</h2>
+        <div className="lp-light-grid" aria-hidden="true" />
+        <span className="lp-light-scan" aria-hidden="true" />
+        <div className="lp-shell lp-wide">
+          <div className="lp-light-head">
+            <p className="lp-eyebrow">Limits</p>
+            <h2 className="lp-h2">
+              What the chain proves, and what it does not.
+            </h2>
+          </div>
           <div className="lp-honest">
             <div className="lp-honest-col">
+              <div className="lp-art lp-art-nodes lp-art-ok" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+                <span />
+              </div>
               <p className="lp-honest-label">Sealed</p>
               <ul>
                 <li>The order of entries</li>
@@ -256,6 +325,12 @@ export default async function Home() {
               </ul>
             </div>
             <div className="lp-honest-col">
+              <div className="lp-art lp-art-nodes lp-art-no" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+                <span />
+              </div>
               <p className="lp-honest-label">Not claimed</p>
               <ul>
                 <li>That the work was good, or the grant deserved</li>
