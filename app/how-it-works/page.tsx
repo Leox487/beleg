@@ -1,162 +1,201 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
 
-import Accordion from "@/app/components/Accordion";
-import AnimateIn from "@/app/components/AnimateIn";
 import ChainLab from "@/app/components/ChainLab";
+import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
 import HowBeats from "@/app/components/HowBeats";
+import {
+  StageSeal,
+  StageVerify,
+  StageWitness,
+} from "@/app/components/HomeStages";
 
 export const metadata: Metadata = {
   title: "How Beleg Works · Beleg",
   description:
-    "The cryptography behind Beleg in plain English: hash chains, in-browser verification, and Bitcoin anchoring.",
+    "Hash chains, in-browser verification, witness confirmations, and Bitcoin timestamps, in plain English.",
 };
 
-export default function HowItWorksPage() {
+export default async function HowItWorksPage() {
+  const { userId } = await auth();
+  const signedIn = Boolean(userId);
+  const ctaHref = signedIn ? "/dashboard" : "/sign-up";
+  const ctaLabel = signedIn ? "Go to your ledger" : "Start a ledger";
+
   return (
-    <main className="page how-page">
-      <div className="page-inner doc doc-how">
-        <header className="doc-header how-header">
-          <h1 className="h1 doc-title how-title">How Beleg Works</h1>
-          <p className="how-desc">
-            Beleg is a running record of what you have actually done. Each
-            milestone you add is sealed with a cryptographic fingerprint and
-            linked to the one before it, so nothing in the past can be quietly
-            rewritten. The people who were there can confirm entries themselves,
-            and anyone you share the record with can check every seal in their
-            own browser, without taking your word for it, or ours.
+    <main className="landing lp ip">
+      <section className="lp-hero ip-hero">
+        <div className="lp-hero-wash" aria-hidden="true" />
+        <div className="lp-shell">
+          <p className="lp-kicker">How it works</p>
+          <h1 className="lp-h1 ip-h1">A chain you can break on this page.</h1>
+          <p className="lp-lead">
+            Each milestone is sealed with a fingerprint and linked to the one
+            before it. The people who were there can confirm an entry. Anyone
+            you share the record with can recompute every seal in their own
+            browser. They do not have to take your word for it, or ours.
           </p>
-        </header>
+        </div>
+      </section>
 
-        <AnimateIn direction="up">
-          <section className="how-section">
-            <p className="how-eyebrow">The 20-second version</p>
-            <HowBeats />
-          </section>
-        </AnimateIn>
+      <section className="lp-section ip-section ip-anchor" id="beats">
+        <div className="lp-shell">
+          <p className="lp-eyebrow">Twenty seconds</p>
+          <h2 className="lp-h2">Fingerprint, chain, break, timestamp, check.</h2>
+          <HowBeats />
+        </div>
+      </section>
 
-        <AnimateIn direction="up">
-          <section className="how-section">
-            <p className="how-eyebrow">Try it</p>
-            <h2 className="how-heading">Break the chain yourself.</h2>
-            <p className="how-sub">
-              These are real SHA-256 seals, computed in your browser right now.
-              Change a single character in entry #1 and watch what happens to
-              everything after it.
-            </p>
-            <div className="card how-lab-card">
-              <ChainLab />
-            </div>
-          </section>
-        </AnimateIn>
+      <section className="lp-section ip-section ip-anchor" id="try">
+        <div className="lp-shell">
+          <p className="lp-eyebrow">Try it</p>
+          <h2 className="lp-h2">Change one character in entry #1.</h2>
+          <p className="lp-body ip-intro">
+            These are real SHA-256 seals, computed in your browser right now.
+            Edit the first line and watch every seal after it fail.
+          </p>
+          <div className="ip-lab">
+            <ChainLab />
+          </div>
+        </div>
+      </section>
 
-        <AnimateIn direction="up">
-          <section className="how-section">
-            <p className="how-eyebrow">The long version</p>
-            <h2 className="how-heading">
-              Every detail, if you want to check our work.
+      <section className="lp-section ip-section">
+        <div className="lp-shell">
+          <p className="lp-eyebrow">The longer version</p>
+          <h2 className="lp-h2">What actually gets sealed.</h2>
+          <div className="lp-features">
+            <article className="lp-feature ip-anchor" id="record">
+              <div className="lp-feature-copy">
+                <p className="lp-feature-kicker">01 · The chain</p>
+                <h3 className="lp-feature-title">
+                  Each hash is built from the entry plus the hash before it.
+                </h3>
+                <p className="lp-body">
+                  Title, body, date, timestamp, run through SHA-256. Same input,
+                  same fingerprint. Change one character and you get a different
+                  one. Entry #2 includes entry #1&apos;s hash. Entry #3 includes
+                  #2&apos;s. The first entry links to a genesis value of zeros.
+                </p>
+                <p className="lp-body">
+                  Edit #1 later and its hash changes, so #2 no longer matches, so
+                  #3 does not either. That is why there is no edit button. You
+                  can only add to the end.
+                </p>
+              </div>
+              <div className="lp-feature-stage">
+                <StageSeal />
+              </div>
+            </article>
+
+            <article className="lp-feature lp-feature-flip ip-anchor" id="witness">
+              <div className="lp-feature-copy">
+                <p className="lp-feature-kicker">02 · Witnesses</p>
+                <h3 className="lp-feature-title">
+                  A confirmation is another sealed entry, not a comment.
+                </h3>
+                <p className="lp-body">
+                  When someone confirms, their name and statement are hashed and
+                  linked like everything else. They cannot be edited, backdated,
+                  or pulled off later. They do not need a Beleg account.
+                </p>
+              </div>
+              <div className="lp-feature-stage">
+                <StageWitness />
+              </div>
+            </article>
+
+            <article className="lp-feature ip-anchor" id="verify">
+              <div className="lp-feature-copy">
+                <p className="lp-feature-kicker">03 · The verifier</p>
+                <h3 className="lp-feature-title">
+                  The check runs on the reviewer&apos;s machine.
+                </h3>
+                <p className="lp-body">
+                  Open a public proof page and hit Verify. The browser downloads
+                  the entries, recomputes every hash, and checks the links. Green
+                  means they still match. Red names the first entry that does
+                  not.
+                </p>
+                <p className="lp-body">
+                  The math does not ask our server for a verdict. If the
+                  database were altered, the verifier would still catch it,
+                  unless every later hash was rewritten too. Bitcoin anchoring
+                  is what makes even that rewrite fail.
+                </p>
+              </div>
+              <div className="lp-feature-stage">
+                <StageVerify />
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="lp-section lp-light">
+        <div className="lp-light-grid" aria-hidden="true" />
+        <span className="lp-light-scan" aria-hidden="true" />
+        <div className="lp-shell lp-wide">
+          <div className="lp-light-head ip-anchor" id="timestamp">
+            <p className="lp-eyebrow">Timestamp</p>
+            <h2 className="lp-h2">
+              The newest seal is written into Bitcoin, where nobody here can
+              rewrite it.
             </h2>
-
-            <div className="how-accordion">
-              <Accordion title="The chain">
-                <p>
-                  Every entry you add gets a &quot;hash&quot;: a digital
-                  fingerprint created by running the entry&apos;s contents
-                  (title, body, date, timestamp) through a mathematical function
-                  called SHA-256. The same input always produces the same
-                  fingerprint. Even changing one character produces a completely
-                  different fingerprint.
-                </p>
-                <p>
-                  Each entry&apos;s hash is computed from two things: the
-                  entry&apos;s own contents, and the previous entry&apos;s hash.
-                  This links them into a chain. The first entry links to a
-                  special &quot;genesis&quot; value (all zeros). Entry #2 links
-                  to entry #1. Entry #3 links to entry #2. And so on.
-                </p>
-                <p>
-                  If anyone changed entry #1 after the fact, its hash would
-                  change. But entry #2&apos;s hash depends on entry #1&apos;s
-                  hash, so entry #2&apos;s hash would also change. And entry #3
-                  depends on entry #2. The entire chain after the edit breaks.
-                  That&apos;s why it&apos;s called &quot;append-only&quot;: you
-                  can only add to the end, never change the past.
-                </p>
-              </Accordion>
-
-              <Accordion title="The verifier">
-                <p>
-                  When you open a public proof page, the &quot;Verify chain&quot;
-                  button runs entirely in your browser. It downloads every
-                  entry&apos;s data, recomputes every hash from scratch using the
-                  same SHA-256 function, and checks that every link holds. If
-                  everything matches, you see a green banner. If anything was
-                  tampered with, you see red, and it tells you exactly which
-                  entry broke.
-                </p>
-                <p>
-                  This is important: the verification does not trust Beleg&apos;s
-                  server. Your browser does the math independently. Even if
-                  Beleg&apos;s database were compromised, the verifier would
-                  catch it, because the attacker would need to recompute every
-                  hash in the chain to make a forgery pass, and the anchoring
-                  (below) makes even that impossible.
-                </p>
-              </Accordion>
-
-              <Accordion title="Attestations">
-                <p>
-                  When a third party confirms an entry, their confirmation is
-                  itself added to the chain as a new sealed entry. It gets its
-                  own hash, linking to whatever came before it. So attestations
-                  carry the same tamper-evidence as everything else. They
-                  can&apos;t be edited, backdated, or removed after the fact.
-                </p>
-              </Accordion>
-
-              <Accordion title="Bitcoin anchoring">
-                <p>
-                  Periodically, the latest hash in your chain is submitted to the
-                  Bitcoin blockchain via OpenTimestamps, a free, open protocol.
-                  Bitcoin&apos;s blockchain is a public ledger maintained by
-                  thousands of independent computers worldwide. Once your hash is
-                  recorded there, it is provably timestamped against
-                  infrastructure that nobody (not Beleg, not you, not anyone)
-                  controls or can rewrite.
-                </p>
-                <p>
-                  This means: even if Beleg disappeared tomorrow, anyone with the
-                  .ots proof file could independently verify that your ledger
-                  existed at that date, using only open-source tools and the
-                  public Bitcoin blockchain. No trust in any company required.
-                </p>
-              </Accordion>
-
-              <Accordion title="What this doesn't do">
-                <p>
-                  Beleg proves integrity (nothing changed) and timing (when it
-                  was recorded). It does not prove truth (whether the claim is
-                  accurate). A sealed entry saying &quot;shipped the
-                  prototype&quot; proves you wrote those words on that date.
-                  Proving the prototype actually shipped requires witnesses
-                  (attestations) and evidence (which future versions will support
-                  through verified email ingestion and payment connectors).
-                </p>
-              </Accordion>
-
-              <Accordion title="Open verification">
-                <p>
-                  The SHA-256 hash function is a public standard. Anyone can
-                  implement it. The chain structure is a standard Merkle-style
-                  linked list. OpenTimestamps is open source. Nothing about
-                  Beleg&apos;s verification requires proprietary software or
-                  trusting a third party. That&apos;s the point.
-                </p>
-              </Accordion>
+          </div>
+          <div className="ip-light-split">
+            <div className="ip-light-copy">
+              <div className="ip-btc" aria-hidden="true">
+                <span className="ip-btc-hash">c14d6a2e80…99e07f</span>
+                <span className="ip-btc-arrow" />
+                <span className="ip-btc-block">OpenTimestamps · Bitcoin</span>
+              </div>
+              <p className="lp-body">
+                Periodically the latest hash is submitted through OpenTimestamps,
+                a free open protocol. Once it is in a Bitcoin block, the date is
+                checkable against a network of machines we do not run. If Beleg
+                disappeared tomorrow, anyone with the <code>.ots</code> proof
+                could still show that this ledger existed on that day, using
+                open-source tools and the public chain.
+              </p>
             </div>
-          </section>
-        </AnimateIn>
-      </div>
+            <div className="ip-light-copy ip-anchor" id="limits">
+              <p className="lp-honest-label">What this does not do</p>
+              <p className="lp-body">
+                Beleg proves integrity (nothing changed) and timing (when it was
+                recorded). It does not prove the claim is true. A sealed line
+                that says &quot;shipped the prototype&quot; proves you wrote
+                those words on that date. Whether the prototype shipped is a
+                job for witnesses and evidence.
+              </p>
+              <p className="lp-body">
+                SHA-256 is a public standard. The chain is a linked list of
+                hashes. OpenTimestamps is open source. Checking a Beleg page
+                does not require proprietary software, or trusting a company.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="lp-section lp-cta">
+        <div className="lp-shell lp-cta-inner">
+          <h2 className="lp-h2 lp-cta-title">
+            Record one milestone. Share the link when someone asks.
+          </h2>
+          <div className="lp-actions">
+            <Link className="lp-btn lp-btn-primary" href={ctaHref}>
+              <span>{ctaLabel}</span>
+              <CtaBadge />
+            </Link>
+            <Link className="lp-btn lp-btn-ghost" href="/uses">
+              See who it is for
+            </Link>
+          </div>
+        </div>
+      </section>
 
       <Footer />
     </main>

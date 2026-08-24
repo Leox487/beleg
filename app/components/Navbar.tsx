@@ -10,17 +10,17 @@ const HOW_IT_WORKS = [
   {
     heading: "The chain",
     links: [
-      { href: "/how-it-works", label: "Record", text: "Hash and link each milestone. No edit button." },
-      { href: "/how-it-works", label: "Witness", text: "The person who was there confirms in one click." },
-      { href: "/how-it-works", label: "Verify", text: "The check runs in the reviewer’s browser." },
-      { href: "/how-it-works", label: "Timestamp", text: "Pending proofs are dated on Bitcoin." },
+      { href: "/how-it-works#record", label: "Record", text: "Hash and link each milestone. No edit button." },
+      { href: "/how-it-works#witness", label: "Witness", text: "The person who was there confirms in one click." },
+      { href: "/how-it-works#verify", label: "Verify", text: "The check runs in the reviewer’s browser." },
+      { href: "/how-it-works#timestamp", label: "Timestamp", text: "Pending proofs are dated on Bitcoin." },
     ],
   },
   {
     heading: "Inspect it",
     links: [
       { href: "/verify", label: "Verify a ledger", text: "Paste a public link and recompute the seals." },
-      { href: "/how-it-works", label: "The cryptography", text: "Hash chains, in-browser verify, OpenTimestamps." },
+      { href: "/how-it-works#try", label: "The cryptography", text: "Hash chains, in-browser verify, OpenTimestamps." },
       { href: "/verify-guide", label: "Verify it yourself", text: "Walk through an intact chain, step by step." },
       { href: "/security", label: "Security", text: "What we store, what we don’t, and what we cannot rewrite." },
     ],
