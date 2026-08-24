@@ -1,18 +1,17 @@
 import type { ComponentProps } from "react";
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 
 import { IdleDim } from "./components/IdleDim";
 import { Navbar } from "./components/Navbar";
 import { ScrollNav } from "./components/ScrollNav";
 import "./globals.css";
 
-const display = Instrument_Serif({
+const sans = Inter({
   subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"],
-  variable: "--font-display",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-sans",
   display: "swap",
 });
 
@@ -42,7 +41,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${display.variable} ${mono.variable} ${display.className}`}>
+    <html
+      lang="en"
+      className={`${sans.variable} ${mono.variable}`}
+    >
       <body>
         <ClerkProvider
           appearance={
@@ -54,7 +56,6 @@ export default function RootLayout({
                 colorInputBackground: "#22262B",
                 colorInputText: "#E0E0E0",
                 borderRadius: "8px",
-                fontFamily: "Instrument Serif, Georgia, serif",
               },
             } as ComponentProps<typeof ClerkProvider>["appearance"]
           }

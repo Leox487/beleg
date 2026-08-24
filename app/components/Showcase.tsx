@@ -21,7 +21,7 @@ const PANELS = [
     label: "Share",
     text: "Share one public link. Anyone can verify the whole chain in their own browser.",
   },
-];
+] as const;
 
 function WindowBar({ title }: { title: string }) {
   return (
@@ -142,13 +142,19 @@ function ShareMock() {
   );
 }
 
-const MOCKS = [<RecordMock key="r" />, <WitnessMock key="w" />, <ShareMock key="s" />];
+function MockFor({ id }: { id: (typeof PANELS)[number]["id"] }) {
+  if (id === "record") return <RecordMock />;
+  if (id === "witness") return <WitnessMock />;
+  return <ShareMock />;
+}
 
-/**
- * Vertical accordion: hover/focus/click opens one step and plays its demo.
- * The open step stays open when the pointer leaves. Resetting on mouseleave
- * collapses the panel, jumps the layout, and fights the outlink below.
- */
+function slotFor(index: number, active: number) {
+  const delta = (index - active + PANELS.length) % PANELS.length;
+  if (delta === 0) return "front";
+  if (delta === 1) return "right";
+  return "left";
+}
+
 export function Showcase() {
   const [active, setActive] = useState(0);
   const [seen, setSeen] = useState(false);
@@ -193,37 +199,77 @@ export function Showcase() {
     setActive(i);
   };
 
-  return (
-    <div className={`showcase${seen ? " is-seen" : ""}`} ref={rootRef}>
-      {PANELS.map((panel, i) => {
-        const isActive = i === active;
-        return (
-          <div key={panel.id} className="showcase-panel-wrap">
-            <div
-              className={`showcase-panel showcase-${panel.id} step-card${
-                isActive ? " is-active" : ""
-              }`}
-              onMouseEnter={() => takeOver(i)}
-            >
-              <button
-                type="button"
-                className="panel-head"
-                aria-expanded={isActive}
-                onFocus={() => takeOver(i)}
-                onClick={() => takeOver(i)}
-              >
-                <span className="panel-step mono">{panel.step}</span>
-                <span className="panel-label">{panel.label}</span>
-              </button>
+  const stepBy = (dir: number) => {
+    takeOver((active + dir + PANELS.length) % PANELS.length);
+  };
 
-              <div className="panel-reveal">
-                <p className="panel-text">{panel.text}</p>
-                <div className="panel-mock">{MOCKS[i]}</div>
+  const current = PANELS[active];
+
+  return (
+    <div
+      className={`showcase-door${seen ? " is-seen" : ""}`}
+      ref={rootRef}
+    >
+      <div className="showcase-stage">
+        {PANELS.map((panel, i) => {
+          const slot = slotFor(i, active);
+          const isFront = slot === "front";
+          return (
+            <article
+              key={panel.id}
+              className={`showcase-card showcase-${panel.id} is-${slot}${
+                isFront ? " is-active" : ""
+              }`}
+              aria-label={isFront ? undefined : `Show ${panel.label}`}
+              role={isFront ? undefined : "button"}
+              tabIndex={isFront ? undefined : 0}
+              onClick={() => {
+                if (!isFront) takeOver(i);
+              }}
+              onKeyDown={(event) => {
+                if (isFront) return;
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  takeOver(i);
+                }
+              }}
+            >
+              <p className="showcase-card-kicker">{panel.step}</p>
+              <h3 className="showcase-card-label">{panel.label}</h3>
+              <p className="showcase-card-text">{panel.text}</p>
+              <div className="showcase-card-mock">
+                {isFront ? (
+                  <MockFor key={`${panel.id}-${active}`} id={panel.id} />
+                ) : (
+                  <MockFor id={panel.id} />
+                )}
               </div>
-            </div>
-          </div>
-        );
-      })}
+            </article>
+          );
+        })}
+      </div>
+
+      <div className="showcase-nav">
+        <button
+          type="button"
+          className="showcase-arrow"
+          aria-label="Previous step"
+          onClick={() => stepBy(-1)}
+        >
+          ←
+        </button>
+        <p className="showcase-nav-status" aria-live="polite">
+          {current.step} · {current.label}
+        </p>
+        <button
+          type="button"
+          className="showcase-arrow"
+          aria-label="Next step"
+          onClick={() => stepBy(1)}
+        >
+          →
+        </button>
+      </div>
     </div>
   );
 }

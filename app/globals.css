@@ -76,15 +76,15 @@ body {
 }
 
 html {
-  --font-sans: var(--font-display);
-  font-synthesis: none;
+  --font-display: var(--font-sans);
 }
 
 body {
   position: relative;
   color: var(--text);
   background-color: var(--bg);
-  font-family: var(--font-display), "Iowan Old Style", Georgia, serif;
+  font-family: var(--font-sans), Inter, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
   font-size: 15px;
   font-weight: 400;
   line-height: 1.6;
@@ -11216,9 +11216,9 @@ html {
    ========================================================================= */
 
 .wordmark {
-  font-family: var(--font-display), Georgia, serif !important;
-  font-size: 18px !important;
-  font-weight: 400 !important;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
   letter-spacing: -0.03em !important;
 }
 
@@ -11243,9 +11243,9 @@ html {
   filter: none !important;
   height: 34px;
   padding: 0 14px;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 14px;
-  font-weight: 400;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
   letter-spacing: -0.01em;
   transition: background 180ms ease, transform 140ms ease;
 }
@@ -11260,9 +11260,6 @@ html {
 
 .landing.lp {
   --bg: #1a1d20;
-  --lp-head: var(--font-display);
-  --lp-copy: var(--font-display);
-  --lp-meta: var(--font-display);
   padding: 0;
   background: #1a1d20;
   min-height: 100vh;
@@ -11326,10 +11323,10 @@ html {
 .lp-kicker,
 .lp-eyebrow {
   margin: 0 0 16px;
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
   font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-3);
 }
@@ -11340,11 +11337,11 @@ html {
 
 .lp-h1 {
   margin: 0;
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
   font-size: clamp(3rem, 7vw, 5.15rem);
-  font-weight: 400;
-  letter-spacing: -0.03em;
-  line-height: 1.06;
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 1.02;
   color: var(--text);
   text-wrap: balance;
   max-width: 14ch;
@@ -11353,11 +11350,11 @@ html {
 .lp-h2 {
   margin: 0 0 36px;
   max-width: 22ch;
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
   font-size: clamp(1.7rem, 3.2vw, 2.35rem);
-  font-weight: 400;
-  letter-spacing: -0.025em;
-  line-height: 1.18;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
   color: var(--text);
   text-wrap: balance;
 }
@@ -11365,7 +11362,6 @@ html {
 .lp-lead {
   margin: 20px 0 0;
   max-width: 34rem;
-  font-family: var(--font-display), Georgia, serif;
   font-size: 17px;
   line-height: 1.6;
   color: var(--text-2);
@@ -11373,7 +11369,6 @@ html {
 
 .lp-body {
   margin: 0;
-  font-family: var(--font-display), Georgia, serif;
   font-size: 15px;
   line-height: 1.6;
   color: var(--text-2);
@@ -11395,9 +11390,9 @@ html {
   height: 44px;
   padding: 0 18px;
   border-radius: 999px !important;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 15px;
-  font-weight: 400;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
   letter-spacing: -0.01em;
   box-shadow: none !important;
   filter: none !important;
@@ -11529,10 +11524,9 @@ html {
 
 .lp-flow-title {
   margin: 0 0 10px;
-  font-family: var(--font-display), Georgia, serif;
   font-size: clamp(1.35rem, 2.2vw, 1.75rem);
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.04em;
   color: var(--text);
 }
 
@@ -11555,7 +11549,6 @@ html {
 .lp-flow-text {
   margin: 0;
   max-width: 22ch;
-  font-family: var(--font-display), Georgia, serif;
   font-size: 14.5px;
   line-height: 1.55;
   color: var(--text-2);
@@ -11720,8 +11713,8 @@ html {
   max-width: 22ch;
   margin-bottom: 0;
   font-size: clamp(2.5rem, 5.4vw, 4.15rem);
-  line-height: 1.08;
-  letter-spacing: -0.03em;
+  line-height: 1.05;
+  letter-spacing: -0.05em;
 }
 
 .lp-light .lp-cases {
@@ -12057,19 +12050,18 @@ html {
 
 .lp-feature-kicker {
   margin: 0 0 10px;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 12px;
-  letter-spacing: 0.12em;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent);
 }
 
 .lp-feature-title {
   margin: 0 0 12px;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(1.25rem, 2vw, 1.55rem);
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
   line-height: 1.3;
   color: var(--text);
   transition: color 180ms ease;
@@ -12101,10 +12093,9 @@ html {
 
 .lp-case-who {
   margin: 0 0 12px;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(1.25rem, 2vw, 1.55rem);
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
   color: var(--text);
 }
 
@@ -12128,20 +12119,19 @@ html {
 .lp-step-n {
   display: block;
   margin-bottom: 14px;
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
   font-size: clamp(1.8rem, 3vw, 2.4rem);
-  font-weight: 400;
-  letter-spacing: -0.04em;
+  font-weight: 600;
+  letter-spacing: -0.06em;
   line-height: 1;
   color: rgba(247, 248, 250, 0.22);
 }
 
 .lp-step-title {
   margin: 0 0 8px;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
   color: #f7f8fa;
 }
 
@@ -12160,9 +12150,9 @@ html {
 
 .lp-honest-label {
   margin: 0 0 16px;
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
   font-size: 13px;
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-3);
@@ -12179,7 +12169,6 @@ html {
 .lp-honest-col li {
   padding-left: 14px;
   position: relative;
-  font-family: var(--font-display), Georgia, serif;
   font-size: 15px;
   line-height: 1.5;
   color: var(--text-2);
@@ -12237,6 +12226,202 @@ html {
 
 .landing.lp .showcase {
   margin-top: 8px;
+}
+
+.showcase-door {
+  width: 100%;
+  max-width: 920px;
+  margin-top: 8px;
+}
+
+.showcase-stage {
+  position: relative;
+  height: 560px;
+  perspective: 1600px;
+  transform-style: preserve-3d;
+}
+
+.showcase-card {
+  position: absolute;
+  top: 0;
+  left: 14%;
+  right: 14%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 22px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #22262b;
+  border-radius: 14px;
+  transform-style: preserve-3d;
+  transition: transform 720ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 480ms ease, filter 480ms ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.showcase-card.is-front {
+  transform: translate3d(0, 0, 72px) scale(1);
+  opacity: 1;
+  z-index: 3;
+  filter: none;
+  cursor: default;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.showcase-card.is-left {
+  transform: translate3d(-42%, 18px, -240px) scale(0.78) rotateY(32deg);
+  opacity: 0.38;
+  z-index: 1;
+  filter: brightness(0.55);
+}
+
+.showcase-card.is-right {
+  transform: translate3d(42%, 18px, -240px) scale(0.78) rotateY(-32deg);
+  opacity: 0.38;
+  z-index: 1;
+  filter: brightness(0.55);
+}
+
+.showcase-card.is-left .mock-cursor,
+.showcase-card.is-right .mock-cursor,
+.showcase-card.is-left .showcase-card-text,
+.showcase-card.is-right .showcase-card-text {
+  visibility: hidden;
+}
+
+.showcase-card.is-left .mock,
+.showcase-card.is-right .mock {
+  pointer-events: none;
+}
+
+.showcase-card-kicker {
+  margin: 0 0 8px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.showcase-card.is-front .showcase-card-kicker {
+  color: var(--accent);
+}
+
+.showcase-card-label {
+  margin: 0;
+  font-family: var(--font-sans), Inter, sans-serif;
+  font-size: clamp(1.6rem, 2.4vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--text);
+}
+
+.showcase-card-text {
+  margin: 10px 0 16px;
+  max-width: 42ch;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.showcase-card-mock {
+  flex: 1;
+  min-height: 0;
+}
+
+.showcase-card-mock .mock {
+  height: 100%;
+}
+
+.showcase-door .is-active .mock-cursor {
+  opacity: 1;
+}
+
+.showcase-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.showcase-arrow {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 160ms, border-color 160ms, transform 70ms;
+}
+
+.showcase-arrow:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.showcase-arrow:active {
+  transform: scale(0.96);
+}
+
+.showcase-nav-status {
+  margin: 0;
+  min-width: 8.5rem;
+  text-align: center;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+@media (max-width: 980px) {
+  .showcase-stage {
+    height: 520px;
+  }
+
+  .showcase-card {
+    left: 8%;
+    right: 8%;
+  }
+
+  .showcase-card.is-left {
+    transform: translate3d(-28%, 14px, -180px) scale(0.82) rotateY(24deg);
+  }
+
+  .showcase-card.is-right {
+    transform: translate3d(28%, 14px, -180px) scale(0.82) rotateY(-24deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .showcase-stage {
+    height: 480px;
+    perspective: none;
+  }
+
+  .showcase-card.is-left,
+  .showcase-card.is-right {
+    transform: translate3d(0, 12px, 0) scale(0.92);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .showcase-card.is-front {
+    transform: none;
+    left: 0;
+    right: 0;
+  }
+
+  .showcase-card {
+    left: 0;
+    right: 0;
+  }
 }
 
 @media (max-width: 980px) {
@@ -12334,9 +12519,27 @@ html {
   .lp-art-grant .lp-art-line i,
   .lp-art-chain span,
   .lp-art-redact::after,
-  .lp-art-ok span {
+  .lp-art-ok span,
+  .showcase-card {
     animation: none !important;
     transition: none;
+  }
+
+  .showcase-card.is-left,
+  .showcase-card.is-right {
+    display: none;
+  }
+
+  .showcase-card.is-front {
+    transform: none;
+    position: relative;
+    left: 0;
+    right: 0;
+  }
+
+  .showcase-stage {
+    height: auto;
+    perspective: none;
   }
 }
 
@@ -12565,17 +12768,15 @@ html {
 
 .ip-facts h2 {
   margin: 0 0 12px;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(1.25rem, 2vw, 1.6rem);
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
   color: var(--text);
 }
 
 .ip-facts p {
   margin: 0;
   max-width: 36ch;
-  font-family: var(--font-display), Georgia, serif;
   font-size: 15px;
   line-height: 1.55;
   color: var(--text-2);
@@ -12605,7 +12806,6 @@ html {
 }
 
 .ip-quiet-list li {
-  font-family: var(--font-display), Georgia, serif;
   font-size: 15px;
   line-height: 1.55;
   color: var(--text-2);
@@ -12614,8 +12814,7 @@ html {
 .ip-quiet-list strong {
   display: block;
   margin-bottom: 2px;
-  font-family: var(--font-display), Georgia, serif;
-  font-weight: 400;
+  font-weight: 600;
   color: var(--text);
 }
 
@@ -12749,9 +12948,9 @@ html {
 }
 
 .ip .uses-detail-title {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
   font-size: clamp(1.45rem, 2.2vw, 1.85rem);
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: -0.03em;
   color: #f7f8fa;
 }
@@ -13184,9 +13383,8 @@ html {
 
 .ip-contrast-label {
   margin: 0 0 16px;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 12px;
-  font-weight: 400;
+  font-size: 10.5px;
+  font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-3);
@@ -13270,9 +13468,8 @@ html {
 }
 
 .ip-contrast-row em {
-  font-family: var(--font-display), Georgia, serif;
   font-style: normal;
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.08em;
   color: var(--accent);
   animation: ip-seal 4.2s ease-in-out infinite;
