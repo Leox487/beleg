@@ -11251,13 +11251,16 @@ html {
 }
 
 .landing.lp {
+  --bg: #000;
   padding: 0;
-  background: var(--bg);
+  background: #000;
+  min-height: 100vh;
 }
 
 .landing.lp .site-footer {
   margin-top: 0;
-  border-top: 1px solid var(--border);
+  background: #000;
+  border-top: 1px solid #1a1a1a;
 }
 
 .lp-shell {
@@ -11587,12 +11590,54 @@ html {
 
 .lp-section {
   padding: 88px 0;
+  background: #000;
 }
 
 .lp-band {
-  background: var(--bg-raised);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  background: #000;
+  border: 0;
+}
+
+.lp-light {
+  background: #f3f1eb;
+  color: #141414;
+  padding: 104px 0;
+}
+
+.lp-light .lp-eyebrow {
+  color: #6b6458;
+}
+
+.lp-light .lp-h2,
+.lp-light .lp-case-who,
+.lp-light .lp-step-title,
+.lp-light .lp-honest-label {
+  color: #141414;
+}
+
+.lp-light .lp-body,
+.lp-light .lp-honest-col li {
+  color: #4a453c;
+}
+
+.lp-light .lp-outlink a {
+  color: #4a453c;
+}
+
+.lp-light .lp-outlink a:hover {
+  color: #141414;
+}
+
+.lp-light .lp-step-n {
+  color: rgba(20, 20, 20, 0.18);
+}
+
+.lp-light .lp-honest-col li::before {
+  background: #c9c3b5;
+}
+
+.lp-light .lp-honest-col:first-child li::before {
+  background: #1a9e76;
 }
 
 .lp-outlink {
@@ -11770,8 +11815,8 @@ html {
   position: relative;
   overflow: hidden;
   text-align: left;
-  border-top: 1px solid var(--border);
-  background: var(--bg);
+  border-top: 1px solid #1a1a1a;
+  background: #000;
 }
 
 .lp-cta::before {

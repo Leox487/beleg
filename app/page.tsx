@@ -127,7 +127,7 @@ export default async function Home() {
         </ol>
       </section>
 
-      <section className="lp-section lp-band">
+      <section className="lp-section">
         <div className="lp-shell">
           <p className="lp-eyebrow">From the day it happened</p>
           <h2 className="lp-h2">
@@ -200,7 +200,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="lp-section lp-band">
+      <section className="lp-section lp-light">
         <div className="lp-shell">
           <p className="lp-eyebrow">Who it is for</p>
           <h2 className="lp-h2">
@@ -241,7 +241,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="lp-section">
+      <section className="lp-section lp-light">
         <div className="lp-shell">
           <p className="lp-eyebrow">Limits</p>
           <h2 className="lp-h2">What the chain proves, and what it does not.</h2>
