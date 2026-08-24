@@ -11,26 +11,22 @@ import {
 } from "@/app/components/HomeStages";
 import { Showcase } from "@/app/components/Showcase";
 
-const PRIMITIVES = [
+const FLOW = [
   {
     title: "Record",
     text: "Each milestone is hashed and linked to the one before it. There is no edit button.",
-    visual: "record" as const,
   },
   {
     title: "Witness",
     text: "Someone who was there confirms in one click. They do not need a Beleg account.",
-    visual: "witness" as const,
   },
   {
     title: "Verify",
     text: "The public page recomputes every seal in the reviewer’s browser. We do not issue the badge.",
-    visual: "verify" as const,
   },
   {
     title: "Timestamp",
-    text: "Pending proofs are anchored with OpenTimestamps, so the chain is dated on Bitcoin.",
-    visual: "stamp" as const,
+    text: "Pending proofs are dated on Bitcoin with OpenTimestamps.",
   },
 ];
 
@@ -71,40 +67,6 @@ const REVIEW_STEPS = [
     text: "Dates and amounts should line up. Beleg does not grade the project. It shows the trail.",
   },
 ];
-
-function PrimitiveVisual({ kind }: { kind: (typeof PRIMITIVES)[number]["visual"] }) {
-  if (kind === "record") {
-    return (
-      <div className="lp-prim-viz lp-prim-viz-record" aria-hidden="true">
-        <span>#06  Grant received</span>
-        <span>#07  Confirmed by Maya</span>
-        <span>#08  Pilot launched</span>
-      </div>
-    );
-  }
-  if (kind === "witness") {
-    return (
-      <div className="lp-prim-viz lp-prim-viz-witness" aria-hidden="true">
-        <span className="lp-prim-check">✓</span>
-        <span>Maya Chen · Civic Innovation Fund</span>
-      </div>
-    );
-  }
-  if (kind === "verify") {
-    return (
-      <div className="lp-prim-viz lp-prim-viz-verify" aria-hidden="true">
-        <span className="lp-prim-ok">Chain verified</span>
-        <span>8 entries intact</span>
-      </div>
-    );
-  }
-  return (
-    <div className="lp-prim-viz lp-prim-viz-stamp" aria-hidden="true">
-      <span>OpenTimestamps</span>
-      <span>Bitcoin block #883,214</span>
-    </div>
-  );
-}
 
 function LandingActions({
   href,
@@ -154,15 +116,15 @@ export default async function Home() {
           </div>
         </div>
 
-        <ul className="lp-shell lp-primitives">
-          {PRIMITIVES.map((item) => (
-            <li key={item.title} className="lp-prim">
-              <h2 className="lp-prim-title">{item.title}</h2>
-              <p className="lp-prim-text">{item.text}</p>
-              <PrimitiveVisual kind={item.visual} />
+        <ol className="lp-shell lp-flow">
+          {FLOW.map((item) => (
+            <li key={item.title} className="lp-flow-item">
+              <span className="lp-flow-node" aria-hidden="true" />
+              <h2 className="lp-flow-title">{item.title}</h2>
+              <p className="lp-flow-text">{item.text}</p>
             </li>
           ))}
-        </ul>
+        </ol>
       </section>
 
       <section className="lp-section lp-band">
