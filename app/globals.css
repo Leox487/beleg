@@ -11261,14 +11261,38 @@ html {
   --lp-head: var(--font-sans);
   --lp-copy: var(--font-sans);
   --lp-meta: var(--font-mono);
+  position: relative;
+  isolation: isolate;
   padding: 0;
-  background: #1a1d20;
   min-height: 100vh;
+  background-color: #1a1d20;
+  background-image:
+    radial-gradient(
+      ellipse 85% 52% at 96% -6%,
+      rgba(45, 212, 160, 0.3) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 58% 42% at -8% 18%,
+      rgba(79, 124, 255, 0.18) 0%,
+      transparent 56%
+    ),
+    radial-gradient(
+      ellipse 48% 32% at 52% 46%,
+      rgba(45, 212, 160, 0.08) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 42% 30% at 90% 88%,
+      rgba(224, 168, 62, 0.12) 0%,
+      transparent 64%
+    ),
+    linear-gradient(180deg, #1c2421 0%, #1a1d20 34%, #171b22 68%, #1a1d20 100%);
 }
 
 .landing.lp .site-footer {
   margin-top: 0;
-  background: #1a1d20;
+  background: transparent;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -11287,18 +11311,23 @@ html {
 
 .lp-hero-wash {
   position: absolute;
-  inset: -20% -10% 20%;
+  inset: -28% -18% 8%;
   pointer-events: none;
   z-index: 0;
   background:
     radial-gradient(
-      ellipse 50% 55% at 78% 28%,
-      rgba(45, 212, 160, 0.16) 0%,
-      transparent 62%
+      ellipse 58% 62% at 82% 18%,
+      rgba(45, 212, 160, 0.32) 0%,
+      transparent 58%
     ),
     radial-gradient(
-      ellipse 40% 40% at 12% 80%,
-      rgba(122, 162, 255, 0.08) 0%,
+      ellipse 46% 48% at 8% 88%,
+      rgba(79, 124, 255, 0.16) 0%,
+      transparent 64%
+    ),
+    radial-gradient(
+      ellipse 30% 28% at 48% 42%,
+      rgba(224, 168, 62, 0.1) 0%,
       transparent 70%
     );
 }
@@ -11604,7 +11633,7 @@ html {
 
 .lp-section {
   padding: 88px 0;
-  background: #1a1d20;
+  background: transparent;
 }
 
 .lp-band {
@@ -12202,7 +12231,7 @@ html {
   overflow: hidden;
   text-align: left;
   border-top: 0;
-  background: #1a1d20;
+  background: transparent;
 }
 
 .lp-cta::before {
@@ -12210,10 +12239,10 @@ html {
   position: absolute;
   top: 50%;
   left: 8%;
-  width: 420px;
-  height: 420px;
+  width: 520px;
+  height: 520px;
   transform: translateY(-50%);
-  background: rgba(45, 212, 160, 0.1);
+  background: rgba(45, 212, 160, 0.18);
   filter: blur(80px);
   pointer-events: none;
 }

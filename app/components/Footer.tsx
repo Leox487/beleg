@@ -10,6 +10,7 @@ const COLUMNS = [
       { href: "/uses", label: "Who it's for" },
       { href: "/for-reviewers", label: "For reviewers" },
       { href: "/verify", label: "Verify a ledger" },
+      { href: "/verify-guide", label: "Verify it yourself" },
       { href: "/changelog", label: "Changelog" },
     ],
   },

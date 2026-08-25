@@ -130,7 +130,65 @@ const ABOUT = [
   },
 ];
 
-type Mega = "uses" | "how" | "about" | null;
+const TOOLS = [
+  {
+    heading: "Verification tool",
+    links: [
+      {
+        href: "/verify",
+        label: "Verify a ledger",
+        text: "Paste a public proof URL. The seals recompute in this browser.",
+      },
+      {
+        href: "/verify-guide",
+        label: "Verify it yourself",
+        text: "SHA-256 and OpenTimestamps, with no Beleg page in the loop.",
+      },
+    ],
+  },
+  {
+    heading: "On the chain",
+    links: [
+      {
+        href: "/how-it-works#try",
+        label: "Break a chain",
+        text: "Edit one character. Watch every seal after it fail.",
+      },
+      {
+        href: "/for-reviewers",
+        label: "For reviewers",
+        text: "What to ask for, and how to read a public page.",
+      },
+    ],
+  },
+  {
+    heading: "The rest",
+    links: [
+      {
+        href: "/changelog",
+        label: "Changelog",
+        text: "What shipped, and what broke.",
+      },
+      {
+        href: "/glossary",
+        label: "Glossary",
+        text: "Hash, seal, chain, genesis, anchor.",
+      },
+      {
+        href: "/faq",
+        label: "FAQ",
+        text: "Edit, shutdown, blockchain, cost.",
+      },
+      {
+        href: "/security",
+        label: "Security",
+        text: "What the chain defends, and what it does not.",
+      },
+    ],
+  },
+];
+
+type Mega = "uses" | "how" | "tools" | "about" | null;
 
 export function NavBarClient({
   signedIn,
@@ -201,6 +259,22 @@ export function NavBarClient({
               aria-haspopup="true"
             >
               How it works
+            </Link>
+          </div>
+
+          <div
+            className="nav-item"
+            onPointerEnter={() => open("tools")}
+            onPointerLeave={scheduleClose}
+            onFocusCapture={() => open("tools")}
+          >
+            <Link
+              href="/verify"
+              className={`navbar-link navbar-link-info nav-link${mega === "tools" ? " is-open" : ""}`}
+              aria-expanded={mega === "tools"}
+              aria-haspopup="true"
+            >
+              Tools
             </Link>
           </div>
 
@@ -281,6 +355,26 @@ export function NavBarClient({
         {mega === "how" ? (
           <div className="nav-mega-inner nav-mega-how">
             {HOW_IT_WORKS.map((col) => (
+              <div key={col.heading} className="nav-mega-col">
+                <p className="nav-mega-cat">{col.heading}</p>
+                <ul>
+                  {col.links.map((link) => (
+                    <li key={link.label}>
+                      <Link href={link.href} onClick={() => setMega(null)}>
+                        <strong>{link.label}</strong>
+                        <span>{link.text}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {mega === "tools" ? (
+          <div className="nav-mega-inner nav-mega-how">
+            {TOOLS.map((col) => (
               <div key={col.heading} className="nav-mega-col">
                 <p className="nav-mega-cat">{col.heading}</p>
                 <ul>
