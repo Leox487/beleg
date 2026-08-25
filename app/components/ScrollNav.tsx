@@ -29,6 +29,6 @@ export function ScrollNav({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div className={scrolled ? "nav-scrolled" : undefined}>{children}</div>
+    <div className={`nav-wrap${scrolled ? " nav-scrolled" : ""}`}>{children}</div>
   );
 }

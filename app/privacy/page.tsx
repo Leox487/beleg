@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { Footer } from "@/app/components/Footer";
+import { LegalDeck, type LegalSection } from "@/app/components/LegalDeck";
 
 export const metadata: Metadata = {
   title: "Privacy Policy · Beleg",
@@ -8,130 +9,147 @@ export const metadata: Metadata = {
     "What data Beleg collects, why, and how it is handled, in plain English.",
 };
 
+const SECTIONS: LegalSection[] = [
+  {
+    heading: "What we collect",
+    cards: [
+      {
+        id: "account",
+        icon: "user",
+        title: "Account",
+        body: "Email and name, through Clerk, when you sign up.",
+        more: "That is the identity we attach to your ledgers. We do not ask for a phone number, a government ID, or a billing address.",
+      },
+      {
+        id: "venture",
+        icon: "file",
+        title: "Venture data",
+        body: "Names, titles, bodies, dates, and the seals you create.",
+        more: "This is the product: an append-only chain of what you recorded. We store the words you typed and the hashes computed from them.",
+      },
+      {
+        id: "attest",
+        icon: "stamp",
+        title: "Witness data",
+        body: "Name, email, statement, and the time they confirmed.",
+        more: "Witnesses do not create accounts. We keep only what they typed on the confirmation link. Pending requests never appear on the public page.",
+      },
+      {
+        id: "anchor",
+        icon: "hash",
+        title: "Anchoring",
+        body: "A hash of the chain, sent to OpenTimestamps. Not the entries.",
+        more: "The fingerprint cannot be reversed into your text. Bitcoin calendars see a digest, not a grant title.",
+      },
+      {
+        id: "usage",
+        icon: "log",
+        title: "Usage logs",
+        body: "Page visits and errors, kept for debugging.",
+        more: "No analytics trackers, advertising pixels, or third-party tracking scripts.",
+      },
+      {
+        id: "not",
+        icon: "ban",
+        title: "What we do not take",
+        body: "Payments, IDs, phone numbers, location, or your inbox.",
+        more: "Email ingestion, if it ships, gets its own policy before launch. We do not collect payment information.",
+      },
+    ],
+  },
+  {
+    heading: "How it is handled",
+    cards: [
+      {
+        id: "store",
+        icon: "server",
+        title: "Where it lives",
+        body: "Postgres in the US. Auth with Clerk. Hosting on Vercel.",
+        more: "Data sits in a US-region database (us-west-1). Clerk handles sign-in. Both vendors publish their own security practices.",
+      },
+      {
+        id: "public",
+        icon: "globe",
+        title: "Public proof pages",
+        body: "Anyone with the URL can read what you chose to record.",
+        more: "Name, tagline, titles, bodies, dates, seals, and confirmed witnesses. You pick the words and when to share the link. We do not index the page for you.",
+      },
+      {
+        id: "keep",
+        icon: "archive",
+        title: "Retention",
+        body: "Entries cannot be edited. A whole ledger can be deleted.",
+        more: "Append-only is the product, not a bug. To erase a venture and the account, email beleg.app@proton.me. We delete within 30 days.",
+        href: {
+          label: "Email beleg.app@proton.me",
+          url: "mailto:beleg.app@proton.me",
+        },
+      },
+      {
+        id: "rights",
+        icon: "scale",
+        title: "Your rights",
+        body: "Access, correction, or deletion on request. 30 days.",
+        more: "EU residents also have portability and the right to complain to a supervisory authority. Write beleg.app@proton.me.",
+      },
+    ],
+  },
+  {
+    heading: "Vendors and other rules",
+    cards: [
+      {
+        id: "vendors",
+        icon: "share",
+        title: "Third parties",
+        body: "Clerk, the database host, Vercel, OpenTimestamps. Nobody else.",
+        more: "We do not sell or rent the chain. OpenTimestamps receives a hash. Clerk receives the account. Vercel serves the app.",
+      },
+      {
+        id: "cookies",
+        icon: "cookie",
+        title: "Cookies",
+        body: "Session cookies for sign-in. Nothing for ads.",
+        more: "Clerk sets what it needs to keep you logged in. No advertising, tracking, or analytics cookies.",
+      },
+      {
+        id: "kids",
+        icon: "child",
+        title: "Children",
+        body: "Not for anyone under 13. Do not create an account.",
+        more: "If we learn an account belongs to a child under 13, we delete it.",
+      },
+      {
+        id: "changes",
+        icon: "clock",
+        title: "Changes",
+        body: "Updates land on this page with a new date.",
+        more: "We do not bury material changes in the footer. The date at the top is the record.",
+      },
+      {
+        id: "contact",
+        icon: "mail",
+        title: "Contact",
+        body: "beleg.app@proton.me",
+        more: "That address reaches a person in Philadelphia. Use it for deletion, access, or a privacy question.",
+        href: {
+          label: "Write beleg.app@proton.me",
+          url: "mailto:beleg.app@proton.me",
+        },
+      },
+    ],
+  },
+];
+
 export default function PrivacyPage() {
   return (
-    <main className="page">
-      <div className="page-inner doc">
-        <header className="doc-header">
-          <h1 className="h1 doc-title">Privacy Policy</h1>
-          <p className="small">Last updated: August 18, 2026</p>
-        </header>
-
-        <div className="card doc-body">
-          <p>
-            This policy explains what data Beleg collects, why, and how
-            it&apos;s handled.
-          </p>
-
-          <h2>What we collect</h2>
-          <p>
-            <strong>Account information:</strong> your email address and name,
-            collected through Clerk (our authentication provider) when you sign
-            up.
-          </p>
-          <p>
-            <strong>Venture data:</strong> the venture names, entry titles,
-            entry bodies, dates, and hash values you create. This is the core of
-            what Beleg does: recording your milestones in a sealed, append-only
-            chain.
-          </p>
-          <p>
-            <strong>Attestation data:</strong> when you request an attestation,
-            we store the attester&apos;s name and email, their confirmation
-            statement, and the confirmation timestamp. Attesters do not create
-            accounts. Their data is limited to what they provide through the
-            attestation link.
-          </p>
-          <p>
-            <strong>Anchoring data:</strong> when you anchor your ledger, we
-            submit a cryptographic hash (not your content) to public Bitcoin
-            timestamp servers via OpenTimestamps. The hash is a fingerprint. It
-            cannot be reversed to reveal your entries.
-          </p>
-          <p>
-            <strong>Usage data:</strong> basic server logs (page visits, errors)
-            retained for debugging. We do not use analytics trackers,
-            advertising pixels, or any third-party tracking scripts.
-          </p>
-          <p>
-            <strong>What we do NOT collect:</strong> payment information,
-            government IDs, phone numbers, location data, or the contents of
-            your emails (the email ingestion feature, when built, will be
-            covered by an updated policy before launch).
-          </p>
-
-          <h2>How data is stored</h2>
-          <p>
-            All data is stored in Supabase (PostgreSQL) hosted in the United
-            States (us-west-1). Authentication is handled by Clerk. Both
-            services maintain their own security practices and compliance
-            certifications.
-          </p>
-
-          <h2>Public proof pages</h2>
-          <p>
-            When you create a venture on Beleg, it generates a public proof page
-            at a URL you control. Anyone with that URL can view your venture
-            name, tagline, entry titles, entry bodies, dates, hash values, and
-            confirmed attestations. Pending attestations are never shown
-            publicly. You choose what to record and when to share the link.
-            Beleg does not publish or index your proof page without your action.
-          </p>
-
-          <h2>Data retention and deletion</h2>
-          <p>
-            Entries are append-only by design. This is a core product feature,
-            not a limitation. You cannot edit or delete individual entries
-            because the integrity of the chain depends on every entry remaining
-            as recorded. If you want your entire venture and all its data
-            permanently deleted, email{" "}
-            <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a> (or the
-            contact below) and we will delete your venture, all entries, all
-            attestations, and your account within 30 days.
-          </p>
-
-          <h2>Your rights</h2>
-          <p>
-            You may request access to, correction of, or deletion of your
-            personal data at any time by emailing{" "}
-            <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a>. We
-            will respond within 30 days. For EU residents, you have additional
-            rights under GDPR including the right to data portability and the
-            right to lodge a complaint with your supervisory authority.
-          </p>
-
-          <h2>Third-party services</h2>
-          <p>
-            Clerk (authentication), Supabase (database), Vercel (hosting),
-            OpenTimestamps (Bitcoin anchoring). We do not sell, share, or
-            provide your data to any other third party.
-          </p>
-
-          <h2>Children</h2>
-          <p>
-            Beleg is not directed at children under 13. If you are under 13, do
-            not create an account.
-          </p>
-
-          <h2>Changes</h2>
-          <p>
-            If this policy changes, the updated version will be posted here with
-            a new &quot;Last updated&quot; date.
-          </p>
-
-          <h2>Cookies</h2>
-          <p>
-            We use session cookies through Clerk for authentication. We do not
-            use advertising, tracking, or analytics cookies.
-          </p>
-
-          <h2>Contact</h2>
-          <p>
-            <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a>
-          </p>
-        </div>
-      </div>
-
+    <main className="landing lp ip">
+      <LegalDeck
+        kicker="Privacy"
+        title="What we hold, and what we never take."
+        lead="Click a card. The short version is on the face. The rest opens underneath. Nothing here is sold, and nothing is tracked for ads."
+        updated="Last updated August 18, 2026"
+        sections={SECTIONS}
+      />
       <Footer />
     </main>
   );

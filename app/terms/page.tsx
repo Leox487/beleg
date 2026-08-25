@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { Footer } from "@/app/components/Footer";
+import { LegalDeck, type LegalSection } from "@/app/components/LegalDeck";
 
 export const metadata: Metadata = {
   title: "Terms of Service · Beleg",
@@ -8,111 +9,122 @@ export const metadata: Metadata = {
     "The terms you agree to when using Beleg, including what the ledger does and does not prove.",
 };
 
+const SECTIONS: LegalSection[] = [
+  {
+    heading: "Using Beleg",
+    cards: [
+      {
+        id: "age",
+        icon: "age",
+        title: "Age",
+        body: "13 or older. Under 18 needs a parent or guardian.",
+        more: "If you are under 13, do not create an account. If you are 13 to 17, you are saying a parent or guardian said yes.",
+      },
+      {
+        id: "what",
+        icon: "tool",
+        title: "What this is",
+        body: "An append-only ledger of milestones. Not a notary. Not a bank.",
+        more: "Beleg is not a legal document system, a notary, a financial product, or a stand-in for a lawyer, accountant, or auditor.",
+      },
+      {
+        id: "duty",
+        icon: "duty",
+        title: "Your responsibilities",
+        body: "Record what happened. Do not fake a witness or someone else's identity.",
+        more: "Do not use Beleg for fraud, threats, illegal content, or other people's personal data without their consent. You own the accuracy of what you type.",
+      },
+    ],
+  },
+  {
+    heading: "What a sealed line is worth",
+    cards: [
+      {
+        id: "proves",
+        icon: "truth",
+        title: "What it proves",
+        body: "The words were recorded then, and have not been rewritten.",
+        more: "A sealed entry saying you signed a $50K contract proves you wrote that sentence on that date. It does not prove the contract exists.",
+      },
+      {
+        id: "not",
+        icon: "alert",
+        title: "What it does not prove",
+        body: "Truth, quality, or that a missing witness means it never happened.",
+        more: "A named person confirmed a statement. That is not the same as the statement being true. Bitcoin dating proves the chain existed, not that the contents are accurate. Do not call this a certified document or an audit.",
+      },
+      {
+        id: "attest",
+        icon: "stamp",
+        title: "Witnesses",
+        body: "You are asking a real person to put their name on a public record.",
+        more: "Do not invent attesters. Do not request a confirmation from someone who did not agree. Confirmations cannot be pulled back. They should only confirm what they know.",
+      },
+      {
+        id: "append",
+        icon: "chain",
+        title: "Append-only",
+        body: "No edit. No delete of a single line. Think before you seal.",
+        more: "If you need the whole account gone, email us. We delete within 30 days. A correction is a new entry. The original stays.",
+      },
+    ],
+  },
+  {
+    heading: "The service",
+    cards: [
+      {
+        id: "beta",
+        icon: "cloud",
+        title: "Availability",
+        body: "Beta. Bugs, downtime, and breaking changes are possible.",
+        more: "No uptime promise, no SLA, no warranty. Use it knowing that.",
+      },
+      {
+        id: "liability",
+        icon: "shield",
+        title: "Liability",
+        body: "Provided as-is. We are not on the hook for decisions you make from it.",
+        more: "That includes disputes over a witness statement, lost data, and interruptions. Do not treat a Beleg page as legal proof.",
+      },
+      {
+        id: "stop",
+        icon: "ban",
+        title: "Termination",
+        body: "We can close accounts used for fraud. You can leave any time.",
+        more: "Ask for a full delete and we will do it within 30 days.",
+      },
+      {
+        id: "changes",
+        icon: "clock",
+        title: "Changes",
+        body: "We may update these terms. Using the app after that is acceptance.",
+        more: "The date at the top of this page is the live version.",
+      },
+      {
+        id: "contact",
+        icon: "mail",
+        title: "Contact",
+        body: "beleg.app@proton.me",
+        more: "That is the address for terms, deletion, and anything else.",
+        href: {
+          label: "Write beleg.app@proton.me",
+          url: "mailto:beleg.app@proton.me",
+        },
+      },
+    ],
+  },
+];
+
 export default function TermsPage() {
   return (
-    <main className="page">
-      <div className="page-inner doc">
-        <header className="doc-header">
-          <h1 className="h1 doc-title">Terms of Service</h1>
-          <p className="small">Last updated: August 18, 2026</p>
-        </header>
-
-        <div className="card doc-body">
-          <p>
-            By using Beleg, you agree to these terms. If you disagree,
-            don&apos;t use the service.
-          </p>
-
-          <h2>Age requirement</h2>
-          <p>
-            You must be at least 13 years old to use Beleg. If you are under
-            18, you represent that you have your parent or guardian&apos;s
-            permission to use the service.
-          </p>
-
-          <h2>What Beleg is</h2>
-          <p>
-            Beleg is a tool that records business milestones in an append-only,
-            cryptographically chained ledger. It is not a legal document system,
-            a notary service, a financial tool, or a replacement for
-            professional advice of any kind.
-          </p>
-
-          <h2>What Beleg proves and does not prove</h2>
-          <p>
-            Beleg proves that entries were recorded at a specific time and have
-            not been altered since. It does not prove that the underlying claims
-            in those entries are true. A sealed entry saying &quot;signed a $50K
-            contract&quot; proves you recorded that sentence on that date, not
-            that the contract exists. Attestations prove that a named person
-            confirmed a statement, not that the statement is factually correct.
-            Bitcoin anchoring proves the chain existed at a specific time, not
-            that the contents are accurate. Do not represent Beleg records as
-            legal proof, certified documents, or audited statements.
-          </p>
-
-          <h2>Your responsibilities</h2>
-          <p>
-            You are responsible for the accuracy of what you record. Do not use
-            Beleg to create fraudulent records, impersonate others, or request
-            attestations under false pretenses. Do not submit entries that
-            contain illegal content, threats, or personally identifiable
-            information about others without their consent.
-          </p>
-
-          <h2>Attestations</h2>
-          <p>
-            When you request an attestation, you are asking a real person to put
-            their name on a public record. Do not request attestations from
-            people who have not agreed to participate. Do not fabricate attester
-            identities. Attesters confirm voluntarily and their confirmations
-            cannot be retracted. They should only confirm what they know to be
-            true.
-          </p>
-
-          <h2>Append-only means append-only</h2>
-          <p>
-            You cannot edit or delete individual entries. This is by design.
-            Think before you record. If you need your entire account and all
-            data deleted, contact us and we will do so within 30 days.
-          </p>
-
-          <h2>Service availability</h2>
-          <p>
-            Beleg is a beta product built independently. It may have
-            bugs, downtime, or breaking changes. There is no uptime guarantee,
-            no SLA, and no warranty of any kind. Use it knowing this.
-          </p>
-
-          <h2>Limitation of liability</h2>
-          <p>
-            Beleg is provided &quot;as is&quot; without warranty. We are not
-            liable for any damages arising from your use of the service,
-            including but not limited to: decisions made based on Beleg records,
-            disputes arising from attestation content, loss of data, or service
-            interruptions.
-          </p>
-
-          <h2>Termination</h2>
-          <p>
-            We may suspend or terminate accounts that violate these terms or use
-            the service for fraud. You may stop using Beleg at any time and
-            request full data deletion.
-          </p>
-
-          <h2>Changes</h2>
-          <p>
-            We may update these terms. Continued use after changes constitutes
-            acceptance.
-          </p>
-
-          <h2>Contact</h2>
-          <p>
-            <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a>
-          </p>
-        </div>
-      </div>
-
+    <main className="landing lp ip">
+      <LegalDeck
+        kicker="Terms"
+        title="The rules for sealing a line, and for reading one."
+        lead="By using Beleg you agree to these terms. If you disagree, do not use the service. Click a card for the rest of the sentence."
+        updated="Last updated August 18, 2026"
+        sections={SECTIONS}
+      />
       <Footer />
     </main>
   );

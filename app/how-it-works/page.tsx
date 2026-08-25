@@ -5,35 +5,13 @@ import { auth } from "@clerk/nextjs/server";
 import ChainLab from "@/app/components/ChainLab";
 import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
+import { HowFacts } from "@/app/components/HowFacts";
 
 export const metadata: Metadata = {
   title: "How Beleg Works · Beleg",
   description:
     "Hash chains, in-browser verification, witness confirmations, and Bitcoin timestamps, in plain English.",
 };
-
-const FACTS = [
-  {
-    id: "record",
-    title: "Record",
-    text: "Each entry is hashed and linked to the one before it. There is no edit button.",
-  },
-  {
-    id: "witness",
-    title: "Witness",
-    text: "Someone who was there confirms in one click. They do not need an account.",
-  },
-  {
-    id: "verify",
-    title: "Verify",
-    text: "The public page recomputes every seal in the reviewer’s browser.",
-  },
-  {
-    id: "timestamp",
-    title: "Timestamp",
-    text: "The newest seal is dated on Bitcoin with OpenTimestamps.",
-  },
-];
 
 export default async function HowItWorksPage() {
   const { userId } = await auth();
@@ -60,14 +38,7 @@ export default async function HowItWorksPage() {
 
       <section className="lp-section ip-section lp-face-lab">
         <div className="lp-shell">
-          <ol className="ip-facts">
-            {FACTS.map((fact) => (
-              <li key={fact.id} className="ip-anchor" id={fact.id}>
-                <h2>{fact.title}</h2>
-                <p>{fact.text}</p>
-              </li>
-            ))}
-          </ol>
+          <HowFacts />
           <p className="lp-body ip-note ip-anchor" id="limits">
             A sealed line proves when you wrote it, and that it has not changed.
             It does not prove the event is true. Witnesses and evidence do that.

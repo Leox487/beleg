@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { Footer } from "@/app/components/Footer";
+import { LegalDeck, type LegalSection } from "@/app/components/LegalDeck";
 
 export const metadata: Metadata = {
   title: "Security · Beleg",
@@ -9,64 +9,109 @@ export const metadata: Metadata = {
     "What Beleg protects, what it stores, where it runs, and the threats it explicitly does not defend against.",
 };
 
+const SECTIONS: LegalSection[] = [
+  {
+    heading: "What the chain actually defends",
+    cards: [
+      {
+        id: "hash",
+        icon: "hash",
+        title: "Silent edits",
+        body: "SHA-256 seals, each linked to the one before it.",
+        more: "Change a past line and every seal after it fails. Anyone can recompute that in their own browser. They do not have to take our word.",
+      },
+      {
+        id: "verify",
+        icon: "globe",
+        title: "A badge from our server",
+        body: "Verify is local math. We do not issue the result.",
+        more: "The public page walks the chain in the reviewer's browser. If Beleg disappeared, the same check would still work from the published JSON.",
+      },
+      {
+        id: "time",
+        icon: "clock",
+        title: "Backdating",
+        body: "Anchored chains are dated on Bitcoin with OpenTimestamps.",
+        more: "That proves the newest seal existed at a calendar time nobody at Beleg controls. It does not prove the story in the entry is true.",
+      },
+      {
+        id: "witness",
+        icon: "stamp",
+        title: "A fake confirmation after the fact",
+        body: "A witness is its own sealed entry, chained in sequence.",
+        more: "You cannot slide a name onto an old line without breaking the seals that follow.",
+      },
+    ],
+  },
+  {
+    heading: "Where it runs",
+    cards: [
+      {
+        id: "store",
+        icon: "db",
+        title: "What we store",
+        body: "Account, ledger text, witness details, and anchor proofs.",
+        more: "Email and name come from Clerk. Full inventory is on the privacy page.",
+        href: { label: "Open the privacy cards", url: "/privacy" },
+      },
+      {
+        id: "where",
+        icon: "server",
+        title: "Vendors",
+        body: "Postgres in the US, Clerk, Vercel, OpenTimestamps calendars.",
+        more: "Row-level rules are on. Reads and writes go through server routes, not a public database key in the browser.",
+      },
+      {
+        id: "report",
+        icon: "bug",
+        title: "Report a problem",
+        body: "beleg.app@proton.me. Beta. Responsible disclosure is welcome.",
+        more: "If you find a way to rewrite a chain, break verify, or read someone else's private ledger, write that address.",
+        href: {
+          label: "Email beleg.app@proton.me",
+          url: "mailto:beleg.app@proton.me",
+        },
+      },
+    ],
+  },
+  {
+    heading: "Outside the threat model",
+    cards: [
+      {
+        id: "lie",
+        icon: "alert",
+        title: "A lie on day one",
+        body: "Recording a false claim is still a false claim.",
+        more: "Beleg proves integrity and timing. Honesty is on the writer and the witnesses.",
+      },
+      {
+        id: "false-witness",
+        icon: "user",
+        title: "A witness who is wrong",
+        body: "Their name is sealed. Their memory is not audited.",
+        more: "A confirmation is evidence that a person said yes, not that the world matched the sentence.",
+      },
+      {
+        id: "creds",
+        icon: "key",
+        title: "Stolen login",
+        body: "If someone has your account, they can add new entries.",
+        more: "They still cannot quietly rewrite the old ones. Lock the account and write us if that happens.",
+      },
+    ],
+  },
+];
+
 export default function SecurityPage() {
   return (
-    <main className="page">
-      <div className="page-inner doc doc-narrow">
-        <header className="doc-header">
-          <p className="doc-eyebrow">Security</p>
-          <h1 className="h1 doc-title">Security</h1>
-          <p className="doc-lead">
-            What Beleg actually defends against, and what it doesn&apos;t.
-          </p>
-        </header>
-
-        <div className="card doc-body">
-          <h3>What&apos;s protected, and how</h3>
-          <p>
-            Entries are hashed with SHA-256 and chained, so any alteration to
-            past entries is detectable by anyone. Verification runs client-side,
-            so you don&apos;t have to trust our server&apos;s answer. Anchored
-            chains are timestamped against Bitcoin.
-          </p>
-
-          <h3>What we store</h3>
-          <p>
-            Your email and name (via Clerk), your venture and entry contents,
-            attestation details, and anchor proofs. Full detail in the{" "}
-            <Link href="/privacy">Privacy Policy</Link>.
-          </p>
-
-          <h3>Where it runs</h3>
-          <p>
-            Supabase (PostgreSQL, US region) for data, Clerk for authentication,
-            Vercel for hosting, OpenTimestamps public calendars for anchoring.
-            Row-level security is enabled; all reads and writes go through
-            server routes.
-          </p>
-
-          <h3>Threat model: what Beleg defends against</h3>
-          <p>
-            Silent alteration of past entries, backdating entries, reordering
-            history, forging a witness confirmation after the fact.
-          </p>
-
-          <h3>What Beleg does not defend against</h3>
-          <p>
-            Someone recording a false claim in the first place. A witness
-            attesting to something untrue. Loss of your account credentials.
-            Beleg proves integrity and timing, not honesty.
-          </p>
-
-          <h3>Reporting a problem</h3>
-          <p>
-            If you find a security issue, email{" "}
-            <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a>. This is a beta
-            product; responsible disclosure is genuinely appreciated.
-          </p>
-        </div>
-      </div>
-
+    <main className="landing lp ip">
+      <LegalDeck
+        kicker="Security"
+        title="What the chain stops, and what it never claimed to stop."
+        lead="Integrity and timing, recomputed in the reviewer's browser. Click a card. This is not a promise that the story is true."
+        updated="Threat model for the beta"
+        sections={SECTIONS}
+      />
       <Footer />
     </main>
   );

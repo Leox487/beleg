@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 
 import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
+import { LimitPanel } from "@/app/components/LimitPanel";
 import { UseExplorer } from "@/app/components/UseExplorer";
 import { USE_CASES } from "@/lib/use-cases";
 
@@ -40,28 +41,7 @@ export default async function UsesPage() {
       <section className="lp-section ip-section lp-face-grotesk">
         <div className="lp-shell">
           <p className="lp-eyebrow">Where it does not help</p>
-          <ul className="ip-quiet-list">
-            <li>
-              <strong>Licensed trades and clinicians.</strong> A state board
-              lookup already answers the question.
-            </li>
-            <li>
-              <strong>Public registers.</strong> Court filings, permits,
-              inspection scores, property sales.
-            </li>
-            <li>
-              <strong>Public audience numbers.</strong> Subscriber counts the
-              sponsor can already read off the page.
-            </li>
-            <li>
-              <strong>Audited financials.</strong> A lender wants tax returns
-              and bank statements.
-            </li>
-            <li>
-              <strong>Confidential client outcomes.</strong> Asking a client to
-              confirm in public is often the wrong move.
-            </li>
-          </ul>
+          <LimitPanel />
         </div>
       </section>
 
