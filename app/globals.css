@@ -1170,10 +1170,7 @@ a {
   border-top: 0;
 }
 
-.showcase-panel.is-active,
-.showcase-record.is-active,
-.showcase-witness.is-active,
-.showcase-share.is-active {
+.showcase-panel.is-active {
   background: none;
   box-shadow: none;
 }
@@ -12347,15 +12344,22 @@ html {
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: #22262b;
   border-radius: 14px;
-  transition: transform 720ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 480ms ease;
+  opacity: 1;
+  transition: transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   overflow: hidden;
 }
 
+.showcase-card.is-front,
+.showcase-card.is-left,
+.showcase-card.is-right,
+.showcase-card.is-active {
+  background: #22262b;
+  opacity: 1;
+}
+
 .showcase-card.is-front {
   transform: none;
-  opacity: 1;
   z-index: 3;
   cursor: default;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
@@ -12363,13 +12367,11 @@ html {
 
 .showcase-card.is-left {
   transform: translate3d(-38%, 14px, 0) scale(0.86);
-  opacity: 0.4;
   z-index: 1;
 }
 
 .showcase-card.is-right {
   transform: translate3d(38%, 14px, 0) scale(0.86);
-  opacity: 0.4;
   z-index: 1;
 }
 
