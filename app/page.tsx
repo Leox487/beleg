@@ -148,7 +148,7 @@ export default async function Home() {
 
   return (
     <main className="landing lp">
-      <section className="lp-hero">
+      <section className="lp-hero lp-face-news">
         <div className="lp-hero-wash" aria-hidden="true" />
         <div className="lp-shell lp-hero-grid">
           <div className="lp-hero-copy">
@@ -179,7 +179,7 @@ export default async function Home() {
         </ol>
       </section>
 
-      <section className="lp-section">
+      <section className="lp-section lp-face-playfair">
         <div className="lp-shell">
           <p className="lp-eyebrow">From the day it happened</p>
           <h2 className="lp-h2">
@@ -192,7 +192,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="lp-section">
+      <section className="lp-section lp-face-fraunces">
         <div className="lp-shell">
           <p className="lp-eyebrow">How a check actually works</p>
           <h2 className="lp-h2">
@@ -252,7 +252,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="lp-section lp-light">
+      <section className="lp-section lp-light lp-face-playfair">
         <div className="lp-light-grid" aria-hidden="true" />
         <span className="lp-light-scan" aria-hidden="true" />
         <div className="lp-shell lp-wide">
@@ -277,7 +277,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="lp-section">
+      <section className="lp-section lp-face-news">
         <div className="lp-shell">
           <p className="lp-eyebrow">For reviewers</p>
           <h2 className="lp-h2">
@@ -298,7 +298,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="lp-section lp-light">
+      <section className="lp-section lp-light lp-face-fraunces">
         <div className="lp-light-grid" aria-hidden="true" />
         <span className="lp-light-scan" aria-hidden="true" />
         <div className="lp-shell lp-wide">
@@ -343,7 +343,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="lp-section lp-cta">
+      <section className="lp-section lp-cta lp-face-news">
         <div className="lp-shell lp-cta-inner">
           <h2 className="lp-h2 lp-cta-title">
             Start a ledger. Share the link when someone asks you to prove it.

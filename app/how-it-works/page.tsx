@@ -43,7 +43,7 @@ export default async function HowItWorksPage() {
 
   return (
     <main className="landing lp ip">
-      <section className="lp-hero ip-hero">
+      <section className="lp-hero ip-hero lp-face-playfair">
         <div className="lp-hero-wash" aria-hidden="true" />
         <div className="lp-shell ip-anchor" id="try">
           <p className="lp-kicker">How it works</p>
@@ -58,7 +58,7 @@ export default async function HowItWorksPage() {
         </div>
       </section>
 
-      <section className="lp-section ip-section">
+      <section className="lp-section ip-section lp-face-lab">
         <div className="lp-shell">
           <ol className="ip-facts">
             {FACTS.map((fact) => (
@@ -75,7 +75,7 @@ export default async function HowItWorksPage() {
         </div>
       </section>
 
-      <section className="lp-section lp-cta">
+      <section className="lp-section lp-cta lp-face-news">
         <div className="lp-shell lp-cta-inner">
           <h2 className="lp-h2 lp-cta-title">
             Record one milestone. Share the link when someone asks.

@@ -1,7 +1,16 @@
 import type { ComponentProps } from "react";
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import {
+  Fira_Code,
+  Fraunces,
+  Inter,
+  JetBrains_Mono,
+  Newsreader,
+  Pixelify_Sans,
+  Playfair_Display,
+  Plus_Jakarta_Sans,
+} from "next/font/google";
 
 import { IdleDim } from "./components/IdleDim";
 import { Navbar } from "./components/Navbar";
@@ -15,11 +24,61 @@ const sans = Inter({
   display: "swap",
 });
 
+const news = Newsreader({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-news",
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-playfair",
+  display: "swap",
+  preload: false,
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-fraunces",
+  display: "swap",
+  preload: false,
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-jakarta",
+  display: "swap",
+  preload: false,
+});
+
 const mono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-mono",
   display: "swap",
+});
+
+const fira = Fira_Code({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-fira",
+  display: "swap",
+  preload: false,
+});
+
+const pixel = Pixelify_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-pixel",
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -43,7 +102,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sans.variable} ${mono.variable}`}
+      className={`${sans.variable} ${news.variable} ${playfair.variable} ${fraunces.variable} ${jakarta.variable} ${mono.variable} ${fira.variable} ${pixel.variable}`}
     >
       <body>
         <ClerkProvider
