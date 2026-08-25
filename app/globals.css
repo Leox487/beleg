@@ -12175,14 +12175,42 @@ html {
 .lp-honest {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 48px 64px;
+  gap: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .lp-honest-col {
-  padding: 0;
+  padding: 28px 32px;
   border: 0;
   border-radius: 0;
   background: none;
+}
+
+.lp-honest-col:first-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lp-honest .lp-art {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #22262b;
+  color: var(--text-2);
+}
+
+.lp-honest .lp-art-nodes span {
+  box-shadow: 0 0 0 4px #22262b;
+}
+
+.lp-honest .lp-art-no::before {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.lp-honest .lp-art-no span {
+  background: rgba(247, 248, 250, 0.28);
+}
+
+.lp-honest .lp-art-no span:last-child {
+  border-color: rgba(247, 248, 250, 0.35);
+  box-shadow: 0 0 0 4px #22262b;
 }
 
 .lp-honest-label {
@@ -12502,6 +12530,11 @@ html {
   .lp-light .lp-honest-col:first-child {
     border-right: 0;
     border-bottom: 1px solid rgba(20, 18, 14, 0.14);
+  }
+
+  .lp-honest-col:first-child {
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .lp-light .lp-case:last-child,

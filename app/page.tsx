@@ -298,16 +298,12 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="lp-section lp-light lp-face-grotesk">
-        <div className="lp-light-grid" aria-hidden="true" />
-        <span className="lp-light-scan" aria-hidden="true" />
-        <div className="lp-shell lp-wide">
-          <div className="lp-light-head">
-            <p className="lp-eyebrow">Limits</p>
-            <h2 className="lp-h2">
-              What the chain proves, and what it does not.
-            </h2>
-          </div>
+      <section className="lp-section lp-face-grotesk">
+        <div className="lp-shell">
+          <p className="lp-eyebrow">Limits</p>
+          <h2 className="lp-h2">
+            What the chain proves, and what it does not.
+          </h2>
           <div className="lp-honest">
             <div className="lp-honest-col">
               <div className="lp-art lp-art-nodes lp-art-ok" aria-hidden="true">
