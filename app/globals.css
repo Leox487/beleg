@@ -11296,7 +11296,7 @@ html {
       rgba(224, 168, 62, 0.16) 0%,
       transparent 64%
     ),
-    linear-gradient(180deg, #1c2421 0%, #1a1d20 34%, #171b22 68%, #1a1d20 100%);
+    linear-gradient(180deg, #1c2421 0%, #1a1d20 22%, #1a1d20 100%);
 }
 
 .landing.lp .site-footer {
@@ -11316,6 +11316,83 @@ html {
   position: relative;
   overflow: hidden;
   padding: 56px 0 48px;
+}
+
+.landing.lp:not(.ip) .lp-stage {
+  position: relative;
+}
+
+.landing.lp:not(.ip) .lp-stage > .chain-field {
+  inset: -8% -6% 0;
+  z-index: 0;
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 58%,
+    rgba(0, 0, 0, 0.5) 68%,
+    transparent 80%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 58%,
+    rgba(0, 0, 0, 0.5) 68%,
+    transparent 80%
+  );
+}
+
+.landing.lp:not(.ip) .lp-stage .lp-shell {
+  position: relative;
+  z-index: 1;
+}
+
+.landing.lp:not(.ip) .lp-hero {
+  overflow: visible;
+  padding-bottom: 56px;
+}
+
+.landing.lp:not(.ip) .lp-cinema-shell {
+  z-index: 2;
+}
+
+.landing.lp:not(.ip) .chain-field-bloom-mint {
+  top: 2%;
+  right: 0;
+}
+
+.landing.lp:not(.ip) .chain-field-bloom-gold {
+  bottom: 42%;
+  left: 0;
+}
+
+.landing.lp:not(.ip) .chain-field-bloom-blue {
+  top: 38%;
+  left: 36%;
+}
+
+.landing.lp:not(.ip) .chain-field-wash {
+  background:
+    radial-gradient(
+      ellipse 78% 48% at 78% 16%,
+      rgba(45, 212, 160, 0.42) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 55% 42% at 14% 44%,
+      rgba(224, 168, 62, 0.22) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 48% 40% at 88% 52%,
+      rgba(122, 162, 255, 0.22) 0%,
+      transparent 62%
+    );
+}
+
+.landing.lp:not(.ip) .lp-hero + .lp-section {
+  margin-top: 0;
+  padding-top: 56px;
+  background: transparent;
 }
 
 .lp-hero-wash {
