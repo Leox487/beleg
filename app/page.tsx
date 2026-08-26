@@ -10,6 +10,7 @@ import {
   StageVerify,
   StageWitness,
 } from "@/app/components/HomeStages";
+import { LedgerCinema } from "@/app/components/LedgerCinema";
 import { Showcase } from "@/app/components/Showcase";
 
 const FLOW = [
@@ -178,6 +179,10 @@ export default async function Home() {
             </li>
           ))}
         </ol>
+
+        <div className="lp-shell lp-cinema-shell">
+          <LedgerCinema />
+        </div>
       </section>
 
       <section className="lp-section lp-face-jakarta">
