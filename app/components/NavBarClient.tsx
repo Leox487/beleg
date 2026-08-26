@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { BelegMark } from "@/app/components/BelegMark";
 import { LinkPending } from "@/app/components/CtaBadge";
+import { TOOL_GROUPS } from "@/lib/tools";
 
 type UseGroup = {
   category: string;
@@ -130,64 +131,6 @@ const ABOUT = [
   },
 ];
 
-const TOOLS = [
-  {
-    heading: "Verification tool",
-    links: [
-      {
-        href: "/verify",
-        label: "Verify a ledger",
-        text: "Paste a public proof URL. The seals recompute in this browser.",
-      },
-      {
-        href: "/verify-guide",
-        label: "Verify it yourself",
-        text: "SHA-256 and OpenTimestamps, with no Beleg page in the loop.",
-      },
-    ],
-  },
-  {
-    heading: "On the chain",
-    links: [
-      {
-        href: "/how-it-works#try",
-        label: "Break a chain",
-        text: "Edit one character. Watch every seal after it fail.",
-      },
-      {
-        href: "/for-reviewers",
-        label: "For reviewers",
-        text: "What to ask for, and how to read a public page.",
-      },
-    ],
-  },
-  {
-    heading: "The rest",
-    links: [
-      {
-        href: "/changelog",
-        label: "Changelog",
-        text: "What shipped, and what broke.",
-      },
-      {
-        href: "/glossary",
-        label: "Glossary",
-        text: "Hash, seal, chain, genesis, anchor.",
-      },
-      {
-        href: "/faq",
-        label: "FAQ",
-        text: "Edit, shutdown, blockchain, cost.",
-      },
-      {
-        href: "/security",
-        label: "Security",
-        text: "What the chain defends, and what it does not.",
-      },
-    ],
-  },
-];
-
 type Mega = "uses" | "how" | "tools" | "about" | null;
 
 export function NavBarClient({
@@ -269,10 +212,11 @@ export function NavBarClient({
             onFocusCapture={() => open("tools")}
           >
             <Link
-              href="/verify"
+              href="/tools"
               className={`navbar-link navbar-link-info nav-link${mega === "tools" ? " is-open" : ""}`}
               aria-expanded={mega === "tools"}
               aria-haspopup="true"
+              onClick={() => setMega(null)}
             >
               Tools
             </Link>
@@ -373,23 +317,30 @@ export function NavBarClient({
         ) : null}
 
         {mega === "tools" ? (
-          <div className="nav-mega-inner nav-mega-how">
-            {TOOLS.map((col) => (
-              <div key={col.heading} className="nav-mega-col">
-                <p className="nav-mega-cat">{col.heading}</p>
-                <ul>
-                  {col.links.map((link) => (
-                    <li key={link.label}>
-                      <Link href={link.href} onClick={() => setMega(null)}>
-                        <strong>{link.label}</strong>
-                        <span>{link.text}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          <>
+            <div className="nav-mega-inner nav-mega-how">
+              {TOOL_GROUPS.map((col) => (
+                <div key={col.heading} className="nav-mega-col">
+                  <p className="nav-mega-cat">{col.heading}</p>
+                  <ul>
+                    {col.links.map((link) => (
+                      <li key={link.label}>
+                        <Link href={link.href} onClick={() => setMega(null)}>
+                          <strong>{link.label}</strong>
+                          <span>{link.text}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            <p className="nav-mega-foot">
+              <Link href="/tools" onClick={() => setMega(null)}>
+                See every tool →
+              </Link>
+            </p>
+          </>
         ) : null}
 
         {mega === "about" ? (

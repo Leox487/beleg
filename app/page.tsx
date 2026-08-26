@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 
+import { ChainField } from "@/app/components/ChainField";
 import { CtaBadge } from "@/app/components/CtaBadge";
 import { Footer } from "@/app/components/Footer";
 import { HeroProofMock } from "@/app/components/HeroProofMock";
@@ -149,7 +150,7 @@ export default async function Home() {
   return (
     <main className="landing lp">
       <section className="lp-hero lp-face-inter">
-        <div className="lp-hero-wash" aria-hidden="true" />
+        <ChainField />
         <div className="lp-shell lp-hero-grid">
           <div className="lp-hero-copy">
             <p className="lp-kicker">Append-only · anchored to Bitcoin</p>
