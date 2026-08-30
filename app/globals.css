@@ -11318,41 +11318,47 @@ html {
   padding: 56px 0 48px;
 }
 
-.landing.lp:not(.ip) .lp-stage {
-  position: relative;
+.landing.lp:not(.ip) .lp-hero {
+  overflow: hidden;
+  padding-bottom: 128px;
 }
 
-.landing.lp:not(.ip) .lp-stage > .chain-field {
+.landing.lp:not(.ip) .lp-hero .chain-field {
   inset: -8% -6% 0;
-  z-index: 0;
   -webkit-mask-image: linear-gradient(
     180deg,
     #000 0%,
-    #000 58%,
-    rgba(0, 0, 0, 0.5) 68%,
-    transparent 80%
+    #000 calc(100% - 280px),
+    transparent 100%
   );
   mask-image: linear-gradient(
     180deg,
     #000 0%,
-    #000 58%,
-    rgba(0, 0, 0, 0.5) 68%,
-    transparent 80%
+    #000 calc(100% - 280px),
+    transparent 100%
   );
 }
 
-.landing.lp:not(.ip) .lp-stage .lp-shell {
-  position: relative;
-  z-index: 1;
-}
-
-.landing.lp:not(.ip) .lp-hero {
-  overflow: visible;
-  padding-bottom: 56px;
+.landing.lp:not(.ip) .lp-hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 220px;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(26, 29, 32, 0) 0%,
+    rgba(26, 29, 32, 0.4) 36%,
+    #1a1d20 72%,
+    #1a1d20 100%
+  );
 }
 
 .landing.lp:not(.ip) .lp-cinema-shell {
-  z-index: 2;
+  z-index: 4;
 }
 
 .landing.lp:not(.ip) .chain-field-bloom-mint {
@@ -11361,7 +11367,7 @@ html {
 }
 
 .landing.lp:not(.ip) .chain-field-bloom-gold {
-  bottom: 42%;
+  bottom: 28%;
   left: 0;
 }
 
@@ -11391,8 +11397,8 @@ html {
 
 .landing.lp:not(.ip) .lp-hero + .lp-section {
   margin-top: 0;
-  padding-top: 56px;
-  background: transparent;
+  padding-top: 64px;
+  background-color: #1a1d20;
 }
 
 .lp-hero-wash {

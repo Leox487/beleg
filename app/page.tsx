@@ -150,9 +150,8 @@ export default async function Home() {
 
   return (
     <main className="landing lp">
-      <div className="lp-stage">
+      <section className="lp-hero lp-face-inter">
         <ChainField />
-        <section className="lp-hero lp-face-inter">
         <div className="lp-shell lp-hero-grid">
           <div className="lp-hero-copy">
             <p className="lp-kicker">Append-only · anchored to Bitcoin</p>
@@ -186,19 +185,18 @@ export default async function Home() {
         </div>
       </section>
 
-        <section className="lp-section lp-face-jakarta">
-          <div className="lp-shell">
-            <p className="lp-eyebrow">From the day it happened</p>
-            <h2 className="lp-h2">
-              One $12,000 grant, sealed, confirmed, and shared as a public link.
-            </h2>
-            <Showcase />
-            <p className="lp-outlink">
-              <Link href="/how-it-works">See the cryptography in detail →</Link>
-            </p>
-          </div>
-        </section>
-      </div>
+      <section className="lp-section lp-face-jakarta">
+        <div className="lp-shell">
+          <p className="lp-eyebrow">From the day it happened</p>
+          <h2 className="lp-h2">
+            One $12,000 grant, sealed, confirmed, and shared as a public link.
+          </h2>
+          <Showcase />
+          <p className="lp-outlink">
+            <Link href="/how-it-works">See the cryptography in detail →</Link>
+          </p>
+        </div>
+      </section>
 
       <section className="lp-section lp-face-grotesk">
         <div className="lp-shell">
