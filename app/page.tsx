@@ -11,6 +11,7 @@ import {
   StageWitness,
 } from "@/app/components/HomeStages";
 import { LedgerCinema } from "@/app/components/LedgerCinema";
+import { ProofTicker } from "@/app/components/ProofTicker";
 import { Showcase } from "@/app/components/Showcase";
 
 const FLOW = [
@@ -152,6 +153,7 @@ export default async function Home() {
     <main className="landing lp">
       <section className="lp-hero lp-face-inter">
         <ChainField />
+        <ProofTicker />
         <div className="lp-shell lp-hero-grid">
           <div className="lp-hero-copy">
             <p className="lp-kicker">Append-only · anchored to Bitcoin</p>
