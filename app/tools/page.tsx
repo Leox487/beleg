@@ -21,7 +21,7 @@ export default async function ToolsPage() {
 
   return (
     <main className="landing lp ip">
-      <section className="lp-hero ip-hero lp-face-grotesk">
+      <section className="lp-hero ip-hero lp-face-inter">
         <ChainField />
         <div className="lp-shell">
           <p className="lp-kicker">Tools</p>
@@ -33,7 +33,7 @@ export default async function ToolsPage() {
         </div>
       </section>
 
-      <section className="lp-section lp-face-jakarta">
+      <section className="lp-section lp-face-inter">
         <div className="lp-shell">
           <ToolsDeck />
         </div>

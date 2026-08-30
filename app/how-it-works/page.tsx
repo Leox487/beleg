@@ -36,7 +36,7 @@ export default async function HowItWorksPage() {
         </div>
       </section>
 
-      <section className="lp-section ip-section lp-face-lab">
+      <section className="lp-section ip-section lp-face-grotesk">
         <div className="lp-shell">
           <HowFacts />
           <p className="lp-body ip-note ip-anchor" id="limits">
@@ -46,7 +46,7 @@ export default async function HowItWorksPage() {
         </div>
       </section>
 
-      <section className="lp-section lp-cta lp-face-inter">
+      <section className="lp-section lp-cta lp-face-grotesk">
         <div className="lp-shell lp-cta-inner">
           <h2 className="lp-h2 lp-cta-title">
             Record one milestone. Share the link when someone asks.

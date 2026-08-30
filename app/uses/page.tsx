@@ -38,14 +38,14 @@ export default async function UsesPage() {
         </div>
       </section>
 
-      <section className="lp-section ip-section lp-face-grotesk">
+      <section className="lp-section ip-section lp-face-jakarta">
         <div className="lp-shell">
           <p className="lp-eyebrow">Where it does not help</p>
           <LimitPanel />
         </div>
       </section>
 
-      <section className="lp-section lp-cta lp-face-inter">
+      <section className="lp-section lp-cta lp-face-jakarta">
         <div className="lp-shell lp-cta-inner">
           <h2 className="lp-h2 lp-cta-title">
             Start with one entry. Send the witness link the same day.
