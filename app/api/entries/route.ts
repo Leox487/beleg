@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!rateLimitOk(`entries-post:${userId}`, 60, 60 * 60 * 1000)) {
+  if (!(await rateLimitOk(`entries-post:${userId}`, 60, 60 * 60 * 1000))) {
     return tooManyRequests(3600);
   }
 

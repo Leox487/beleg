@@ -4,6 +4,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { sendAttestationEmail } from "@/lib/email";
+import { rateLimitOk, tooManyRequests } from "@/lib/rateLimit";
 import { sanitizeText } from "@/lib/sanitize";
 import sql from "@/lib/supabase";
 
@@ -38,6 +39,12 @@ export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Each success sends a Resend email. Signup is open, so cap this per account
+  // to protect both the bill and the sending domain's reputation.
+  if (!(await rateLimitOk(`attest-request:${userId}`, 50, 24 * 60 * 60 * 1000))) {
+    return tooManyRequests(3600);
   }
 
   let body: Body;

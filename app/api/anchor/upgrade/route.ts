@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { mapAnchor } from "@/lib/row";
 import { upgradeProofBase64 } from "@/lib/ots";
+import { pruneRateLimits } from "@/lib/rateLimit";
 import sql from "@/lib/supabase";
 import type { Anchor } from "@/lib/types";
 
@@ -93,10 +94,19 @@ async function handleUpgrade(req: Request) {
     }
   }
 
+  // Spent rate-limit windows are dead weight; clear them on the same schedule.
+  let prunedRateLimits = 0;
+  try {
+    prunedRateLimits = await pruneRateLimits();
+  } catch (error) {
+    console.error("Failed to prune rate_limits:", error);
+  }
+
   return NextResponse.json({
     checked: anchors.length,
     confirmed,
     updated,
+    prunedRateLimits,
   });
 }
 

@@ -13,7 +13,7 @@ function asTrimmedString(v: unknown): string {
 
 // PUBLIC route: the unguessable token IS the authentication. No auth() here.
 export async function POST(req: Request) {
-  if (!rateLimitOk(`attest-confirm:${clientIp(req)}`, 5, 60 * 1000)) {
+  if (!(await rateLimitOk(`attest-confirm:${clientIp(req)}`, 5, 60 * 1000))) {
     return tooManyRequests(60);
   }
 

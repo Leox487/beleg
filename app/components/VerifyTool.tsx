@@ -140,32 +140,46 @@ export function VerifyTool() {
 
     setRunning(true);
     try {
-      const res = await fetch(
-        `/api/public/${encodeURIComponent(slug)}/entries`,
-      );
+      // The endpoint pages by seq. Verification needs the whole chain, so
+      // follow the cursor until the last page.
+      const entries: Entry[] = [];
+      let name: string | null = null;
+      let afterSeq: number | null = 0;
 
-      if (res.status === 404) {
-        setError(`No ledger found at that link (looked for "${slug}").`);
-        return;
+      while (afterSeq !== null) {
+        const res = await fetch(
+          `/api/public/${encodeURIComponent(slug)}/entries?after_seq=${afterSeq}`,
+        );
+
+        if (res.status === 404) {
+          setError(`No ledger found at that link (looked for "${slug}").`);
+          return;
+        }
+        if (!res.ok) {
+          setError("Couldn't load that ledger. Try again in a moment.");
+          return;
+        }
+
+        const page = (await res.json()) as {
+          venture: { name: string };
+          entries: Entry[];
+          has_more?: boolean;
+          next_after_seq?: number | null;
+        };
+
+        name = page.venture.name;
+        entries.push(...page.entries);
+        afterSeq = page.has_more ? (page.next_after_seq ?? null) : null;
       }
-      if (!res.ok) {
-        setError("Couldn't load that ledger. Try again in a moment.");
-        return;
-      }
 
-      const data = (await res.json()) as {
-        venture: { name: string };
-        entries: Entry[];
-      };
-
-      if (data.entries.length === 0) {
-        setVentureName(data.venture.name);
+      if (entries.length === 0) {
+        setVentureName(name);
         setError("This ledger has no entries yet, so there's nothing to verify.");
         return;
       }
 
-      setVentureName(data.venture.name);
-      setResult(await verifyEntries(data.entries));
+      setVentureName(name);
+      setResult(await verifyEntries(entries));
     } catch {
       setError("Couldn't reach the server. Check your connection and retry.");
     } finally {

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { mapAnchor } from "@/lib/row";
 import { stampHashHex } from "@/lib/ots";
+import { rateLimitOk, tooManyRequests } from "@/lib/rateLimit";
 import sql from "@/lib/supabase";
 
 // OpenTimestamps uses Node-only crypto/networking libraries (bitcore-lib,
@@ -19,6 +20,13 @@ export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Every anchor submits to the public OpenTimestamps calendars. The
+  // duplicate-tip guard below already forces a new entry between anchors;
+  // this bounds how fast that loop can be driven.
+  if (!(await rateLimitOk(`anchor-post:${userId}`, 24, 24 * 60 * 60 * 1000))) {
+    return tooManyRequests(3600);
   }
 
   let body: Body;

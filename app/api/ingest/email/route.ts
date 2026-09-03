@@ -43,7 +43,10 @@ function verifyResendWebhook(
 ): ResendReceivedEvent {
   const secret = process.env.RESEND_WEBHOOK_SECRET;
   if (!secret) {
-    return JSON.parse(payload) as ResendReceivedEvent;
+    // Fail closed. This route is unauthenticated and reaches the Resend API,
+    // the Claude extraction, and a chain write, so an unset secret disables
+    // it rather than waving every caller through.
+    throw new Error("RESEND_WEBHOOK_SECRET is not configured");
   }
 
   return resend.webhooks.verify({
@@ -128,6 +131,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: "RESEND_API_KEY is not configured" },
       { status: 500 },
+    );
+  }
+
+  if (!process.env.RESEND_WEBHOOK_SECRET) {
+    console.error("RESEND_WEBHOOK_SECRET is unset; inbound email is disabled");
+    return NextResponse.json(
+      { error: "Inbound email is not configured" },
+      { status: 503 },
     );
   }
 
