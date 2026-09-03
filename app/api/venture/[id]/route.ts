@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { clientIp, rateLimitOk, tooManyRequests } from "@/lib/rateLimit";
 import sql from "@/lib/supabase";
 
 /**
@@ -7,9 +8,14 @@ import sql from "@/lib/supabase";
  * the stored .ots proof and the chain tip hash that was stamped.
  */
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  // Unauthenticated and runs three queries per call.
+  if (!(await rateLimitOk(`venture-anchor:${clientIp(req)}`, 60, 60 * 1000))) {
+    return tooManyRequests(60);
+  }
+
   const { id } = await params;
 
   const ventureRows = await sql`

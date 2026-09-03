@@ -1,4 +1,5 @@
 import { proofBase64ToBytes } from "@/lib/ots";
+import { clientIp, rateLimitOk, tooManyRequests } from "@/lib/rateLimit";
 import sql from "@/lib/supabase";
 
 // Serves raw .ots proof bytes. Node runtime for Buffer handling.
@@ -7,9 +8,13 @@ export const runtime = "nodejs";
 // PUBLIC: anyone can download a ledger's .ots proof and verify it independently
 // with the standard `ots verify` CLI, without trusting Beleg at all.
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  if (!(await rateLimitOk(`anchor-proof:${clientIp(req)}`, 60, 60 * 1000))) {
+    return tooManyRequests(60);
+  }
+
   const { id } = await params;
 
   const anchorRows = await sql`
