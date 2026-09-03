@@ -36,7 +36,7 @@ export type LegalCard = {
   icon: LegalIcon;
   title: string;
   body: string;
-  more?: string;
+  more?: string | string[];
   href?: { label: string; url: string };
 };
 
@@ -286,7 +286,11 @@ function Row({
 
       {selected?.more || selected?.href ? (
         <div className="legal-detail">
-          {selected.more ? <p>{selected.more}</p> : null}
+          {selected.more
+            ? (Array.isArray(selected.more) ? selected.more : [selected.more]).map(
+                (paragraph) => <p key={paragraph}>{paragraph}</p>,
+              )
+            : null}
           {selected.href ? (
             <p>
               <a href={selected.href.url}>{selected.href.label}</a>

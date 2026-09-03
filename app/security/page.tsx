@@ -58,8 +58,8 @@ const SECTIONS: LegalSection[] = [
         id: "where",
         icon: "server",
         title: "Vendors",
-        body: "Postgres in the US, Clerk, Vercel, OpenTimestamps calendars.",
-        more: "Row-level rules are on. Reads and writes go through server routes, not a public database key in the browser.",
+        body: "Neon, Clerk, Vercel, Resend, Upstash, Cloudflare, Anthropic, Stripe, OpenTimestamps, Blockstream.",
+        more: "Row-level rules are on. Reads and writes go through server routes, not a public database key in the browser. The privacy page lists what each vendor can see.",
       },
       {
         id: "report",

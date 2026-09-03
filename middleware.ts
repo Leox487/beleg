@@ -25,6 +25,9 @@ const isPublicRoute = createRouteMatcher([
   "/contact",
   "/for-reviewers",
   "/api/public/(.*)",
+  // Witness confirmation: the unguessable token is the auth. The page at
+  // /attest/(.*) is already public; this is the POST that page calls.
+  "/api/attestations/confirm",
   // Public verification surface. Proof pages load these without auth.
   "/api/venture/(.*)",
   "/api/block-header/(.*)",
