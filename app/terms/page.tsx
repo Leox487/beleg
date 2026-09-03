@@ -214,9 +214,9 @@ const SECTIONS: LegalSection[] = [
         id: "law",
         icon: "scale",
         title: "Governing law",
-        body: "Pennsylvania law. Courts in Philadelphia, unless a statute says otherwise.",
+        body: "Pennsylvania law. Courts in Pennsylvania, unless a statute says otherwise.",
         more: [
-          "These terms are governed by the laws of the Commonwealth of Pennsylvania, without regard to conflict-of-law rules. You and Beleg agree to the exclusive jurisdiction of the state and federal courts located in Philadelphia, Pennsylvania, except that we may still seek injunctive relief anywhere to stop abuse of the service.",
+          "These terms are governed by the laws of the Commonwealth of Pennsylvania, without regard to conflict-of-law rules. You and Beleg agree to the exclusive jurisdiction of the state and federal courts located in Pennsylvania, except that we may still seek injunctive relief anywhere to stop abuse of the service.",
           "If you are a consumer in a place that forbids this choice of forum, the mandatory rules of that place apply instead.",
         ],
       },

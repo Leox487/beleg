@@ -17,7 +17,7 @@ const SECTIONS: LegalSection[] = [
         id: "controller",
         icon: "user",
         title: "Operator",
-        body: "Beleg, from Philadelphia. The inbox is beleg.app@proton.me.",
+        body: "Beleg. The inbox is beleg.app@proton.me.",
         more: [
           "Beleg operates belegapp.com and the related application. There is no separate privacy office. That address is the contact for access, deletion, a complaint, or a question about this page.",
           "We process personal data as the controller for the hosted service. If you publish a public proof page, you decide what goes on it. Reviewers who open a link you sent them are reading a record you chose to share.",
@@ -332,7 +332,7 @@ const SECTIONS: LegalSection[] = [
         title: "Contact",
         body: "beleg.app@proton.me — access, deletion, a complaint, or a security report.",
         more: [
-          "That address reaches a person in Philadelphia. Use it for a privacy request, a vendor question, or a report that a public page contains data that should not have been published.",
+          "Use it for a privacy request, a vendor question, or a report that a public page contains data that should not have been published.",
           "We aim to respond within 30 days. There is no contact form and no phone line.",
         ],
         href: {

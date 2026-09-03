@@ -79,7 +79,7 @@ export default function FaqPage() {
 
           <Accordion title="Who built this?">
             <p>
-              Beleg is built and maintained in Philadelphia. See{" "}
+              An independent project. The product and why it exists are on{" "}
               <Link href="/about">About</Link>.
             </p>
           </Accordion>

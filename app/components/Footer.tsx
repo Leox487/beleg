@@ -73,7 +73,7 @@ export function Footer() {
         </div>
 
         <div className="site-footer-bottom">
-          <p>© 2026 Beleg · Built in Philadelphia</p>
+          <p>© 2026 Beleg</p>
           <p>Beta</p>
         </div>
       </div>
