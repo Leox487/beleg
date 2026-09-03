@@ -4,6 +4,7 @@ import { appendEntry } from "@/lib/chain";
 import { clientIp, rateLimitOk, tooManyRequests } from "@/lib/rateLimit";
 import { sanitizeText } from "@/lib/sanitize";
 import sql from "@/lib/supabase";
+import { isTurnstileConfigured, verifyTurnstileToken } from "@/lib/turnstile";
 
 type Body = Record<string, unknown>;
 
@@ -13,7 +14,8 @@ function asTrimmedString(v: unknown): string {
 
 // PUBLIC route: the unguessable token IS the authentication. No auth() here.
 export async function POST(req: Request) {
-  if (!(await rateLimitOk(`attest-confirm:${clientIp(req)}`, 5, 60 * 1000))) {
+  const ip = clientIp(req);
+  if (!(await rateLimitOk(`attest-confirm:${ip}`, 5, 60 * 1000))) {
     return tooManyRequests(60);
   }
 
@@ -40,6 +42,25 @@ export async function POST(req: Request) {
     );
   }
   const attesterNote = attesterNoteRaw.length > 0 ? attesterNoteRaw : null;
+
+  // Bot check before any database work. Skipped when no secret is set so a
+  // deployment without Turnstile keys still confirms attestations; the rate
+  // limit above is the only guard in that case.
+  if (isTurnstileConfigured()) {
+    const turnstile = await verifyTurnstileToken(
+      asTrimmedString(body.turnstile_token),
+      ip,
+    );
+    if (!turnstile.success) {
+      console.warn(
+        `Turnstile rejected a confirmation from ${ip}: ${turnstile.errorCodes.join(", ") || "no code"}`,
+      );
+      return NextResponse.json(
+        { error: "Could not verify you are human. Please try again." },
+        { status: 403 },
+      );
+    }
+  }
 
   const attestationRows = await sql`
     SELECT id, venture_id, entry_id, attester_email, statement, status

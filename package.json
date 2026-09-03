@@ -11,6 +11,9 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.110",
     "@clerk/nextjs": "^7.5.19",
+    "@marsidev/react-turnstile": "^1.6.1",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.3",
     "ai": "^6.0.253",
     "buffer": "^6.0.3",
     "dkim-verifier": "^0.0.11",

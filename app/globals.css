@@ -3831,6 +3831,10 @@ a {
   margin-top: 8px;
 }
 
+.attest-turnstile {
+  margin-bottom: 16px;
+}
+
 .attest-tabs {
   display: flex;
   gap: 0;

@@ -1,9 +1,14 @@
 "use client";
 
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type Tab = "confirm" | "other";
+
+// Absent in local development; the widget is then skipped and the route falls
+// back to its rate limit.
+const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 export function AttestForm({
   token,
@@ -20,10 +25,24 @@ export function AttestForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(undefined);
+
+  // Turnstile tokens are single-use, so a rejected submit needs a fresh one.
+  const resetTurnstile = () => {
+    if (!siteKey) return;
+    setTurnstileToken(null);
+    turnstileRef.current?.reset();
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting) return;
+
+    if (siteKey && !turnstileToken) {
+      setError("Please wait for the verification check to finish.");
+      return;
+    }
 
     if (!confirmed) {
       setError("Please check the confirmation box.");
@@ -49,17 +68,20 @@ export function AttestForm({
           token,
           attester_name: name.trim(),
           attester_note: trimmedNote || undefined,
+          turnstile_token: turnstileToken ?? undefined,
         }),
       });
       const data = (await res.json()) as { success?: boolean; error?: string };
       if (!res.ok || !data.success) {
         setError(data.error ?? "Could not confirm. Please try again.");
+        resetTurnstile();
         return;
       }
       setDone(true);
       router.refresh();
     } catch {
       setError("Network error. Please try again.");
+      resetTurnstile();
     } finally {
       setSubmitting(false);
     }
@@ -164,12 +186,27 @@ export function AttestForm({
         </div>
       )}
 
+      {siteKey ? (
+        <div className="attest-turnstile">
+          <Turnstile
+            ref={turnstileRef}
+            siteKey={siteKey}
+            onSuccess={setTurnstileToken}
+            onExpire={() => setTurnstileToken(null)}
+            onError={() => {
+              setTurnstileToken(null);
+              setError("Verification could not load. Please reload the page.");
+            }}
+          />
+        </div>
+      ) : null}
+
       {error ? <p className="form-error">{error}</p> : null}
 
       <button
         type="submit"
         className={`btn btn-primary btn-block${submitting ? " btn-loading" : ""}`}
-        disabled={submitting || !confirmed}
+        disabled={submitting || !confirmed || (Boolean(siteKey) && !turnstileToken)}
       >
         {submitting ? <span className="btn-ellipsis">…</span> : "Confirm"}
       </button>
