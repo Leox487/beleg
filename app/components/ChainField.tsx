@@ -1,12 +1,33 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 /**
  * Beleg-native hero atmosphere: a living hash tree, not a forest.
  * Linked seals branch the way a Merkle tree does. Soft color, not a Neon clone.
+ * Animations pause once the hero leaves the viewport so scroll stays cheap.
  */
 export function ChainField() {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [quiet, setQuiet] = useState(false);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || typeof IntersectionObserver === "undefined") return;
+    const obs = new IntersectionObserver(
+      ([entry]) => setQuiet(!entry.isIntersecting),
+      { rootMargin: "120px" },
+    );
+    obs.observe(root);
+    return () => obs.disconnect();
+  }, []);
+
   return (
-    <div className="chain-field" aria-hidden="true">
+    <div
+      ref={rootRef}
+      className={quiet ? "chain-field is-quiet" : "chain-field"}
+      aria-hidden="true"
+    >
       <div className="chain-field-wash" />
       <div className="chain-field-bloom chain-field-bloom-mint" />
       <div className="chain-field-bloom chain-field-bloom-gold" />

@@ -61,8 +61,10 @@ function drawSet(previous: readonly string[]): string[] {
 
 export function ProofTicker() {
   const trackRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const [lines, setLines] = useState<string[]>(() => PROOFS.slice(0, VISIBLE));
   const [duration, setDuration] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   // Drawn after mount so the server HTML and the first client render agree.
   useEffect(() => {
@@ -76,18 +78,32 @@ export function ProofTicker() {
     if (half > 0) setDuration(half / SPEED);
   }, [lines]);
 
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || typeof IntersectionObserver === "undefined") return;
+    const obs = new IntersectionObserver(
+      ([entry]) => setPaused(!entry.isIntersecting),
+      { rootMargin: "80px" },
+    );
+    obs.observe(root);
+    return () => obs.disconnect();
+  }, []);
+
   const reroll = useCallback(() => {
     setLines((current) => drawSet(current));
   }, []);
 
   return (
-    <div className="proof-ticker">
+    <div className="proof-ticker" ref={rootRef}>
       <p className="proof-ticker-label">On the record</p>
       <div className="proof-ticker-window">
         <div
           ref={trackRef}
           className="proof-ticker-track"
-          style={duration ? { animationDuration: `${duration}s` } : undefined}
+          style={{
+            animationDuration: duration ? `${duration}s` : undefined,
+            animationPlayState: paused ? "paused" : "running",
+          }}
           onAnimationIteration={reroll}
           aria-hidden="true"
         >

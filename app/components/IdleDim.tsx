@@ -39,10 +39,10 @@ export function IdleDim() {
     window.addEventListener("pointerdown", wake, opts);
     window.addEventListener("keydown", wake, opts);
     window.addEventListener("scroll", wake, opts);
-    window.addEventListener("wheel", wake, opts);
-    window.addEventListener("touchstart", wake, opts);
-    window.addEventListener("pointermove", onMove, opts);
-    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("visibilitychange", onVisible);
+    if (window.matchMedia("(pointer: fine)").matches) {
+      window.addEventListener("pointermove", onMove, opts);
+    }
 
     return () => {
       window.clearTimeout(timer);
@@ -50,10 +50,8 @@ export function IdleDim() {
       window.removeEventListener("pointerdown", wake);
       window.removeEventListener("keydown", wake);
       window.removeEventListener("scroll", wake);
-      window.removeEventListener("wheel", wake);
-      window.removeEventListener("touchstart", wake);
       window.removeEventListener("pointermove", onMove);
-      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 

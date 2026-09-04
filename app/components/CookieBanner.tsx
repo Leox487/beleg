@@ -9,12 +9,12 @@ export function CookieBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (getConsent() === null) setVisible(true);
+    setVisible(getConsent() === null);
   }, []);
 
   function choose(choice: ConsentChoice) {
-    setVisible(false);
     setConsent(choice);
+    setVisible(false);
   }
 
   if (!visible) return null;
@@ -29,6 +29,7 @@ export function CookieBanner() {
         <button
           type="button"
           className="cookie-btn cookie-btn-quiet"
+          onPointerDown={() => choose("essential")}
           onClick={() => choose("essential")}
         >
           Decline
@@ -36,6 +37,7 @@ export function CookieBanner() {
         <button
           type="button"
           className="cookie-btn cookie-btn-ok"
+          onPointerDown={() => choose("all")}
           onClick={() => choose("all")}
         >
           Accept

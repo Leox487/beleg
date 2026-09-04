@@ -11,6 +11,7 @@ import {
 } from "next/font/google";
 
 import { DEFAULT_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { CONSENT_BOOT_SCRIPT } from "@/lib/consent";
 import { BetaNotice } from "./components/BetaNotice";
 import { CookieBanner } from "./components/CookieBanner";
 import { IdleDim } from "./components/IdleDim";
@@ -22,7 +23,7 @@ import "./globals.css";
 
 const sans = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-sans",
   display: "swap",
 });
@@ -101,9 +102,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${sans.variable} ${jakarta.variable} ${grotesk.variable} ${mono.variable} ${fira.variable} ${pixel.variable}`}
     >
       <body>
+        <script dangerouslySetInnerHTML={{ __html: CONSENT_BOOT_SCRIPT }} />
+        <IdleDim />
         <ClerkProvider
           appearance={
             {
@@ -118,16 +122,15 @@ export default function RootLayout({
             } as ComponentProps<typeof ClerkProvider>["appearance"]
           }
         >
-          <IdleDim />
           <ScrollNav>
             <Navbar />
           </ScrollNav>
           <BetaNotice />
           {children}
           <StickyCta />
-          <CookieBanner />
-          <OptionalAnalytics />
         </ClerkProvider>
+        <CookieBanner />
+        <OptionalAnalytics />
       </body>
     </html>
   );
