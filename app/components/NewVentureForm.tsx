@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 
+import { FormError } from "@/app/components/FormError";
 import { createVentureAction } from "@/lib/actions/createVenture";
 
 export function NewVentureForm({ collapsible = false }: { collapsible?: boolean }) {
@@ -56,7 +57,7 @@ export function NewVentureForm({ collapsible = false }: { collapsible?: boolean 
         />
       </div>
 
-      {state.error ? <p className="form-error">{state.error}</p> : null}
+      <FormError>{state.error}</FormError>
 
       <div className="form-actions">
         <button

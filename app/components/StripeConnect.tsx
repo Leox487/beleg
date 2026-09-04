@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { CopyText } from "@/app/components/CopyText";
+import { FormError } from "@/app/components/FormError";
 
 type Connection = {
   accountId: string;
@@ -91,7 +92,7 @@ export function StripeConnect({
         >
           {loading ? "Disconnecting…" : "Disconnect"}
         </button>
-        {error ? <p className="settings-error">{error}</p> : null}
+        <FormError className="settings-error">{error}</FormError>
       </div>
     );
   }
@@ -123,7 +124,7 @@ export function StripeConnect({
       >
         {loading ? "Connecting…" : "Connect Stripe"}
       </button>
-      {error ? <p className="settings-error">{error}</p> : null}
+      <FormError className="settings-error">{error}</FormError>
     </div>
   );
 }

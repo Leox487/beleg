@@ -54,6 +54,9 @@ export function Footer() {
               A sealed record of what you actually did.
             </p>
             <p className="site-footer-anchor">Anchored to Bitcoin</p>
+            <p className="site-footer-address">
+              <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a>
+            </p>
           </div>
 
           {COLUMNS.map((column) => (
@@ -74,7 +77,9 @@ export function Footer() {
 
         <div className="site-footer-bottom">
           <p>© 2026 Beleg</p>
-          <p>Beta</p>
+          <p>
+            <Link href="/terms">Public beta</Link>
+          </p>
         </div>
       </div>
     </footer>

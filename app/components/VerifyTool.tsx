@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { FormError } from "@/app/components/FormError";
+
 import {
   GENESIS_HASH,
   chainHashBrowser,
@@ -209,7 +211,7 @@ export function VerifyTool() {
         </button>
       </form>
 
-      {error ? <p className="verify-tool-error">{error}</p> : null}
+      <FormError className="verify-tool-error">{error}</FormError>
 
       {result ? (
         <div className="verify-tool-result">

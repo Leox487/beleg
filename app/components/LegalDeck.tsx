@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 export type LegalIcon =
   | "lock"
@@ -263,7 +263,7 @@ function Row({
         {slice.map((card) => {
           const open = card.id === selectedId;
           return (
-            <li key={card.id}>
+            <li key={card.id} id={card.id}>
               <button
                 type="button"
                 className={`legal-card${open ? " is-open" : ""}`}
@@ -321,6 +321,14 @@ export function LegalDeck({
       sections.map((section) => [section.heading, section.cards[0]?.id ?? ""]),
     ),
   );
+
+  useEffect(() => {
+    const hash = window.location.hash.replace(/^#/, "");
+    if (!hash) return;
+    const section = sections.find((s) => s.cards.some((c) => c.id === hash));
+    if (!section) return;
+    setOpen((prev) => ({ ...prev, [section.heading]: hash }));
+  }, []);
 
   return (
     <>

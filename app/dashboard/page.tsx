@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -6,6 +7,12 @@ import { mapVenture } from "@/lib/row";
 import sql from "@/lib/supabase";
 import type { Venture } from "@/lib/types";
 import { NewVentureForm } from "@/app/components/NewVentureForm";
+
+export const metadata: Metadata = {
+  title: "Your ledgers · Beleg",
+  description: "Open a ledger, add a sealed entry, or start a new one.",
+  robots: { index: false, follow: false },
+};
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
@@ -50,9 +57,9 @@ export default async function DashboardPage() {
         <div className="empty-state">
           <h1 className="empty-title">Start your first ledger</h1>
           <p className="empty-help">
-            A venture is the thing you&apos;re building: a company, a product, a
-            project. You&apos;ll add milestones as they happen, and share one
-            public link with reviewers, judges, or investors.
+            A venture is the thing you&apos;re building. You add short
+            milestones as they happen and share one public link. Do not paste
+            pitch decks or grant packets — there is no private file store.
           </p>
           <NewVentureForm />
         </div>

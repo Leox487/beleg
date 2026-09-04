@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { mapAnchor, mapEntry, mapVenture } from "@/lib/row";
@@ -24,6 +25,32 @@ function formatStarted(iso: string): string {
     month: "short",
     day: "numeric",
   });
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const rows = await sql`
+    SELECT name, tagline FROM ventures WHERE slug = ${slug} LIMIT 1
+  `;
+  const row = rows[0] as { name?: string; tagline?: string | null } | undefined;
+  if (!row?.name) {
+    return { title: "Ledger not found · Beleg" };
+  }
+  const description =
+    row.tagline?.trim() ||
+    `Public sealed ledger for ${row.name}. Words here were not rewritten after they were recorded.`;
+  return {
+    title: `${row.name} · Beleg`,
+    description,
+    openGraph: {
+      title: `${row.name} · Beleg`,
+      description,
+    },
+  };
 }
 
 export default async function PublicProofPage({

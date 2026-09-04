@@ -10,9 +10,14 @@ import {
   Space_Grotesk,
 } from "next/font/google";
 
+import { DEFAULT_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { BetaNotice } from "./components/BetaNotice";
+import { CookieBanner } from "./components/CookieBanner";
 import { IdleDim } from "./components/IdleDim";
 import { Navbar } from "./components/Navbar";
+import { OptionalAnalytics } from "./components/OptionalAnalytics";
 import { ScrollNav } from "./components/ScrollNav";
+import { StickyCta } from "./components/StickyCta";
 import "./globals.css";
 
 const sans = Inter({
@@ -62,9 +67,23 @@ const pixel = Pixelify_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Beleg. Proof, not prose.",
-  description:
-    "Beleg gives your traction a cryptographically sealed timeline, recorded as it happens, witnessed by real people, and provable to anyone reading.",
+  metadataBase: new URL(SITE_URL),
+  title: `${SITE_NAME}. Proof, not prose.`,
+  description: DEFAULT_DESCRIPTION,
+  applicationName: SITE_NAME,
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "en_US",
+    title: `${SITE_NAME}. Proof, not prose.`,
+    description: DEFAULT_DESCRIPTION,
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME}. Proof, not prose.`,
+    description: DEFAULT_DESCRIPTION,
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -103,7 +122,11 @@ export default function RootLayout({
           <ScrollNav>
             <Navbar />
           </ScrollNav>
+          <BetaNotice />
           {children}
+          <StickyCta />
+          <CookieBanner />
+          <OptionalAnalytics />
         </ClerkProvider>
       </body>
     </html>

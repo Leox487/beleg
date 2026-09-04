@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { FormError } from "@/app/components/FormError";
+
 export default function WhitelistManager({
   ventureId,
 }: {
@@ -56,8 +58,10 @@ export default function WhitelistManager({
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <p style={{ fontSize: 13, color: "var(--text-2)", margin: 0 }}>
-        Only emails from these addresses will auto-create entries when forwarded
-        to your venture address.
+        Only mail from these addresses becomes an entry. The subject and a
+        slice of the body may be sent to a model to draft a title. Check that
+        draft. The sealed entry is on the public proof page, so do not forward
+        decks, packets, or mail you are not allowed to publish.
       </p>
       <div style={{ display: "flex", gap: 8 }}>
         <input
@@ -85,11 +89,7 @@ export default function WhitelistManager({
           {loading ? "Adding…" : "Add"}
         </button>
       </div>
-      {error ? (
-        <p style={{ fontSize: 13, color: "var(--danger)", margin: 0 }}>
-          {error}
-        </p>
-      ) : null}
+      <FormError>{error}</FormError>
       {emails.length === 0 ? (
         <p style={{ fontSize: 13, color: "var(--text-3)", margin: 0 }}>
           No whitelisted senders yet.

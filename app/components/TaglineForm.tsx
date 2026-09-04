@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { FormError } from "@/app/components/FormError";
+
 export function TaglineForm({
   ventureId,
   initialTagline,
@@ -59,7 +61,7 @@ export function TaglineForm({
           {saving ? "Saving…" : "Save"}
         </button>
         {saved ? <span className="muted">Saved</span> : null}
-        {error ? <span className="settings-error">{error}</span> : null}
+        <FormError className="settings-error">{error}</FormError>
       </div>
     </form>
   );

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -17,6 +18,34 @@ function formatCreated(iso: string): string {
     month: "long",
     day: "numeric",
   });
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const { userId } = await auth();
+  if (!userId) {
+    return {
+      title: "Settings · Beleg",
+      robots: { index: false, follow: false },
+    };
+  }
+  const rows = await sql`
+    SELECT name, clerk_user_id FROM ventures WHERE id = ${id} LIMIT 1
+  `;
+  const row = rows[0] as { name?: string; clerk_user_id?: string } | undefined;
+  const title =
+    row?.name && row.clerk_user_id === userId
+      ? `${row.name} settings · Beleg`
+      : "Settings · Beleg";
+  return {
+    title,
+    description: "Ledger settings. Not indexed.",
+    robots: { index: false, follow: false },
+  };
 }
 
 export default async function VentureSettingsPage({

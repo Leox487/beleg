@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { FormError } from "@/app/components/FormError";
+
 interface SentState {
   to: string;
   name: string;
@@ -216,7 +218,7 @@ export function RequestAttestForm({ entryId }: { entryId: string }) {
         </p>
       </div>
 
-      {error ? <p className="form-error">{error}</p> : null}
+      <FormError>{error}</FormError>
 
       <div className="form-actions">
         <button

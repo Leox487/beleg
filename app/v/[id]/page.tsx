@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
 
@@ -19,6 +20,31 @@ function formatDateTime(iso: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const { userId } = await auth();
+  if (!userId) {
+    return { title: "Ledger · Beleg", robots: { index: false, follow: false } };
+  }
+  const rows = await sql`
+    SELECT name, clerk_user_id FROM ventures WHERE id = ${id} LIMIT 1
+  `;
+  const row = rows[0] as { name?: string; clerk_user_id?: string } | undefined;
+  const title =
+    row?.name && row.clerk_user_id === userId
+      ? `${row.name} · Beleg`
+      : "Ledger · Beleg";
+  return {
+    title,
+    description: "Your sealed ledger. Not indexed.",
+    robots: { index: false, follow: false },
+  };
 }
 
 export default async function LedgerPage({

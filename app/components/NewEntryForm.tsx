@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { FormError } from "@/app/components/FormError";
 import { ENTRY_KINDS, type EntryKind } from "@/lib/types";
 
 export function NewEntryForm({ ventureId }: { ventureId: string }) {
@@ -72,8 +73,9 @@ export function NewEntryForm({ ventureId }: { ventureId: string }) {
           required
         />
         <p className="field-help">
-          Be specific. This will be sealed exactly as written and can&apos;t be
-          edited later.
+          Sealed exactly as written. This text is on the public proof page.
+          Do not paste a pitch deck, grant packet, credentials, or anyone
+          else&apos;s documents.
         </p>
       </div>
 
@@ -89,7 +91,8 @@ export function NewEntryForm({ ventureId }: { ventureId: string }) {
           rows={3}
         />
         <p className="field-help">
-          Optional: links, numbers, names, context. Also sealed.
+          Optional context, also sealed and public. Links and numbers are
+          enough. There is no private file vault.
         </p>
       </div>
 
@@ -126,7 +129,7 @@ export function NewEntryForm({ ventureId }: { ventureId: string }) {
         </div>
       </div>
 
-      {error ? <p className="form-error">{error}</p> : null}
+      <FormError>{error}</FormError>
 
       <button
         type="submit"

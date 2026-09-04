@@ -223,7 +223,7 @@ export function VerifyChain({
       if (result.verified) {
         setBitcoin({
           state: "ok",
-          message: `Bitcoin-anchored at block #${result.blockHeight}. Mathematically proven existence.`,
+          message: `Bitcoin-anchored at block #${result.blockHeight}. The hash existed then. That is not a finding about the event.`,
         });
       } else {
         setBitcoin({

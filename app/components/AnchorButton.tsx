@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { FormError } from "@/app/components/FormError";
+
 export function AnchorButton({ ventureId }: { ventureId: string }) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -46,7 +48,7 @@ export function AnchorButton({ ventureId }: { ventureId: string }) {
           "Anchor this ledger to Bitcoin"
         )}
       </button>
-      {error ? <p className="form-error">{error}</p> : null}
+      <FormError>{error}</FormError>
     </div>
   );
 }

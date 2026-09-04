@@ -60,8 +60,20 @@ export default function FaqPage() {
 
           <Accordion title="Who can see my proof page?">
             <p>
-              Only people you send the link to. Beleg doesn&apos;t publish or
-              index your page.
+              Anyone who has the URL. We do not submit the page to a search
+              index, but we also do not put a login in front of it. The same
+              record is available as JSON for independent verification. Treat
+              the slug as a publication.
+            </p>
+          </Accordion>
+
+          <Accordion title="Can I upload a pitch deck or grant packet?">
+            <p>
+              No. Beleg does not accept file uploads and does not keep a
+              private document vault. An entry is text on a public page. If
+              you paste a deck, a grant application, or someone else&apos;s
+              papers into a title or body, that text is on the proof link.
+              Leave the files where they already live.
             </p>
           </Accordion>
 
@@ -74,7 +86,11 @@ export default function FaqPage() {
           </Accordion>
 
           <Accordion title="Is it free?">
-            <p>Yes, while in beta.</p>
+            <p>
+              Yes, while in public beta. Beta means bugs, downtime, and
+              breaking changes are possible. A seal is not a funding decision
+              and not legal evidence.
+            </p>
           </Accordion>
 
           <Accordion title="Who built this?">

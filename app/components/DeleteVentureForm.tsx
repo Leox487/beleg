@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 
+import { FormError } from "@/app/components/FormError";
 import { deleteVentureAction } from "@/lib/actions/deleteVenture";
 
 const CONFIRM_WORD = "Confirm";
@@ -43,7 +44,7 @@ export function DeleteVentureForm({
       >
         {pending ? "Deleting…" : "Delete venture"}
       </button>
-      {state.error ? <p className="settings-error">{state.error}</p> : null}
+      <FormError className="settings-error">{state.error}</FormError>
     </form>
   );
 }

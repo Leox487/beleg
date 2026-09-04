@@ -4,6 +4,8 @@ import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
+import { FormError } from "@/app/components/FormError";
+
 type Tab = "confirm" | "other";
 
 // Absent in local development; the widget is then skipped and the route falls
@@ -24,7 +26,6 @@ export function AttestForm({
   const [confirmed, setConfirmed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileRef = useRef<TurnstileInstance>(undefined);
 
@@ -77,8 +78,7 @@ export function AttestForm({
         resetTurnstile();
         return;
       }
-      setDone(true);
-      router.refresh();
+      router.push("/thanks?from=witness");
     } catch {
       setError("Network error. Please try again.");
       resetTurnstile();
@@ -86,14 +86,6 @@ export function AttestForm({
       setSubmitting(false);
     }
   };
-
-  if (done) {
-    return (
-      <div className="attest-done verify-ok">
-        ✓ Thank you. Your confirmation has been recorded.
-      </div>
-    );
-  }
 
   return (
     <form className="venture-form attest-form" onSubmit={onSubmit}>
@@ -201,7 +193,7 @@ export function AttestForm({
         </div>
       ) : null}
 
-      {error ? <p className="form-error">{error}</p> : null}
+      <FormError>{error}</FormError>
 
       <button
         type="submit"

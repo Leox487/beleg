@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
+
+import { DEFAULT_DESCRIPTION } from "@/lib/site";
 
 import { ChainField } from "@/app/components/ChainField";
 import { CtaBadge } from "@/app/components/CtaBadge";
@@ -13,6 +16,11 @@ import {
 import { LedgerCinema } from "@/app/components/LedgerCinema";
 import { ProofTicker } from "@/app/components/ProofTicker";
 import { Showcase } from "@/app/components/Showcase";
+
+export const metadata: Metadata = {
+  title: "Beleg. Proof, not prose.",
+  description: DEFAULT_DESCRIPTION,
+};
 
 const FLOW = [
   {
@@ -340,6 +348,7 @@ export default async function Home() {
                 <li>That the work was good, or the grant deserved</li>
                 <li>That a witness is telling the truth about the world</li>
                 <li>That Beleg has audited your company</li>
+                <li>That a grant will be funded, or that the record is legal evidence</li>
                 <li>That a missing confirmation means the event did not happen</li>
               </ul>
             </div>

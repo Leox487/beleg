@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { mapAttestation, mapEntry, mapVenture } from "@/lib/row";
 import sql from "@/lib/supabase";
 import type { Attestation, Entry, Venture } from "@/lib/types";
@@ -20,6 +21,15 @@ function formatDate(iso: string): string {
     month: "short",
     day: "numeric",
   });
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Confirm a record · Beleg",
+    description:
+      "Someone asked you to confirm a sealed Beleg entry. Confirming publishes your name on their public proof page.",
+    robots: { index: false, follow: false },
+  };
 }
 
 export default async function AttestPage({

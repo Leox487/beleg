@@ -64,8 +64,18 @@ const SECTIONS: LegalSection[] = [
         title: "Your content",
         body: "You own what you type. You give us a license to host it and to show a page you published.",
         more: [
-          "You retain whatever rights you have in the words, names, and files you submit. You grant Beleg a non-exclusive, worldwide, royalty-free license to store, hash, timestamp, display, transmit, and back up that content as needed to run the service — including sending a witness email you requested and rendering a public page at a slug you created.",
+          "You retain whatever rights you have in the words and names you submit. You grant Beleg a non-exclusive, worldwide, royalty-free license to store, hash, timestamp, display, transmit, and back up that content as needed to run the service — including sending a witness email you requested and rendering a public page at a slug you created. There is no file-upload product and no private document vault.",
           "You represent that you have the right to submit the content, that it is accurate to your knowledge, and that it does not violate the law or someone else's rights. You will not put credentials, private keys, or other people's sensitive data on a ledger.",
+        ],
+      },
+      {
+        id: "nofiles",
+        icon: "file",
+        title: "No decks or packets",
+        body: "Do not paste pitch decks, grant applications, or other people's papers into an entry.",
+        more: [
+          "Beleg does not accept file uploads. An entry is public text. If you need to keep a document confidential, do not put it here. A reviewer who needs the source file should receive it from you.",
+          "We do not guarantee funding, legal accuracy, or that a drafted title from inbound email is correct. Check those yourself.",
         ],
       },
       {

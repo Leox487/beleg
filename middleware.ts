@@ -1,9 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Public surface: landing, public proof pages, attestation pages, the
-// informational/legal pages, and the Clerk auth screens. Everything else
-// requires a signed-in user.
+// Public APIs and marketing pages. Authenticated app routes are /dashboard
+// and /v/* (see isProtectedPage). Unknown pages render the 404 instead of
+// bouncing to sign-in.
 const isPublicRoute = createRouteMatcher([
   "/",
   "/p/(.*)",
@@ -23,6 +23,7 @@ const isPublicRoute = createRouteMatcher([
   "/faq",
   "/security",
   "/contact",
+  "/thanks",
   "/for-reviewers",
   "/api/public/(.*)",
   // Witness confirmation: the unguessable token is the auth. The page at
@@ -39,8 +40,17 @@ const isPublicRoute = createRouteMatcher([
   "/api/stripe/webhook/(.*)",
 ]);
 
+const isProtectedPage = createRouteMatcher(["/dashboard(.*)", "/v/(.*)"]);
+
 const clerkHandler = clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
+  const path = req.nextUrl.pathname;
+  if (path.startsWith("/api/")) {
+    if (!isPublicRoute(req)) {
+      await auth.protect();
+    }
+    return;
+  }
+  if (isProtectedPage(req)) {
     await auth.protect();
   }
 });

@@ -4,7 +4,8 @@ import { Footer } from "@/app/components/Footer";
 
 export const metadata: Metadata = {
   title: "Contact · Beleg",
-  description: "Get in touch about bugs, security issues, or data deletion.",
+  description:
+    "Write beleg.app@proton.me for bugs, security issues, or data deletion. That address is the official contact for Beleg.",
 };
 
 export default function ContactPage() {
@@ -16,15 +17,17 @@ export default function ContactPage() {
           <h1 className="h1 doc-title">Contact</h1>
         </header>
 
-        <div className="card doc-body">
-          <p>
-            Email <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a> for
-            anything: bugs, security issues, data deletion requests, questions.
+        <div className="card doc-body contact-address">
+          <p className="contact-address-label">Official address</p>
+          <p className="contact-address-value">
+            <a href="mailto:beleg.app@proton.me">beleg.app@proton.me</a>
           </p>
           <p>
-            Replies may take a few days. There is no contact form. A real
-            inbox works better.
+            That inbox is the contact for Beleg: bugs, security reports, data
+            deletion, access requests, and anything else. There is no separate
+            office line and no contact form. Write the address.
           </p>
+          <p>Replies may take a few days.</p>
         </div>
       </div>
 

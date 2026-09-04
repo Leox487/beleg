@@ -59,7 +59,7 @@ const SECTIONS: LegalSection[] = [
         body: "Names, titles, bodies, dates, kinds, hashes, and the seals you create.",
         more: [
           "This is the product: an append-only chain of what you recorded. We store the words you typed, the timestamps, the previous-hash links, and the SHA-256 seals computed from them.",
-          "A public proof page and the machine-readable feed at /api/public/[slug]/entries expose the same record to anyone who has the URL. Do not put secrets, passwords, private keys, health data, or other people's personal data on a ledger unless you intend that record to be shown.",
+          "A public proof page and the machine-readable feed at /api/public/[slug]/entries expose the same record to anyone who has the URL. Do not put secrets, passwords, private keys, health data, pitch decks, grant packets, or other people's personal data on a ledger unless you intend that record to be shown. There is no file upload and no private document vault.",
         ],
       },
       {
@@ -101,7 +101,17 @@ const SECTIONS: LegalSection[] = [
           "Every request that reaches Vercel can appear in platform logs with an IP address, a user agent, a path, a status code, and a time. We use the first x-forwarded-for address to apply rate limits on public and authenticated write routes.",
           "Rate-limit counters are stored either in Upstash Redis (when configured) or in a Postgres table. The key is an action name plus an IP or a user id — not the body of your ledger. Counters are kept only long enough to enforce the window, then pruned.",
           "Unauthenticated witness confirmations may require a Cloudflare Turnstile token. The token is sent to Cloudflare's siteverify endpoint. Cloudflare may see the visitor IP as part of that check. We do not use Turnstile, IPs, or rate-limit keys for advertising, profiling, or sale.",
-          "There is no advertising pixel, no analytics SDK, and no third-party tracker on the pages. Hosting logs and abuse counters are not the same thing as a marketing tracker. We still disclose them because they are personal data.",
+          "There is no advertising pixel and no third-party marketing tracker. Optional Vercel Analytics page-view counts run only after you allow them on the cookie banner. Hosting logs and abuse counters still exist either way. We disclose them because they are personal data.",
+        ],
+      },
+      {
+        id: "nofiles",
+        icon: "file",
+        title: "No document vault",
+        body: "We do not accept pitch decks, grant packets, or other file uploads.",
+        more: [
+          "The product stores short sealed text, hashes, and optional inbound-email extracts. There is no attachment store and no access-controlled file locker. If you paste a document into an entry, it is on the public proof page and in the public JSON feed.",
+          "Leave source documents where they already live. A reviewer who needs the deck should get it from you, not from Beleg.",
         ],
       },
       {
@@ -261,7 +271,7 @@ const SECTIONS: LegalSection[] = [
         title: "Who else can see a copy",
         body: "Clerk, Neon, Vercel, Resend, Upstash, Cloudflare, Anthropic, Stripe, OpenTimestamps, Blockstream.",
         more: [
-          "Clerk: account email, name, authentication. Neon: application database. Vercel: hosting, request logs, scheduled jobs. Resend: transactional mail and inbound email webhooks. Upstash: rate-limit keys when configured. Cloudflare: Turnstile bot checks on witness confirmation. Anthropic: optional milestone extraction from inbound mail. Stripe: optional payment events you connected. OpenTimestamps calendars: a hash, never the entry text. Blockstream: block heights and headers for verification, not your ledger.",
+          "Clerk: account email, name, authentication. Neon: application database. Vercel: hosting, request logs, scheduled jobs, and optional Analytics page views if you allow them. Resend: transactional mail and inbound email webhooks. Upstash: rate-limit keys when configured. Cloudflare: Turnstile bot checks on witness confirmation. Anthropic: optional milestone extraction from inbound mail. Stripe: optional payment events you connected. OpenTimestamps calendars: a hash, never the entry text. Blockstream: block heights and headers for verification, not your ledger.",
           "We do not sell or rent those copies. Each vendor is used to run or protect the service. If a vendor is added or dropped, this page is updated.",
         ],
       },
@@ -279,11 +289,11 @@ const SECTIONS: LegalSection[] = [
         id: "cookies",
         icon: "cookie",
         title: "Cookies and similar tech",
-        body: "Session cookies for sign-in. Abuse counters are not cookies. No ad cookies.",
+        body: "Session cookies for sign-in. Optional analytics only if you allow it. No ad cookies.",
         more: [
-          "Clerk sets cookies or similar storage to keep a session. Those are necessary for the authenticated product. We do not set advertising, social-media, or analytics cookies.",
+          "Clerk sets cookies or similar storage to keep a session. Those are necessary for the authenticated product. We do not set advertising or social-media cookies.",
           "Rate limiting uses the request IP and a server-side counter, not a tracking cookie. Turnstile may set a Cloudflare challenge cookie when the widget runs. That cookie is for the challenge, not for ads.",
-          "There is no cookie banner because we do not use optional tracking cookies. A session cookie is required to stay signed in. You can block cookies in the browser; you will then be unable to use an account.",
+          "A banner asks whether to load optional Vercel Analytics. Accept sets a beleg_consent cookie (and a matching local value) for a year. Decline still allows the Clerk session cookie, which is required to stay signed in. The analytics SDK does not load unless you Accept. It is not an ad network and we do not sell the counts. You can block cookies in the browser; you will then be unable to use an account.",
         ],
       },
       {
@@ -351,7 +361,7 @@ export default function PrivacyPage() {
         kicker="Privacy"
         title="What we hold, who else can see a copy, and what deletion cannot undo."
         lead="This is the live inventory of personal data on Beleg, including IP addresses used to rate-limit public routes and the bot check on witness confirmation. Nothing here is sold. Nothing is used for ads. Click a card for the rest of the sentence."
-        updated="Last updated September 2, 2026"
+        updated="Last updated September 4, 2026"
         sections={SECTIONS}
       />
       <Footer />
