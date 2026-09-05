@@ -1,0 +1,43 @@
+{
+  "name": "beleg",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.110",
+    "@clerk/nextjs": "^7.5.19",
+    "@marsidev/react-turnstile": "^1.6.1",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.3",
+    "@vercel/analytics": "^2.0.1",
+    "ai": "^6.0.253",
+    "buffer": "^6.0.3",
+    "dkim-verifier": "^0.0.11",
+    "dompurify": "^3.4.13",
+    "jsdom": "^29.1.1",
+    "mailparser": "3.9.8",
+    "next": "16.2.11",
+    "opentimestamps": "^0.4.9",
+    "postgres": "^3.4.9",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "resend": "^6.18.1",
+    "server-only": "^0.0.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^30.0.0",
+    "@types/mailparser": "^3.4.6",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.10",
+    "typescript": "^5"
+  }
+}
