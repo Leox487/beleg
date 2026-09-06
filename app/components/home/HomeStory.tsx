@@ -3,7 +3,10 @@
 import Link from "next/link";
 
 import { CtaBadge } from "@/app/components/CtaBadge";
+import { ClaimProof } from "@/app/components/home/ClaimProof";
 import { HashText } from "@/app/components/home/HashText";
+import { ProofCard } from "@/app/components/home/ProofCard";
+import { ProofField } from "@/app/components/home/ProofField";
 import { Reveal } from "@/app/components/home/Reveal";
 
 const TIMELINE = [
@@ -101,6 +104,7 @@ export function HomeStory({
       </p>
 
       <section className="bh-hero">
+        <ProofField />
         <div className="bh-hero-copy">
           <p className="bh-kicker">Verifiable records for real-world progress</p>
           <h1 className="bh-poster">
@@ -115,66 +119,11 @@ export function HomeStory({
         </div>
 
         <div className="bh-hero-stage">
-          <p className="bh-chip">
-            ✓ Verified
-            <span>Mar 14, 2026</span>
-          </p>
-          <article className="bh-doc">
-            <header className="bh-doc-head">
-              <span>01</span>
-              <span>Mar 12, 2026</span>
-            </header>
-            <h2>Grant received</h2>
-            <p className="bh-doc-sum">$12,000</p>
-            <p className="bh-doc-who">Civic Innovation Fund</p>
-            <dl className="bh-doc-facts">
-              <div>
-                <dt>Timestamp</dt>
-                <dd>2026-03-12 14:38:07 UTC</dd>
-              </div>
-              <div>
-                <dt>Witness</dt>
-                <dd>Civic Innovation Fund</dd>
-              </div>
-              <div>
-                <dt>Block</dt>
-                <dd>#883,214</dd>
-              </div>
-              <div>
-                <dt>Chain</dt>
-                <dd>01 → 02 → 03</dd>
-              </div>
-            </dl>
-            <footer className="bh-doc-foot">
-              <b>
-                <span className="bh-dot" />
-                Sealed
-              </b>
-              <span>
-                SHA-256 <HashText value="a3f81c94b7d0e29b" />
-              </span>
-            </footer>
-          </article>
+          <ProofCard />
         </div>
       </section>
 
-      <section className="bh-band">
-        <Reveal className="bh-split">
-          <div>
-            <p className="bh-kicker">The problem</p>
-            <h2 className="bh-h2">Important progress disappears into prose.</h2>
-            <p className="bh-body">
-              Applications, updates, and decks all sound finished. Dates get
-              moved. Confirmations stay in email. A reviewer is asked to trust
-              the writing.
-            </p>
-          </div>
-          <p className="bh-aside">
-            Beleg keeps the event, the order, and the confirmation. The claim
-            still has to be true. The history cannot be quietly rewritten.
-          </p>
-        </Reveal>
-      </section>
+      <ClaimProof />
 
       <section className="bh-band">
         <Reveal>
