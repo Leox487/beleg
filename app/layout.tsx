@@ -119,6 +119,9 @@ export default function RootLayout({
                 colorInputText: "#E0E0E0",
                 borderRadius: "8px",
               },
+              elements: {
+                footerItem: { display: "none" },
+              },
             } as ComponentProps<typeof ClerkProvider>["appearance"]
           }
         >

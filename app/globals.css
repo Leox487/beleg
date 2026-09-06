@@ -2866,6 +2866,10 @@ a {
   color: var(--ink-3);
 }
 
+.cl-footerItem {
+  display: none !important;
+}
+
 /* Instant loading UI for auth routes so navigation feels responsive while
    Clerk's client widget loads. */
 .auth-spinner {
