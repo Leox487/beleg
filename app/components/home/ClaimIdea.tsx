@@ -27,7 +27,8 @@ export function ClaimIdea() {
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
-          setStep((n) => Math.max(n, Number(entry.target.dataset.part) + 1));
+          const part = Number((entry.target as HTMLElement).dataset.part);
+          setStep((n) => Math.max(n, part + 1));
         }
       },
       { threshold: 0.5, rootMargin: "0px 0px -10% 0px" },
