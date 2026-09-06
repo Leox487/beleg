@@ -7,6 +7,7 @@ import { useEffect } from "react";
 
 const HIDE = [
   /^\/$/,
+  /^\/verify$/,
   /^\/dashboard/,
   /^\/v\//,
   /^\/p\//,

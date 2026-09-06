@@ -42,7 +42,7 @@ export function NavBarClient({ signedIn }: { signedIn: boolean }) {
                 Log in
               </Link>
               <Link href="/sign-up" className="navbar-signup">
-                Create a Beleg
+                Create a ledger
                 <CtaBadge />
               </Link>
             </>

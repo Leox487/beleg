@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Footer } from "@/app/components/Footer";
+import { BelegFooter } from "@/app/components/BelegFooter";
 import { VerifyTool } from "@/app/components/VerifyTool";
 
 export const metadata: Metadata = {
@@ -12,29 +12,29 @@ export const metadata: Metadata = {
 
 export default function VerifyPage() {
   return (
-    <main className="page">
-      <div className="page-inner doc doc-narrow">
-        <header className="doc-header">
-          <p className="doc-eyebrow">Verification tool</p>
-          <h1 className="h1 doc-title">Verify any Beleg ledger.</h1>
-          <p className="doc-lead">
-            Paste a public proof page URL below. Verification runs entirely in
-            your browser. Nothing is sent to our servers.
+    <>
+      <main className="beleg-verify">
+        <header className="bh-verify-head">
+          <p className="bh-kicker">Verification tool</p>
+          <h1 className="bh-verify-title">Verify any Beleg ledger.</h1>
+          <p className="bh-body">
+            Paste a public proof page URL. The check runs in this browser.
+            Nothing is sent to our servers except the request to load the
+            public entries.
           </p>
         </header>
 
-        <div className="card doc-body">
+        <div className="bh-verify-tool">
           <VerifyTool />
         </div>
 
-        <p className="doc-note">
+        <p className="bh-verify-note">
           You can also verify without this page. See{" "}
           <Link href="/verify-guide">Verify it yourself</Link> for the
           command-line method using open-source tools.
         </p>
-      </div>
-
-      <Footer />
-    </main>
+      </main>
+      <BelegFooter />
+    </>
   );
 }
