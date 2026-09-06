@@ -4,14 +4,7 @@ import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 
 import { BelegMark } from "@/app/components/BelegMark";
-import { LinkPending } from "@/app/components/CtaBadge";
-
-const LINKS = [
-  { id: "how", label: "How it works" },
-  { id: "uses", label: "Who it's for" },
-  { id: "tools", label: "Tools" },
-  { id: "about", label: "About" },
-] as const;
+import { CtaBadge, LinkPending } from "@/app/components/CtaBadge";
 
 export function NavBarClient({ signedIn }: { signedIn: boolean }) {
   return (
@@ -23,21 +16,18 @@ export function NavBarClient({ signedIn }: { signedIn: boolean }) {
         </Link>
 
         <nav className="navbar-center" aria-label="Main">
-          {LINKS.map((link) => (
-            <a
-              key={link.id}
-              href={`/#${link.id}`}
-              className="navbar-link navbar-link-info"
-            >
-              {link.label}
-            </a>
-          ))}
+          <a href="/#record" className="navbar-link navbar-link-info">
+            Product
+          </a>
+          <Link href="/verify" className="navbar-link navbar-link-info">
+            Verify
+          </Link>
+          <a href="/#about" className="navbar-link navbar-link-info">
+            About
+          </a>
         </nav>
 
         <nav className="navbar-end" aria-label="Account">
-          <a href="/#try" className="navbar-ghost">
-            Try it
-          </a>
           {signedIn ? (
             <>
               <Link href="/dashboard" className="navbar-link">
@@ -52,7 +42,8 @@ export function NavBarClient({ signedIn }: { signedIn: boolean }) {
                 Log in
               </Link>
               <Link href="/sign-up" className="navbar-signup">
-                Sign up
+                Create a Beleg
+                <CtaBadge />
               </Link>
             </>
           )}

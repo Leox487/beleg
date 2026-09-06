@@ -6,6 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useEffect } from "react";
 
 const HIDE = [
+  /^\/$/,
   /^\/dashboard/,
   /^\/v\//,
   /^\/p\//,

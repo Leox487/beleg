@@ -11,7 +11,9 @@ import {
 } from "next/font/google";
 
 import { DEFAULT_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { BELEG_SHELL_SCRIPT } from "@/lib/beleg-shell";
 import { CONSENT_BOOT_SCRIPT } from "@/lib/consent";
+import { BelegShell } from "./components/BelegShell";
 import { BetaNotice } from "./components/BetaNotice";
 import { CookieBanner } from "./components/CookieBanner";
 import { IdleDim } from "./components/IdleDim";
@@ -21,6 +23,7 @@ import { ScrollNav } from "./components/ScrollNav";
 import { SmoothHashLinks } from "./components/SmoothHashLinks";
 import { StickyCta } from "./components/StickyCta";
 import "./globals.css";
+import "./beleg.css";
 
 const sans = Inter({
   subsets: ["latin"],
@@ -42,7 +45,6 @@ const grotesk = Space_Grotesk({
   weight: ["400", "500", "600", "700"],
   variable: "--font-grotesk",
   display: "swap",
-  preload: false,
 });
 
 const mono = JetBrains_Mono({
@@ -108,7 +110,9 @@ export default function RootLayout({
     >
       <body>
         <script dangerouslySetInnerHTML={{ __html: CONSENT_BOOT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: BELEG_SHELL_SCRIPT }} />
         <IdleDim />
+        <BelegShell />
         <ClerkProvider
           appearance={
             {
