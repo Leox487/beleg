@@ -13,53 +13,44 @@ const PARTS = [
 
 export function ClaimIdea() {
   const ref = useRef<HTMLElement>(null);
-  const [step, setStep] = useState(0);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setStep(PARTS.length);
+      setReady(true);
       return;
     }
-    const items = [...el.querySelectorAll<HTMLElement>("[data-part]")];
     const obs = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const part = Number((entry.target as HTMLElement).dataset.part);
-          setStep((n) => Math.max(n, part + 1));
-        }
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        obs.disconnect();
+        setReady(true);
       },
-      { threshold: 0.5, rootMargin: "0px 0px -10% 0px" },
+      { threshold: 0.25 },
     );
-    items.forEach((item) => obs.observe(item));
+    obs.observe(el);
     return () => obs.disconnect();
   }, []);
 
   return (
-    <section id="idea" className="bh-idea" ref={ref}>
+    <section id="idea" className={`bh-idea${ready ? " is-ready" : ""}`} ref={ref}>
       <p className="bh-kicker">The idea</p>
       <h2 className="bh-idea-title">A claim is not proof.</h2>
       <p className="bh-idea-quote">“I received a $12,000 grant.”</p>
       <p className="bh-idea-tag">Claim</p>
 
       <ol className="bh-idea-parts">
-        {PARTS.map((part, i) => (
-          <li
-            key={part.label}
-            data-part={i}
-            className={step > i ? "is-on" : undefined}
-          >
+        {PARTS.map((part) => (
+          <li key={part.label}>
             <span>{part.label}</span>
             <b>{part.value}</b>
           </li>
         ))}
       </ol>
 
-      <p className={`bh-idea-end${step >= PARTS.length ? " is-on" : ""}`}>
-        Now someone else can verify it.
-      </p>
+      <p className="bh-idea-end">Now someone else can verify it.</p>
     </section>
   );
 }

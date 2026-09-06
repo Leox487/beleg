@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const CHECKS = [
   "Witness confirmed",
@@ -12,12 +12,23 @@ const CHECKS = [
 export function ReviewerDemo() {
   const [ran, setRan] = useState(false);
   const [count, setCount] = useState(0);
+  const timers = useRef<number[]>([]);
+
+  useEffect(() => {
+    return () => {
+      timers.current.forEach((id) => window.clearTimeout(id));
+    };
+  }, []);
 
   function verify() {
+    timers.current.forEach((id) => window.clearTimeout(id));
+    timers.current = [];
     setRan(true);
     setCount(0);
     CHECKS.forEach((_, i) => {
-      window.setTimeout(() => setCount(i + 1), 180 * (i + 1));
+      timers.current.push(
+        window.setTimeout(() => setCount(i + 1), 160 * (i + 1)),
+      );
     });
   }
 

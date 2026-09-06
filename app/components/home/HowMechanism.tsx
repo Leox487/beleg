@@ -17,16 +17,27 @@ export function HowMechanism() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const onScroll = () => {
-      const rect = el.getBoundingClientRect();
-      const travel = el.offsetHeight - window.innerHeight;
-      if (travel <= 0) return;
-      const p = Math.min(1, Math.max(0, -rect.top / travel));
-      setStage(Math.min(STAGES.length - 1, Math.floor(p * STAGES.length)));
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setStage(STAGES.length - 1);
+      return;
+    }
+
+    const timers: number[] = [];
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        obs.disconnect();
+        STAGES.forEach((_, i) => {
+          timers.push(window.setTimeout(() => setStage(i), 220 * i));
+        });
+      },
+      { threshold: 0.35 },
+    );
+    obs.observe(el);
+    return () => {
+      obs.disconnect();
+      timers.forEach((id) => window.clearTimeout(id));
     };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (

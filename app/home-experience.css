@@ -39,11 +39,15 @@ html.beleg .navbar-center .navbar-link {
   padding-right: 28px;
 }
 
+.beleg-home section[id] {
+  scroll-margin-top: 88px;
+}
+
 .bh-display {
-  margin: 0 0 28px;
+  margin: 0 0 20px;
   max-width: 16ch;
   font-family: var(--font-grotesk), sans-serif;
-  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  font-size: clamp(2rem, 4vw, 3.2rem);
   font-weight: 500;
   letter-spacing: -0.05em;
   line-height: 0.95;
@@ -198,28 +202,17 @@ html.beleg .navbar-center .navbar-link {
   color: var(--bh-ok);
 }
 
-/* --- horizontal proof stream --- */
+/* --- proof stream --- */
 
 .bh-stream {
-  height: 220vh;
-}
-
-.bh-stream-sticky {
-  position: sticky;
-  top: 72px;
-  height: calc(100vh - 72px);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 0 40px;
+  max-width: var(--bh-width);
+  margin: 0 auto;
+  padding: 48px 28px 40px;
 }
 
 .bh-stream .bh-kicker {
-  max-width: var(--bh-width);
-  margin: 0 auto 36px;
-  padding: 0 28px;
-  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  margin: 0 0 20px;
+  font-size: clamp(1.3rem, 2.4vw, 1.8rem);
   letter-spacing: -0.04em;
   text-transform: none;
   font-family: var(--font-grotesk), sans-serif;
@@ -228,19 +221,20 @@ html.beleg .navbar-center .navbar-link {
 
 .bh-stream-track {
   display: flex;
-  align-items: flex-start;
   gap: 0;
   margin: 0;
-  padding: 0 28px;
+  padding: 0 0 8px;
   list-style: none;
-  width: max-content;
-  will-change: transform;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
 .bh-stream-track li {
-  width: min(78vw, 380px);
-  padding-right: 36px;
+  flex: 0 0 min(72vw, 260px);
+  padding-right: 28px;
   border-right: 1px solid var(--bh-line);
+  scroll-snap-align: start;
 }
 
 .bh-stream-track button {
@@ -297,28 +291,28 @@ html.beleg .navbar-center .navbar-link {
 /* --- claim is not proof --- */
 
 .bh-idea {
-  padding: 96px 28px 120px;
+  padding: 48px 28px 56px;
 }
 
 .bh-idea-title {
   margin: 0;
   font-family: var(--font-grotesk), sans-serif;
-  font-size: clamp(3rem, 8vw, 6.4rem);
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
   font-weight: 500;
-  letter-spacing: -0.06em;
-  line-height: 0.88;
+  letter-spacing: -0.055em;
+  line-height: 0.92;
 }
 
 .bh-idea-quote {
-  margin: 36px 0 0;
+  margin: 20px 0 0;
   max-width: 20ch;
-  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  font-size: clamp(1.2rem, 2vw, 1.6rem);
   line-height: 1.25;
   color: var(--bh-mute);
 }
 
 .bh-idea-tag {
-  margin: 18px 0 40px;
+  margin: 12px 0 24px;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 11px;
   letter-spacing: 0.16em;
@@ -339,14 +333,8 @@ html.beleg .navbar-center .navbar-link {
   display: grid;
   grid-template-columns: 8rem minmax(0, 1fr);
   gap: 16px;
-  padding: 14px 0;
+  padding: 10px 0;
   border-top: 1px solid var(--bh-line);
-  opacity: 0.22;
-  transition: opacity 500ms ease;
-}
-
-.bh-idea-parts li.is-on {
-  opacity: 1;
 }
 
 .bh-idea-parts span {
@@ -362,35 +350,25 @@ html.beleg .navbar-center .navbar-link {
 }
 
 .bh-idea-end {
-  margin: 36px 0 0;
-  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  margin: 24px 0 0;
+  font-size: clamp(1.3rem, 2.2vw, 1.8rem);
   letter-spacing: -0.04em;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 500ms ease, transform 500ms ease;
 }
 
-.bh-idea-end.is-on {
-  opacity: 1;
-  transform: none;
+.bh-idea.is-ready .bh-idea-end {
+  color: var(--bh-ok);
 }
 
 /* --- one mechanism --- */
 
 .bh-mech {
-  height: 260vh;
+  padding: 48px 0;
 }
 
 .bh-mech-sticky {
-  position: sticky;
-  top: 80px;
-  height: calc(100vh - 80px);
   max-width: 36rem;
   margin: 0 auto;
   padding: 0 28px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .bh-mech-brand {
@@ -421,8 +399,8 @@ html.beleg .navbar-center .navbar-link {
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr);
   gap: 14px;
-  padding-bottom: 22px;
-  opacity: 0.24;
+  padding-bottom: 16px;
+  opacity: 0.42;
   transition: opacity 280ms ease;
 }
 
@@ -460,7 +438,7 @@ html.beleg .navbar-center .navbar-link {
 
 .bh-proto {
   background: var(--bh-accent-soft);
-  padding: 88px 0;
+  padding: 56px 0;
   width: 100%;
 }
 
@@ -536,7 +514,7 @@ html.beleg .navbar-center .navbar-link {
 
 .bh-pub {
   width: 100%;
-  padding: 88px 0;
+  padding: 56px 0;
   background: #fff;
 }
 
@@ -631,7 +609,7 @@ html.beleg .navbar-center .navbar-link {
 
 .bh-review {
   width: 100%;
-  padding: 96px 28px;
+  padding: 56px 28px;
   background: var(--bh-ink);
   color: #f4f0e7;
 }
@@ -711,7 +689,7 @@ html.beleg .navbar-center .navbar-link {
 
 .bh-priv {
   width: 100%;
-  padding: 96px 0;
+  padding: 56px 0;
   background: #101113;
   color: #f4f0e7;
 }
@@ -775,9 +753,9 @@ html.beleg .navbar-center .navbar-link {
 /* --- use stories, not cards --- */
 
 .bh-uses {
-  padding: 96px 28px;
+  padding: 56px 28px;
   display: grid;
-  gap: 72px;
+  gap: 36px;
 }
 
 .bh-story p:first-child {
@@ -840,7 +818,7 @@ html.beleg .navbar-center .navbar-link {
 /* --- boundaries --- */
 
 .bh-bounds {
-  padding: 40px 28px 96px;
+  padding: 32px 28px 48px;
 }
 
 .bh-bounds-grid {
@@ -875,7 +853,7 @@ html.beleg .navbar-center .navbar-link {
 /* --- comparison --- */
 
 .bh-compare {
-  padding: 0 28px 96px;
+  padding: 0 28px 48px;
   overflow-x: auto;
 }
 
@@ -902,7 +880,7 @@ html.beleg .navbar-center .navbar-link {
 /* --- developer layer --- */
 
 .bh-tech {
-  padding: 0 28px 96px;
+  padding: 0 28px 48px;
 }
 
 .bh-code {
@@ -993,7 +971,7 @@ html.beleg .beleg-home .acc-icon::after {
 }
 
 .bh-end {
-  padding: 72px 28px 64px;
+  padding: 48px 28px 56px;
 }
 
 /* --- footer sitemap --- */
@@ -1053,40 +1031,6 @@ html.beleg .beleg-home .acc-icon::after {
 }
 
 @media (max-width: 900px) {
-  .bh-stream {
-    height: auto;
-  }
-
-  .bh-stream-sticky {
-    position: static;
-    height: auto;
-    overflow: visible;
-  }
-
-  .bh-stream-track {
-    display: grid;
-    width: 100%;
-    transform: none !important;
-    padding-bottom: 40px;
-  }
-
-  .bh-stream-track li {
-    width: 100%;
-    padding: 20px 0;
-    border-right: 0;
-    border-top: 1px solid var(--bh-line);
-  }
-
-  .bh-mech {
-    height: auto;
-  }
-
-  .bh-mech-sticky {
-    position: static;
-    height: auto;
-    padding: 72px 28px;
-  }
-
   .bh-priv-grid,
   .bh-pub-app,
   .bh-bounds-grid,
@@ -1096,8 +1040,8 @@ html.beleg .beleg-home .acc-icon::after {
     grid-template-columns: 1fr;
   }
 
-  .bh-idea-title {
-    font-size: clamp(2.4rem, 12vw, 3.6rem);
+  .bh-stream-track li {
+    flex-basis: 78vw;
   }
 
   .bh-sys {
@@ -1107,8 +1051,6 @@ html.beleg .beleg-home .acc-icon::after {
 
 @media (prefers-reduced-motion: reduce) {
   .bh-sys-flow li,
-  .bh-idea-parts li,
-  .bh-idea-end,
   .bh-mech-list li {
     opacity: 1;
     transform: none;

@@ -40,6 +40,13 @@ export function PublicLedger() {
           </ol>
         </div>
         <aside>
+          <p>Selected record</p>
+          <ul>
+            <li>{current.title}</li>
+            <li>{current.detail}</li>
+            <li>{current.who}</li>
+            <li>{current.date}</li>
+          </ul>
           <p>Chain status</p>
           <ul>
             <li>4 / 4 records intact</li>
@@ -47,8 +54,7 @@ export function PublicLedger() {
             <li>Bitcoin #883,214</li>
           </ul>
           <p>
-            Selected: {current.title}. Open{" "}
-            <a href="/verify">Verify</a> to recompute a real ledger.
+            Open <a href="/verify">Verify</a> to recompute a real ledger.
           </p>
         </aside>
       </div>
