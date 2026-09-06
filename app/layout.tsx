@@ -24,6 +24,7 @@ import { SmoothHashLinks } from "./components/SmoothHashLinks";
 import { StickyCta } from "./components/StickyCta";
 import "./globals.css";
 import "./beleg.css";
+import "./home-experience.css";
 
 const sans = Inter({
   subsets: ["latin"],

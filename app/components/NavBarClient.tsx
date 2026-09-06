@@ -16,14 +16,20 @@ export function NavBarClient({ signedIn }: { signedIn: boolean }) {
         </Link>
 
         <nav className="navbar-center" aria-label="Main">
-          <a href="/#record" className="navbar-link navbar-link-info">
+          <a href="/#live" className="navbar-link navbar-link-info">
             Product
+          </a>
+          <a href="/#how" className="navbar-link navbar-link-info">
+            How it works
           </a>
           <Link href="/verify" className="navbar-link navbar-link-info">
             Verify
           </Link>
-          <a href="/#about" className="navbar-link navbar-link-info">
-            About
+          <Link href="/security" className="navbar-link navbar-link-info">
+            Security
+          </Link>
+          <a href="/#faq" className="navbar-link navbar-link-info">
+            Resources
           </a>
         </nav>
 

@@ -1,9 +1,9 @@
 /* Public Beleg shell — homepage and /verify. */
 
 html.beleg {
-  --bh-bg: #f5f1e8;
-  --bh-ink: #111111;
-  --bh-mute: #687386;
+  --bh-bg: #f4f0e7;
+  --bh-ink: #101113;
+  --bh-mute: #66738a;
   --bh-line: rgba(17, 17, 17, 0.1);
   --bh-accent: #315cff;
   --bh-accent-soft: #e8edff;
@@ -190,18 +190,7 @@ html.beleg body {
 }
 
 .bh-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: repeating-linear-gradient(
-    to right,
-    rgba(17, 17, 17, 0.035) 0,
-    rgba(17, 17, 17, 0.035) 1px,
-    transparent 1px,
-    transparent calc(25% - 0.25px)
-  );
-  z-index: 0;
+  display: none;
 }
 
 .beleg-home > *,
