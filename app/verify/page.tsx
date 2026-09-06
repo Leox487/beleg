@@ -14,6 +14,10 @@ export default function VerifyPage() {
   return (
     <>
       <main className="beleg-verify">
+        <p className="bh-live">
+          <i />
+          Live · Runs in this browser
+        </p>
         <header className="bh-verify-head">
           <p className="bh-kicker">Verification tool</p>
           <h1 className="bh-verify-title">Verify any Beleg ledger.</h1>

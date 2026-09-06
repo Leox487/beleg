@@ -1,11 +1,14 @@
 /* Public Beleg shell — homepage and /verify. */
 
 html.beleg {
-  --bh-bg: #f4f1e9;
-  --bh-ink: #141414;
-  --bh-mute: #6b675f;
-  --bh-line: rgba(20, 18, 14, 0.16);
-  --bh-ok: #1c7a4a;
+  --bh-bg: #f5f1e8;
+  --bh-ink: #111111;
+  --bh-mute: #687386;
+  --bh-line: rgba(17, 17, 17, 0.1);
+  --bh-accent: #315cff;
+  --bh-accent-soft: #e8edff;
+  --bh-ok: #24a36b;
+  --bh-warn: #d99a25;
   --bh-paper: #efebe2;
   --bh-width: 1320px;
   color-scheme: light;
@@ -18,31 +21,37 @@ html.beleg body {
 }
 
 html.beleg body::before {
-  background-image:
-    radial-gradient(rgba(20, 18, 14, 0.03) 0.55px, transparent 0.65px);
-  background-size: 3px 3px;
-  mask-image: none;
-  -webkit-mask-image: none;
-  opacity: 0.5;
+  display: none;
 }
 
 html.beleg .idle-veil {
   display: none;
 }
 
+html.beleg .nav-wrap {
+  padding: 14px 20px 0;
+}
+
 html.beleg header.navbar,
 html.beleg .navbar-bar,
 html.beleg .nav-scrolled .navbar-bar {
-  background: var(--bh-bg) !important;
+  background: #fff !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  box-shadow: none !important;
 }
 
-html.beleg .navbar-bar {
-  max-width: calc(var(--bh-width) + 56px);
+html.beleg header.navbar {
+  background: transparent !important;
+}
+
+html.beleg .navbar-bar,
+html.beleg .nav-scrolled .navbar-bar {
+  max-width: var(--bh-width);
   margin: 0 auto;
-  border-bottom: 1px solid var(--bh-line) !important;
+  height: 56px;
+  border: 1px solid rgba(17, 17, 17, 0.08) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 1px 0 rgba(17, 17, 17, 0.03);
 }
 
 html.beleg .wordmark,
@@ -63,11 +72,11 @@ html.beleg .wordmark-mark {
 }
 
 html.beleg .wordmark-mark [stroke] {
-  stroke: currentColor;
+  stroke: var(--bh-accent);
 }
 
 html.beleg .wordmark-mark circle {
-  fill: currentColor;
+  fill: var(--bh-accent);
 }
 
 html.beleg .navbar-link,
@@ -87,7 +96,7 @@ html.beleg .navbar-link:hover,
 html.beleg .navbar-link-info:hover,
 html.beleg .navbar-end .navbar-login:hover,
 html.beleg .navbar-login:hover {
-  color: var(--bh-ink) !important;
+  color: var(--bh-accent) !important;
 }
 
 html.beleg .navbar-ghost {
@@ -96,20 +105,24 @@ html.beleg .navbar-ghost {
 
 html.beleg .navbar-signup,
 html.beleg .navbar-end .navbar-signup {
-  height: auto !important;
-  padding: 0 !important;
-  background: transparent !important;
-  color: var(--bh-ink) !important;
+  height: 36px !important;
+  padding: 0 14px !important;
+  background: var(--bh-ink) !important;
+  color: #fff !important;
   border: 0 !important;
-  border-radius: 0 !important;
-  font-weight: 500;
+  border-radius: 999px !important;
+  font-weight: 600;
   box-shadow: none !important;
 }
 
 html.beleg .navbar-signup:hover,
 html.beleg .navbar-end .navbar-signup:hover {
-  color: var(--bh-ink) !important;
-  background: transparent !important;
+  color: #fff !important;
+  background: #1c1c1c !important;
+}
+
+html.beleg .navbar-signup .cta-arrow {
+  color: #fff;
 }
 
 html.beleg .beta-notice {
@@ -156,23 +169,35 @@ html.beleg body.has-sticky-cta .sticky-cta {
 .beleg-home,
 .beleg-verify {
   position: relative;
+  display: flex;
+  flex-direction: column;
   max-width: var(--bh-width);
   margin: 0 auto;
   padding: 0 28px;
-  background: var(--bh-bg);
+  background: transparent;
   color: var(--bh-ink);
+}
+
+html.beleg body {
+  background:
+    radial-gradient(circle at 82% 12%, rgba(49, 92, 255, 0.09), transparent 36%),
+    var(--bh-bg);
 }
 
 .beleg-home::before,
 .beleg-verify::before {
+  display: none;
+}
+
+.bh-hero::before {
   content: "";
   position: absolute;
-  inset: 0 28px;
+  inset: 0;
   pointer-events: none;
   background-image: repeating-linear-gradient(
     to right,
-    rgba(20, 18, 14, 0.055) 0,
-    rgba(20, 18, 14, 0.055) 1px,
+    rgba(17, 17, 17, 0.035) 0,
+    rgba(17, 17, 17, 0.035) 1px,
     transparent 1px,
     transparent calc(25% - 0.25px)
   );
@@ -257,6 +282,46 @@ html.beleg body.has-sticky-cta .sticky-cta {
   color: var(--bh-ok);
 }
 
+.bh-accent {
+  color: var(--bh-accent);
+}
+
+.bh-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px auto 0;
+  padding: 7px 12px 7px 10px;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--bh-mute);
+  font-size: 13px;
+}
+
+.beleg-home > .bh-live,
+.beleg-verify > .bh-live {
+  display: flex;
+  width: max-content;
+  align-self: center;
+}
+
+.bh-live i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--bh-accent);
+  box-shadow: 0 0 0 3px rgba(49, 92, 255, 0.16);
+}
+
+.bh-textlink {
+  color: var(--bh-accent);
+}
+
+.bh-textlink:hover {
+  color: var(--bh-accent);
+}
+
 .bh-btn,
 .bh-textlink {
   display: inline-flex;
@@ -282,21 +347,32 @@ html.beleg body.has-sticky-cta .sticky-cta {
 /* --- hero --- */
 
 .bh-hero {
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(28rem, 34rem);
+  grid-template-columns: minmax(0, 1fr) minmax(28rem, 36rem);
   gap: 48px 56px;
   align-items: end;
-  padding: 64px 0 72px;
+  padding: 40px 0 72px;
   border-bottom: 1px solid var(--bh-line);
+}
+
+.bh-hero > * {
+  position: relative;
+  z-index: 1;
 }
 
 .bh-hero-copy .bh-support {
   margin-bottom: 4px;
 }
 
+.bh-hero-stage {
+  position: relative;
+}
+
 .bh-doc {
-  background: var(--bh-paper);
-  padding: 26px 28px 22px;
+  background: #fff;
+  padding: 26px 28px 0;
+  box-shadow: 0 18px 50px rgba(17, 17, 17, 0.06);
 }
 
 .bh-doc-head,
@@ -313,7 +389,7 @@ html.beleg body.has-sticky-cta .sticky-cta {
 
 .bh-doc-head {
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--bh-ink);
+  border-bottom: 1px solid var(--bh-line);
 }
 
 .bh-doc h2 {
@@ -335,10 +411,73 @@ html.beleg body.has-sticky-cta .sticky-cta {
   color: var(--bh-mute);
 }
 
-.bh-doc-foot {
-  margin-top: 28px;
-  padding-top: 14px;
+.bh-doc-facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 18px;
+  margin: 22px 0 0;
+  padding-top: 16px;
   border-top: 1px solid var(--bh-line);
+}
+
+.bh-doc-facts dt {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bh-mute);
+}
+
+.bh-doc-facts dd {
+  margin: 3px 0 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--bh-ink);
+}
+
+.bh-doc-foot {
+  margin: 24px -28px 0;
+  padding: 14px 28px;
+  background: var(--bh-accent-soft);
+  color: var(--bh-accent);
+  align-items: center;
+}
+
+.bh-doc-foot .bh-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--bh-accent);
+  box-shadow: 0 0 0 4px rgba(49, 92, 255, 0.18);
+}
+
+.bh-doc-foot b {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.bh-chip {
+  position: absolute;
+  right: -18px;
+  top: -16px;
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid rgba(36, 163, 107, 0.28);
+  box-shadow: 0 10px 28px rgba(17, 17, 17, 0.08);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bh-ok);
+  z-index: 2;
+}
+
+.bh-chip span {
+  color: var(--bh-mute);
 }
 
 /* --- bands --- */
@@ -367,19 +506,35 @@ html.beleg body.has-sticky-cta .sticky-cta {
   list-style: none;
   margin: 18px 0 0;
   padding: 0;
+  position: relative;
+}
+
+.bh-timeline::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: var(--bh-accent);
+  opacity: 0.35;
 }
 
 .bh-timeline li {
   display: grid;
-  grid-template-columns: 2.4rem minmax(0, 1fr) auto;
-  gap: 18px;
+  grid-template-columns: 1.2rem 2.4rem minmax(0, 1fr) auto;
+  gap: 14px;
   align-items: baseline;
   padding: 16px 0;
-  border-top: 1px solid var(--bh-ink);
 }
 
-.bh-timeline li:last-child {
-  border-bottom: 1px solid var(--bh-line);
+.bh-tl-node {
+  width: 9px;
+  height: 9px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--bh-accent);
+  box-shadow: 0 0 0 4px rgba(49, 92, 255, 0.14);
 }
 
 .bh-tl-n,
@@ -469,11 +624,11 @@ html.beleg body.has-sticky-cta .sticky-cta {
 .bh-chain::before {
   content: "";
   position: absolute;
-  left: 0;
+  left: 3px;
   top: 0;
-  width: 1px;
+  width: 2px;
   height: 0;
-  background: var(--bh-ink);
+  background: var(--bh-accent);
   transition: height 700ms ease;
 }
 
@@ -487,6 +642,19 @@ html.beleg body.has-sticky-cta .sticky-cta {
   padding: 14px 0 14px 22px;
   border-top: 1px solid var(--bh-line);
   font-family: var(--font-mono), ui-monospace, monospace;
+  position: relative;
+}
+
+.bh-chain li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bh-accent);
+  box-shadow: 0 0 0 4px rgba(49, 92, 255, 0.14);
 }
 
 .bh-chain li:first-child {
@@ -669,11 +837,15 @@ html.beleg .verify-banner,
 html.beleg .verify-banner.verify-ok,
 html.beleg .verify-ok,
 html.beleg .verify-success {
-  border: 1px solid var(--bh-line);
+  border: 1px solid rgba(36, 163, 107, 0.28);
   border-radius: 0;
-  background: var(--bh-paper);
+  background: rgba(36, 163, 107, 0.08);
   color: var(--bh-ok);
   box-shadow: none;
+}
+
+.bh-verify-note a {
+  color: var(--bh-accent);
 }
 
 html.beleg .verify-banner.verify-broken,
@@ -721,15 +893,20 @@ html.beleg .verify-toggle {
     padding: 56px 0;
   }
 
-  .beleg-home::before,
-  .beleg-verify::before {
-    background-image: repeating-linear-gradient(
-      to right,
-      rgba(20, 18, 14, 0.055) 0,
-      rgba(20, 18, 14, 0.055) 1px,
-      transparent 1px,
-      transparent calc(50% - 0.5px)
-    );
+  .bh-chip {
+    right: 0;
+  }
+
+  .bh-timeline {
+    grid-template-columns: unset;
+  }
+
+  .bh-timeline li {
+    grid-template-columns: 1.2rem minmax(0, 1fr) auto;
+  }
+
+  .bh-tl-n {
+    display: none;
   }
 }
 

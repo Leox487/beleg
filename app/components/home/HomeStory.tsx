@@ -95,6 +95,11 @@ export function HomeStory({
 }) {
   return (
     <main className="beleg-home">
+      <p className="bh-live">
+        <i />
+        Live · Public beta
+      </p>
+
       <section className="bh-hero">
         <div className="bh-hero-copy">
           <p className="bh-kicker">Verifiable records for real-world progress</p>
@@ -103,26 +108,54 @@ export function HomeStory({
             <span>not prose.</span>
           </h1>
           <p className="bh-support">
-            A sealed timeline of traction anyone can verify.
+            A sealed timeline of{" "}
+            <span className="bh-accent">traction</span> anyone can verify.
           </p>
           <Start href={ctaHref} label={ctaLabel} />
         </div>
 
-        <article className="bh-doc">
-          <header className="bh-doc-head">
-            <span>01</span>
-            <span>Mar 12, 2026</span>
-          </header>
-          <h2>Grant received</h2>
-          <p className="bh-doc-sum">$12,000</p>
-          <p className="bh-doc-who">Civic Innovation Fund</p>
-          <footer className="bh-doc-foot">
-            <span>Sealed</span>
-            <span>
-              SHA-256 <HashText value="a3f81c94b7d0e29b" />
-            </span>
-          </footer>
-        </article>
+        <div className="bh-hero-stage">
+          <p className="bh-chip">
+            ✓ Verified
+            <span>Mar 14, 2026</span>
+          </p>
+          <article className="bh-doc">
+            <header className="bh-doc-head">
+              <span>01</span>
+              <span>Mar 12, 2026</span>
+            </header>
+            <h2>Grant received</h2>
+            <p className="bh-doc-sum">$12,000</p>
+            <p className="bh-doc-who">Civic Innovation Fund</p>
+            <dl className="bh-doc-facts">
+              <div>
+                <dt>Timestamp</dt>
+                <dd>2026-03-12 14:38:07 UTC</dd>
+              </div>
+              <div>
+                <dt>Witness</dt>
+                <dd>Civic Innovation Fund</dd>
+              </div>
+              <div>
+                <dt>Block</dt>
+                <dd>#883,214</dd>
+              </div>
+              <div>
+                <dt>Chain</dt>
+                <dd>01 → 02 → 03</dd>
+              </div>
+            </dl>
+            <footer className="bh-doc-foot">
+              <b>
+                <span className="bh-dot" />
+                Sealed
+              </b>
+              <span>
+                SHA-256 <HashText value="a3f81c94b7d0e29b" />
+              </span>
+            </footer>
+          </article>
+        </div>
       </section>
 
       <section className="bh-band">
@@ -149,6 +182,7 @@ export function HomeStory({
           <ol className="bh-timeline">
             {TIMELINE.map((item) => (
               <li key={item.n}>
+                <span className="bh-tl-node" aria-hidden="true" />
                 <span className="bh-tl-n">{item.n}</span>
                 <div className="bh-tl-main">
                   <h3>{item.title}</h3>
@@ -161,8 +195,8 @@ export function HomeStory({
                   <span>
                     {item.date} {item.year}
                   </span>
-                  <span className={item.state === "WITNESSED" ? "bh-ok" : undefined}>
-                    {item.state}
+                  <span className={item.state === "WITNESSED" ? "bh-ok" : "bh-accent"}>
+                    ● {item.state}
                   </span>
                 </div>
               </li>
