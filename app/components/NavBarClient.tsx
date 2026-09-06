@@ -35,6 +35,9 @@ export function NavBarClient({ signedIn }: { signedIn: boolean }) {
         </nav>
 
         <nav className="navbar-end" aria-label="Account">
+          <a href="/#try" className="navbar-ghost">
+            Try it
+          </a>
           {signedIn ? (
             <>
               <Link href="/dashboard" className="navbar-link">

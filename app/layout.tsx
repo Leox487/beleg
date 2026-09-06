@@ -18,6 +18,7 @@ import { IdleDim } from "./components/IdleDim";
 import { Navbar } from "./components/Navbar";
 import { OptionalAnalytics } from "./components/OptionalAnalytics";
 import { ScrollNav } from "./components/ScrollNav";
+import { SmoothHashLinks } from "./components/SmoothHashLinks";
 import { StickyCta } from "./components/StickyCta";
 import "./globals.css";
 
@@ -128,6 +129,7 @@ export default function RootLayout({
           <ScrollNav>
             <Navbar />
           </ScrollNav>
+          <SmoothHashLinks />
           <BetaNotice />
           {children}
           <StickyCta />
