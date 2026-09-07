@@ -118,7 +118,7 @@ export default async function NationalAuditPage() {
           <p className="doc-eyebrow">Live — updated daily</p>
           <h1 className="h1 doc-title">US Municipal Record Audit</h1>
           <p className="lp-lead">
-            Beleg retrieves public files from municipal CKAN portals, hashes the
+            Beleg retrieves public files from municipal open data portals, hashes the
             bytes, and keeps every snapshot. A later hash that does not match is
             a content change, not a verdict.
           </p>

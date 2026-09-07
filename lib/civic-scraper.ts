@@ -2,7 +2,11 @@ import "server-only";
 
 import { createHash } from "crypto";
 
-import { CITY_SEEDS, citySlug } from "@/lib/civic-cities";
+import {
+  CITY_SEEDS,
+  citySlug,
+  type CivicCitySeed,
+} from "@/lib/civic-cities";
 import { sendCivicChangeEmail } from "@/lib/civic-email";
 import { stampHashHex, upgradeProofBase64 } from "@/lib/ots";
 import { SITE_URL } from "@/lib/site";
@@ -47,6 +51,19 @@ interface CkanPackage {
     resources?: CkanResource[];
   };
 }
+
+interface SocrataView {
+  id?: string;
+  name?: string;
+  error?: boolean;
+}
+
+type IngestCounters = {
+  checked: number;
+  changed: number;
+  new_records: number;
+  errors: string[];
+};
 
 function isDownloadable(url: string, format?: string): boolean {
   const fmt = (format ?? "").trim().toUpperCase();
@@ -158,9 +175,165 @@ async function insertRecord(input: {
   `;
 }
 
+async function showSocrataView(
+  portal: string,
+  id: string,
+): Promise<{ id: string; name: string } | null> {
+  const base = portal.replace(/\/$/, "");
+  const res = await fetch(`${base}/api/views/${encodeURIComponent(id)}.json`, {
+    signal: AbortSignal.timeout(15_000),
+    headers: { Accept: "application/json" },
+  });
+  if (!res.ok) return null;
+  const body = (await res.json()) as SocrataView;
+  if (!body || body.error || !body.id) return null;
+  return { id: String(body.id), name: String(body.name || body.id) };
+}
+
+function socrataCsvUrl(portal: string, id: string): string {
+  const base = portal.replace(/\/$/, "");
+  return `${base}/api/views/${encodeURIComponent(id)}/rows.csv?accessType=DOWNLOAD`;
+}
+
+async function ingestResource(
+  seed: CivicCitySeed,
+  datasetId: string,
+  datasetName: string,
+  resourceUrl: string,
+  counters: IngestCounters,
+): Promise<void> {
+  counters.checked += 1;
+
+  let hashed: { hash: string; size: number } | null = null;
+  try {
+    hashed = await hashUrl(resourceUrl);
+  } catch (error) {
+    const message = `Fetch/hash failed for ${resourceUrl}`;
+    console.error(message, error);
+    counters.errors.push(message);
+    return;
+  }
+  if (!hashed) {
+    counters.errors.push(`Could not hash ${resourceUrl}`);
+    return;
+  }
+
+  const previous = await latestHash(resourceUrl);
+  if (previous === hashed.hash) return;
+
+  try {
+    await insertRecord({
+      city: seed.city,
+      state: seed.state,
+      datasetId,
+      datasetName,
+      resourceUrl,
+      fileHash: hashed.hash,
+      fileSize: hashed.size,
+    });
+    counters.new_records += 1;
+
+    if (previous) {
+      await sql`
+        INSERT INTO civic_changes (
+          city, state, dataset_name, resource_url, old_hash, new_hash,
+          change_type
+        ) VALUES (
+          ${seed.city}, ${seed.state}, ${datasetName}, ${resourceUrl},
+          ${previous}, ${hashed.hash}, ${"content_modified"}
+        )
+      `;
+      counters.changed += 1;
+      void notifyCitySubscribers({
+        city: seed.city,
+        datasetName,
+        resourceUrl,
+        oldHash: previous,
+        newHash: hashed.hash,
+      }).catch((error) => {
+        console.error("Civic subscriber notify failed:", error);
+      });
+    }
+  } catch (error) {
+    const message = `Insert failed for ${resourceUrl}`;
+    console.error(message, error);
+    counters.errors.push(message);
+  }
+}
+
+async function scrapeCkanCity(
+  seed: CivicCitySeed,
+  counters: IngestCounters,
+): Promise<void> {
+  for (const datasetId of seed.datasets) {
+    let pack: CkanPackage["result"] | null = null;
+    try {
+      pack = await showPackage(seed.portal, datasetId);
+    } catch (error) {
+      const message = `CKAN lookup failed for ${seed.city}/${datasetId}`;
+      console.error(message, error);
+      counters.errors.push(message);
+      continue;
+    }
+    if (!pack) {
+      counters.errors.push(`No CKAN package for ${seed.city}/${datasetId}`);
+      console.error(`No CKAN package for ${seed.city}/${datasetId}`);
+      continue;
+    }
+
+    const resolvedId = pack.name || datasetId;
+    const datasetName = pack.title || datasetId;
+    const resources = (pack.resources ?? []).filter(
+      (resource) =>
+        resource.url && isDownloadable(resource.url, resource.format),
+    );
+
+    for (const resource of resources) {
+      await ingestResource(
+        seed,
+        resolvedId,
+        datasetName,
+        resource.url as string,
+        counters,
+      );
+    }
+  }
+}
+
+async function scrapeSocrataCity(
+  seed: CivicCitySeed,
+  counters: IngestCounters,
+): Promise<void> {
+  for (const datasetId of seed.datasets) {
+    let view: { id: string; name: string } | null = null;
+    try {
+      view = await showSocrataView(seed.portal, datasetId);
+    } catch (error) {
+      const message = `Socrata lookup failed for ${seed.city}/${datasetId}`;
+      console.error(message, error);
+      counters.errors.push(message);
+      continue;
+    }
+    if (!view) {
+      counters.errors.push(`No Socrata view for ${seed.city}/${datasetId}`);
+      console.error(`No Socrata view for ${seed.city}/${datasetId}`);
+      continue;
+    }
+
+    await ingestResource(
+      seed,
+      view.id,
+      view.name,
+      socrataCsvUrl(seed.portal, view.id),
+      counters,
+    );
+  }
+}
+
 /**
- * Pulls seeded CKAN packages for each city, hashes downloadable resources,
- * and writes a civic_records row when the bytes are new or have changed.
+ * Pulls seeded CKAN packages or Socrata views for each city, hashes
+ * downloadable resources, and writes a civic_records row when the bytes
+ * are new or have changed.
  * Pass a city slug to process one city; omit it to process all seeds.
  */
 export async function scrapeCivicRecords(
@@ -175,99 +348,22 @@ export async function scrapeCivicRecords(
     return { checked: 0, changed: 0, new_records: 0, errors: [`unknown city: ${cityFilter}`] };
   }
 
-  let checked = 0;
-  let changed = 0;
-  let new_records = 0;
-  const errors: string[] = [];
+  const counters: IngestCounters = {
+    checked: 0,
+    changed: 0,
+    new_records: 0,
+    errors: [],
+  };
 
   for (const seed of seeds) {
-    for (const datasetId of seed.datasets) {
-      let pack: CkanPackage["result"] | null = null;
-      try {
-        pack = await showPackage(seed.portal, datasetId);
-      } catch (error) {
-        const message = `CKAN lookup failed for ${seed.city}/${datasetId}`;
-        console.error(message, error);
-        errors.push(message);
-        continue;
-      }
-      if (!pack) {
-        errors.push(`No CKAN package for ${seed.city}/${datasetId}`);
-        console.error(`No CKAN package for ${seed.city}/${datasetId}`);
-        continue;
-      }
-
-      const resolvedId = pack.name || datasetId;
-      const datasetName = pack.title || datasetId;
-      const resources = (pack.resources ?? []).filter(
-        (resource) =>
-          resource.url && isDownloadable(resource.url, resource.format),
-      );
-
-      for (const resource of resources) {
-        const resourceUrl = resource.url as string;
-        checked += 1;
-
-        let hashed: { hash: string; size: number } | null = null;
-        try {
-          hashed = await hashUrl(resourceUrl);
-        } catch (error) {
-          const message = `Fetch/hash failed for ${resourceUrl}`;
-          console.error(message, error);
-          errors.push(message);
-          continue;
-        }
-        if (!hashed) {
-          errors.push(`Could not hash ${resourceUrl}`);
-          continue;
-        }
-
-        const previous = await latestHash(resourceUrl);
-        if (previous === hashed.hash) continue;
-
-        try {
-          await insertRecord({
-            city: seed.city,
-            state: seed.state,
-            datasetId: resolvedId,
-            datasetName,
-            resourceUrl,
-            fileHash: hashed.hash,
-            fileSize: hashed.size,
-          });
-          new_records += 1;
-
-          if (previous) {
-            await sql`
-              INSERT INTO civic_changes (
-                city, state, dataset_name, resource_url, old_hash, new_hash,
-                change_type
-              ) VALUES (
-                ${seed.city}, ${seed.state}, ${datasetName}, ${resourceUrl},
-                ${previous}, ${hashed.hash}, ${"content_modified"}
-              )
-            `;
-            changed += 1;
-            void notifyCitySubscribers({
-              city: seed.city,
-              datasetName,
-              resourceUrl,
-              oldHash: previous,
-              newHash: hashed.hash,
-            }).catch((error) => {
-              console.error("Civic subscriber notify failed:", error);
-            });
-          }
-        } catch (error) {
-          const message = `Insert failed for ${resourceUrl}`;
-          console.error(message, error);
-          errors.push(message);
-        }
-      }
+    if (seed.type === "socrata") {
+      await scrapeSocrataCity(seed, counters);
+    } else {
+      await scrapeCkanCity(seed, counters);
     }
   }
 
-  return { checked, changed, new_records, errors };
+  return counters;
 }
 
 async function notifyCitySubscribers(input: {

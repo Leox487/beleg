@@ -27,6 +27,26 @@
     {
       "path": "/api/civic/ingest?city=boston",
       "schedule": "50 7 * * *"
+    },
+    {
+      "path": "/api/civic/ingest?city=chicago",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/civic/ingest?city=seattle",
+      "schedule": "10 8 * * *"
+    },
+    {
+      "path": "/api/civic/ingest?city=austin",
+      "schedule": "20 8 * * *"
+    },
+    {
+      "path": "/api/civic/ingest?city=los-angeles",
+      "schedule": "30 8 * * *"
+    },
+    {
+      "path": "/api/civic/ingest?city=san-francisco",
+      "schedule": "40 8 * * *"
     }
   ]
 }
