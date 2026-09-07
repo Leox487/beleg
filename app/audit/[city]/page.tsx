@@ -1,114 +1,85 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { CivicVerify } from "@/app/components/CivicVerify";
 import { Footer } from "@/app/components/Footer";
-import { asNullableString, asTimestamp } from "@/lib/row";
+import { CITY_SEEDS, citySlug, findCityBySlug } from "@/lib/civic-cities";
+import { asTimestamp } from "@/lib/row";
 import sql from "@/lib/supabase";
 
-import "./civic.css";
-
-export const metadata: Metadata = {
-  title: "Pittsburgh Civic Audit · Beleg",
-  description:
-    "SHA-256 snapshots of public Pittsburgh datasets from WPRDC, with detected file changes and OpenTimestamps proofs.",
-};
+import {
+  formatWhen,
+  mapChange,
+  mapRecord,
+  shortHash,
+} from "../civic-map";
+import "../civic.css";
 
 export const dynamic = "force-dynamic";
 
-type CivicRecordRow = {
-  id: string;
-  dataset_id: string;
-  dataset_name: string;
-  resource_url: string;
-  file_hash: string;
-  file_size: number | null;
-  retrieved_at: string;
-  ots_proof: string | null;
-  anchor_status: string | null;
-};
+type CityParams = { city: string };
 
-type CivicChangeRow = {
-  id: string;
-  dataset_name: string;
-  resource_url: string;
-  old_hash: string;
-  new_hash: string;
-  detected_at: string;
-  change_type: string;
-};
-
-function formatWhen(iso: string): string {
-  return new Date(iso).toLocaleString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "UTC",
-    timeZoneName: "short",
-  });
+export function generateStaticParams() {
+  return CITY_SEEDS.map((seed) => ({ city: citySlug(seed.city) }));
 }
 
-function shortHash(hash: string): string {
-  if (hash.length <= 16) return hash;
-  return `${hash.slice(0, 8)}…${hash.slice(-6)}`;
-}
-
-function mapRecord(row: Record<string, unknown>): CivicRecordRow {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<CityParams>;
+}): Promise<Metadata> {
+  const { city: slug } = await params;
+  const seed = findCityBySlug(slug);
+  if (!seed) {
+    return { title: "Civic Audit · Beleg" };
+  }
   return {
-    id: String(row.id),
-    dataset_id: String(row.dataset_id),
-    dataset_name: String(row.dataset_name),
-    resource_url: String(row.resource_url),
-    file_hash: String(row.file_hash),
-    file_size: row.file_size == null ? null : Number(row.file_size),
-    retrieved_at: asTimestamp(row.retrieved_at),
-    ots_proof: asNullableString(row.ots_proof),
-    anchor_status: asNullableString(row.anchor_status),
+    title: `${seed.city} Civic Audit · Beleg`,
+    description: `SHA-256 snapshots of public ${seed.city} datasets, with detected file changes and OpenTimestamps proofs.`,
   };
 }
 
-function mapChange(row: Record<string, unknown>): CivicChangeRow {
-  return {
-    id: String(row.id),
-    dataset_name: String(row.dataset_name),
-    resource_url: String(row.resource_url),
-    old_hash: String(row.old_hash),
-    new_hash: String(row.new_hash),
-    detected_at: asTimestamp(row.detected_at),
-    change_type: String(row.change_type ?? "content_modified"),
-  };
-}
+export default async function CityAuditPage({
+  params,
+}: {
+  params: Promise<CityParams>;
+}) {
+  const { city: slug } = await params;
+  const seed = findCityBySlug(slug);
+  if (!seed) notFound();
 
-export default async function PittsburghAuditPage() {
   const [recordRows, changeRows, latestRows, statsRows] = await Promise.all([
     sql`
       SELECT
-        id, dataset_id, dataset_name, resource_url, file_hash, file_size,
-        retrieved_at, ots_proof, anchor_status
+        id, city, state, dataset_id, dataset_name, resource_url, file_hash,
+        file_size, retrieved_at, ots_proof, anchor_status
       FROM civic_records
+      WHERE city = ${seed.city}
       ORDER BY retrieved_at DESC
     `,
     sql`
       SELECT
-        id, dataset_name, resource_url, old_hash, new_hash, detected_at,
-        change_type
+        id, city, state, dataset_name, resource_url, old_hash, new_hash,
+        detected_at, change_type
       FROM civic_changes
+      WHERE city = ${seed.city}
       ORDER BY detected_at DESC
       LIMIT 100
     `,
     sql`
       SELECT DISTINCT ON (resource_url)
-        id, dataset_id, dataset_name, resource_url, file_hash, file_size,
-        retrieved_at, ots_proof, anchor_status
+        id, city, state, dataset_id, dataset_name, resource_url, file_hash,
+        file_size, retrieved_at, ots_proof, anchor_status
       FROM civic_records
+      WHERE city = ${seed.city}
       ORDER BY resource_url, retrieved_at DESC
     `,
     sql`
       SELECT
-        (SELECT count(DISTINCT resource_url)::int FROM civic_records) AS monitored,
-        (SELECT max(retrieved_at) FROM civic_records) AS last_checked,
-        (SELECT count(*)::int FROM civic_changes) AS changes
+        (SELECT count(DISTINCT resource_url)::int FROM civic_records WHERE city = ${seed.city}) AS monitored,
+        (SELECT max(retrieved_at) FROM civic_records WHERE city = ${seed.city}) AS last_checked,
+        (SELECT count(*)::int FROM civic_changes WHERE city = ${seed.city}) AS changes
     `,
   ]);
 
@@ -122,32 +93,27 @@ export default async function PittsburghAuditPage() {
     mapRecord(row as Record<string, unknown>),
   );
   const statsRow = statsRows[0] as Record<string, unknown> | undefined;
-  const stats = statsRow
-    ? {
-        monitored: Number(statsRow.monitored ?? 0),
-        last_checked: statsRow.last_checked
-          ? asTimestamp(statsRow.last_checked)
-          : null,
-        changes: Number(statsRow.changes ?? 0),
-      }
-    : undefined;
-
-  const monitored = stats?.monitored ?? 0;
-  const lastChecked = stats?.last_checked
-    ? formatWhen(stats.last_checked)
+  const monitored = Number(statsRow?.monitored ?? 0);
+  const lastChecked = statsRow?.last_checked
+    ? formatWhen(asTimestamp(statsRow.last_checked))
     : "Not yet";
-  const changeCount = stats?.changes ?? 0;
+  const changeCount = Number(statsRow?.changes ?? 0);
 
   return (
     <main className="page civic-page">
       <div className="civic-inner">
         <header className="doc-header">
+          <Link href="/audit" className="civic-back">
+            ← All cities
+          </Link>
           <p className="doc-eyebrow">Cryptographic public record monitor</p>
-          <h1 className="h1 doc-title">Pittsburgh Civic Audit</h1>
+          <h1 className="h1 doc-title">
+            {seed.city} Civic Audit
+          </h1>
           <p className="lp-lead">
-            Beleg retrieves public files from the Western Pennsylvania Regional
-            Data Center, hashes the bytes, and keeps every snapshot. A later
-            hash that does not match is a content change, not a verdict.
+            Beleg retrieves public files from {seed.city}&apos;s open data
+            portal, hashes the bytes, and keeps every snapshot. A later hash
+            that does not match is a content change, not a verdict.
           </p>
         </header>
 
@@ -226,7 +192,9 @@ export default async function PittsburghAuditPage() {
                       <td>{row.anchor_status ?? "pending"}</td>
                       <td>
                         {row.ots_proof ? (
-                          <a href={`/api/civic/proof/${row.id}`}>Download .ots</a>
+                          <a href={`/api/civic/proof/${row.id}`}>
+                            Download .ots
+                          </a>
                         ) : (
                           "—"
                         )}

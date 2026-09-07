@@ -2,32 +2,21 @@ import "server-only";
 
 import { createHash } from "crypto";
 
+import { CITY_SEEDS } from "@/lib/civic-cities";
 import { stampHashHex, upgradeProofBase64 } from "@/lib/ots";
 import sql from "@/lib/supabase";
 
-const CKAN = "https://data.wprdc.org/api/3/action/package_show";
-
-const SEED = [
-  {
-    slug: "city-of-pittsburgh-budget",
-    aliases: ["city-revenues-and-expenses"],
-  },
-  {
-    slug: "city-of-pittsburgh-contracts",
-    aliases: [],
-  },
-  {
-    slug: "311-data",
-    aliases: [],
-  },
-  {
-    slug: "city-of-pittsburgh-operating-budget",
-    aliases: ["city-pittsburgh-operating-budget"],
-  },
-] as const;
-
 const FETCH_MS = 45_000;
 const MAX_BYTES = 80 * 1024 * 1024;
+const UPGRADE_MIN_AGE_MS = 60 * 60 * 1000;
+
+const SKIP_HOSTS = [
+  "docs.google.com",
+  "youtube.com",
+  "youtu.be",
+  "powerbigov.us",
+  "powerbi.com",
+];
 
 export interface CivicIngestResult {
   checked: number;
@@ -40,8 +29,6 @@ export interface CivicUpgradeResult {
   confirmed: number;
   updated: number;
 }
-
-const UPGRADE_MIN_AGE_MS = 60 * 60 * 1000;
 
 interface CkanResource {
   url?: string;
@@ -58,13 +45,21 @@ interface CkanPackage {
   };
 }
 
-function isDownloadable(url: string): boolean {
+function isDownloadable(url: string, format?: string): boolean {
+  const fmt = (format ?? "").trim().toUpperCase();
+  if (fmt === "HTML" || fmt === "ARC GIS GEOSERVICES REST API") {
+    return false;
+  }
   try {
     const parsed = new URL(url);
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
       return false;
     }
-    if (parsed.hostname.includes("docs.google.com")) {
+    const host = parsed.hostname.toLowerCase();
+    if (SKIP_HOSTS.some((skip) => host === skip || host.endsWith(`.${skip}`))) {
+      return false;
+    }
+    if (parsed.pathname.includes("/arcgis/rest/")) {
       return false;
     }
     return true;
@@ -73,23 +68,22 @@ function isDownloadable(url: string): boolean {
   }
 }
 
-async function showPackage(id: string): Promise<CkanPackage["result"] | null> {
-  const res = await fetch(`${CKAN}?id=${encodeURIComponent(id)}`, {
-    signal: AbortSignal.timeout(15_000),
-    headers: { Accept: "application/json" },
-  });
+async function showPackage(
+  portal: string,
+  id: string,
+): Promise<CkanPackage["result"] | null> {
+  const base = portal.replace(/\/$/, "");
+  const res = await fetch(
+    `${base}/api/3/action/package_show?id=${encodeURIComponent(id)}`,
+    {
+      signal: AbortSignal.timeout(15_000),
+      headers: { Accept: "application/json" },
+    },
+  );
   if (!res.ok) return null;
   const body = (await res.json()) as CkanPackage;
   if (!body.success || !body.result) return null;
   return body.result;
-}
-
-async function resolveDataset(slug: string, aliases: readonly string[]) {
-  for (const id of [slug, ...aliases]) {
-    const pack = await showPackage(id);
-    if (pack) return { id, pack };
-  }
-  return null;
 }
 
 async function hashUrl(
@@ -132,6 +126,8 @@ async function latestHash(url: string): Promise<string | null> {
 }
 
 async function insertRecord(input: {
+  city: string;
+  state: string;
   datasetId: string;
   datasetName: string;
   resourceUrl: string;
@@ -139,7 +135,7 @@ async function insertRecord(input: {
   fileSize: number;
 }): Promise<void> {
   let otsProof: string | null = null;
-  let anchorStatus = "pending";
+  const anchorStatus = "pending";
   try {
     otsProof = await stampHashHex(input.fileHash);
   } catch (error) {
@@ -148,82 +144,92 @@ async function insertRecord(input: {
 
   await sql`
     INSERT INTO civic_records (
-      dataset_id, dataset_name, resource_url, file_hash, file_size,
+      city, state, dataset_id, dataset_name, resource_url, file_hash, file_size,
       ots_proof, anchor_status
     ) VALUES (
-      ${input.datasetId}, ${input.datasetName}, ${input.resourceUrl},
-      ${input.fileHash}, ${input.fileSize}, ${otsProof}, ${anchorStatus}
+      ${input.city}, ${input.state}, ${input.datasetId}, ${input.datasetName},
+      ${input.resourceUrl}, ${input.fileHash}, ${input.fileSize}, ${otsProof},
+      ${anchorStatus}
     )
   `;
 }
 
 /**
- * Pulls the seeded WPRDC packages, hashes each downloadable resource, and
- * writes a new civic_records row when the bytes are new or have changed.
+ * Pulls seeded CKAN packages for each city, hashes downloadable resources,
+ * and writes a civic_records row when the bytes are new or have changed.
  */
 export async function scrapeCivicRecords(): Promise<CivicIngestResult> {
   let checked = 0;
   let changed = 0;
   let new_records = 0;
 
-  for (const seed of SEED) {
-    let resolved: Awaited<ReturnType<typeof resolveDataset>>;
-    try {
-      resolved = await resolveDataset(seed.slug, seed.aliases);
-    } catch (error) {
-      console.error(`CKAN lookup failed for ${seed.slug}:`, error);
-      continue;
-    }
-    if (!resolved) {
-      console.error(`No WPRDC package for ${seed.slug}`);
-      continue;
-    }
-
-    const datasetId = resolved.pack.name || resolved.id;
-    const datasetName = resolved.pack.title || seed.slug;
-    const resources = (resolved.pack.resources ?? []).filter(
-      (resource) => resource.url && isDownloadable(resource.url),
-    );
-
-    for (const resource of resources) {
-      const resourceUrl = resource.url as string;
-      checked += 1;
-
-      let hashed: { hash: string; size: number } | null = null;
+  for (const seed of CITY_SEEDS) {
+    for (const datasetId of seed.datasets) {
+      let pack: CkanPackage["result"] | null = null;
       try {
-        hashed = await hashUrl(resourceUrl);
+        pack = await showPackage(seed.portal, datasetId);
       } catch (error) {
-        console.error(`Fetch/hash failed for ${resourceUrl}:`, error);
+        console.error(
+          `CKAN lookup failed for ${seed.city}/${datasetId}:`,
+          error,
+        );
         continue;
       }
-      if (!hashed) continue;
+      if (!pack) {
+        console.error(`No CKAN package for ${seed.city}/${datasetId}`);
+        continue;
+      }
 
-      const previous = await latestHash(resourceUrl);
-      if (previous === hashed.hash) continue;
+      const resolvedId = pack.name || datasetId;
+      const datasetName = pack.title || datasetId;
+      const resources = (pack.resources ?? []).filter(
+        (resource) =>
+          resource.url && isDownloadable(resource.url, resource.format),
+      );
 
-      try {
-        await insertRecord({
-          datasetId,
-          datasetName,
-          resourceUrl,
-          fileHash: hashed.hash,
-          fileSize: hashed.size,
-        });
-        new_records += 1;
+      for (const resource of resources) {
+        const resourceUrl = resource.url as string;
+        checked += 1;
 
-        if (previous) {
-          await sql`
-            INSERT INTO civic_changes (
-              dataset_name, resource_url, old_hash, new_hash, change_type
-            ) VALUES (
-              ${datasetName}, ${resourceUrl}, ${previous}, ${hashed.hash},
-              ${"content_modified"}
-            )
-          `;
-          changed += 1;
+        let hashed: { hash: string; size: number } | null = null;
+        try {
+          hashed = await hashUrl(resourceUrl);
+        } catch (error) {
+          console.error(`Fetch/hash failed for ${resourceUrl}:`, error);
+          continue;
         }
-      } catch (error) {
-        console.error(`Insert failed for ${resourceUrl}:`, error);
+        if (!hashed) continue;
+
+        const previous = await latestHash(resourceUrl);
+        if (previous === hashed.hash) continue;
+
+        try {
+          await insertRecord({
+            city: seed.city,
+            state: seed.state,
+            datasetId: resolvedId,
+            datasetName,
+            resourceUrl,
+            fileHash: hashed.hash,
+            fileSize: hashed.size,
+          });
+          new_records += 1;
+
+          if (previous) {
+            await sql`
+              INSERT INTO civic_changes (
+                city, state, dataset_name, resource_url, old_hash, new_hash,
+                change_type
+              ) VALUES (
+                ${seed.city}, ${seed.state}, ${datasetName}, ${resourceUrl},
+                ${previous}, ${hashed.hash}, ${"content_modified"}
+              )
+            `;
+            changed += 1;
+          }
+        } catch (error) {
+          console.error(`Insert failed for ${resourceUrl}:`, error);
+        }
       }
     }
   }

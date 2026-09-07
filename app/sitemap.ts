@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { CITY_SEEDS, citySlug } from "@/lib/civic-cities";
 import { SITE_URL } from "@/lib/site";
 
 const PATHS = [
@@ -18,7 +19,8 @@ const PATHS = [
   "/contact",
   "/privacy",
   "/terms",
-  "/audit/pittsburgh",
+  "/audit",
+  ...CITY_SEEDS.map((seed) => `/audit/${citySlug(seed.city)}`),
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

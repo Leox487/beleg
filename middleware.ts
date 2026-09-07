@@ -25,6 +25,7 @@ const isPublicRoute = createRouteMatcher([
   "/contact",
   "/thanks",
   "/for-reviewers",
+  "/audit",
   "/audit/(.*)",
   "/audit/pittsburgh",
   "/api/public/(.*)",

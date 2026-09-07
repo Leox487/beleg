@@ -135,9 +135,11 @@ create table if not exists public.processed_webhook_ids (
   processed_at timestamptz not null default now()
 );
 
--- Civic audit: snapshots of public WPRDC files and detected content changes.
+-- Civic audit: snapshots of public CKAN files and detected content changes.
 create table if not exists public.civic_records (
   id uuid primary key default gen_random_uuid(),
+  city text not null default 'Pittsburgh',
+  state text not null default 'PA',
   dataset_id text not null,
   dataset_name text not null,
   resource_url text not null,
@@ -148,9 +150,12 @@ create table if not exists public.civic_records (
   anchor_status text default 'pending'
 );
 create index if not exists civic_records_url_idx on public.civic_records (resource_url);
+create index if not exists civic_records_city_idx on public.civic_records (city);
 
 create table if not exists public.civic_changes (
   id uuid primary key default gen_random_uuid(),
+  city text,
+  state text,
   dataset_name text not null,
   resource_url text not null,
   old_hash text not null,
@@ -158,3 +163,12 @@ create table if not exists public.civic_changes (
   detected_at timestamptz not null default now(),
   change_type text default 'content_modified'
 );
+
+alter table public.civic_records
+  add column if not exists city text not null default 'Pittsburgh';
+alter table public.civic_changes
+  add column if not exists city text;
+alter table public.civic_records
+  add column if not exists state text not null default 'PA';
+alter table public.civic_changes
+  add column if not exists state text;

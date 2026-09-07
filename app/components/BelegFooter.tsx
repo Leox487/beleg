@@ -10,6 +10,7 @@ const COLUMNS = [
       { href: "/#public", label: "Public proofs" },
       { href: "/for-reviewers", label: "For reviewers" },
       { href: "/uses", label: "For founders" },
+      { href: "/audit", label: "Municipal Audit" },
       { href: "/audit/pittsburgh", label: "Pittsburgh Audit" },
     ],
   },
