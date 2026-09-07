@@ -13,6 +13,7 @@ const COLUMNS = [
       { href: "/verify", label: "Verify a ledger" },
       { href: "/verify-guide", label: "Verify it yourself" },
       { href: "/changelog", label: "Changelog" },
+      { href: "/audit/pittsburgh", label: "Pittsburgh Audit" },
     ],
   },
   {

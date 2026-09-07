@@ -25,6 +25,8 @@ const isPublicRoute = createRouteMatcher([
   "/contact",
   "/thanks",
   "/for-reviewers",
+  "/audit/(.*)",
+  "/audit/pittsburgh",
   "/api/public/(.*)",
   // Witness confirmation: the unguessable token is the auth. The page at
   // /attest/(.*) is already public; this is the POST that page calls.
@@ -38,6 +40,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/ingest/email",
   // Stripe inbound webhooks (verified via per-venture HMAC secret).
   "/api/stripe/webhook/(.*)",
+  "/api/civic/proof/(.*)",
 ]);
 
 const isProtectedPage = createRouteMatcher(["/dashboard(.*)", "/v/(.*)"]);
@@ -61,7 +64,10 @@ export default function middleware(
 ) {
   // Bypass Clerk entirely. The route verifies CRON_SECRET itself; Clerk
   // would treat that Bearer token as a JWT and reject the request.
-  if (req.nextUrl.pathname === "/api/anchor/upgrade") {
+  if (
+    req.nextUrl.pathname === "/api/anchor/upgrade" ||
+    req.nextUrl.pathname === "/api/civic/ingest"
+  ) {
     return NextResponse.next();
   }
   return clerkHandler(req, event);

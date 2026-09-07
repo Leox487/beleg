@@ -18,6 +18,7 @@ const PATHS = [
   "/contact",
   "/privacy",
   "/terms",
+  "/audit/pittsburgh",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

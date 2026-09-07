@@ -3,6 +3,10 @@
     {
       "path": "/api/anchor/upgrade",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/civic/ingest",
+      "schedule": "0 7 * * *"
     }
   ]
 }

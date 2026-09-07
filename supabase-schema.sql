@@ -134,3 +134,27 @@ create table if not exists public.processed_webhook_ids (
   id text primary key,
   processed_at timestamptz not null default now()
 );
+
+-- Civic audit: snapshots of public WPRDC files and detected content changes.
+create table if not exists public.civic_records (
+  id uuid primary key default gen_random_uuid(),
+  dataset_id text not null,
+  dataset_name text not null,
+  resource_url text not null,
+  file_hash text not null,
+  file_size bigint,
+  retrieved_at timestamptz not null default now(),
+  ots_proof text,
+  anchor_status text default 'pending'
+);
+create index if not exists civic_records_url_idx on public.civic_records (resource_url);
+
+create table if not exists public.civic_changes (
+  id uuid primary key default gen_random_uuid(),
+  dataset_name text not null,
+  resource_url text not null,
+  old_hash text not null,
+  new_hash text not null,
+  detected_at timestamptz not null default now(),
+  change_type text default 'content_modified'
+);
