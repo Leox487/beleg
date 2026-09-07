@@ -11,11 +11,11 @@ export type CivicCitySeed = {
  * except WPRDC, which is CKAN but does not implement site_read
  * (status_show and package_show both succeed).
  *
- * Skipped — not CKAN at the listed host:
- * New York (data.cityofnewyork.us), Chicago, Los Angeles,
- * Philadelphia (opendataphilly.org), Dallas, San Diego, Austin,
- * Jacksonville, Columbus, Charlotte, Indianapolis, Seattle,
- * Denver, Nashville, Oklahoma City, Detroit.
+ * Skipped — not CKAN at the listed host (site_read ≠ {success:true}):
+ * Chicago, Seattle, Austin, Denver, Nashville, Detroit, New Orleans,
+ * Los Angeles, Philadelphia (data.phila.gov 403), Baltimore, San Francisco,
+ * Kansas City, Louisville, Memphis, Atlanta, Minneapolis, Portland,
+ * Tucson, Raleigh.
  */
 export const CITY_SEEDS: readonly CivicCitySeed[] = [
   {
@@ -63,6 +63,16 @@ export const CITY_SEEDS: readonly CivicCitySeed[] = [
       "311-service-request-data",
       "active-building-permits",
       "police-calls-for-service",
+    ],
+  },
+  {
+    city: "Boston",
+    state: "MA",
+    portal: "https://data.boston.gov",
+    datasets: [
+      "revenue-budget",
+      "city-of-boston-contract-award",
+      "approved-building-permits",
     ],
   },
 ];

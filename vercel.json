@@ -23,6 +23,10 @@
     {
       "path": "/api/civic/ingest?city=san-jose",
       "schedule": "40 7 * * *"
+    },
+    {
+      "path": "/api/civic/ingest?city=boston",
+      "schedule": "50 7 * * *"
     }
   ]
 }
