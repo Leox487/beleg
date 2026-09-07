@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { CivicChangeList } from "@/app/components/CivicChangeList";
 import { Footer } from "@/app/components/Footer";
-import { CITY_SEEDS, citySlug } from "@/lib/civic-cities";
+import { MUNICIPAL_SEEDS, citySlug } from "@/lib/civic-cities";
 import { asTimestamp } from "@/lib/row";
 import { SITE_URL } from "@/lib/site";
 import sql from "@/lib/supabase";
@@ -103,7 +103,9 @@ export default async function NationalAuditPage() {
     changesByCity.set(String(row.city), Number(row.changes ?? 0));
   }
 
-  const cities = [...CITY_SEEDS].sort((a, b) => {
+  const federalStats = statsByCity.get("Federal");
+  const federalChanges = changesByCity.get("Federal") ?? 0;
+  const cities = [...MUNICIPAL_SEEDS].sort((a, b) => {
     const aChanges = changesByCity.get(a.city) ?? 0;
     const bChanges = changesByCity.get(b.city) ?? 0;
     if (aChanges > 0 && bChanges === 0) return -1;
@@ -124,14 +126,18 @@ export default async function NationalAuditPage() {
           </p>
         </header>
 
-        <ul className="civic-stats civic-stats-5">
+        <ul className="civic-stats civic-stats-6">
           <li>
             <strong>{monitored}</strong>
             <span>Records monitored</span>
           </li>
           <li>
-            <strong>{CITY_SEEDS.length}</strong>
+            <strong>{MUNICIPAL_SEEDS.length}</strong>
             <span>Cities monitored</span>
+          </li>
+          <li>
+            <strong>Federal + {MUNICIPAL_SEEDS.length} cities</strong>
+            <span>Levels of government monitored</span>
           </li>
           <li>
             <strong>{lastChecked}</strong>
@@ -146,6 +152,39 @@ export default async function NationalAuditPage() {
             <span>Bitcoin anchors</span>
           </li>
         </ul>
+
+        <section className="civic-section">
+          <h2>Federal</h2>
+          <ul className="civic-grid">
+            <li>
+              <Link href="/audit/federal">
+                <p className="civic-grid-name">
+                  <span
+                    className={
+                      federalChanges > 0
+                        ? "civic-dot civic-dot-warn"
+                        : "civic-dot civic-dot-ok"
+                    }
+                    aria-hidden="true"
+                  />
+                  US Federal Government
+                </p>
+                <p className="civic-grid-meta">
+                  {federalStats?.monitored ?? 0} records
+                </p>
+                <p className="civic-grid-meta">
+                  Last checked{" "}
+                  {federalStats?.last_checked
+                    ? formatWhen(federalStats.last_checked)
+                    : "Not yet"}
+                </p>
+                <p className="civic-grid-meta">
+                  {federalChanges} {federalChanges === 1 ? "change" : "changes"}
+                </p>
+              </Link>
+            </li>
+          </ul>
+        </section>
 
         <section className="civic-section">
           <h2>Cities</h2>

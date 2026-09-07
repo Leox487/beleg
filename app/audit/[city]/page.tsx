@@ -7,7 +7,12 @@ import { CivicProofZip } from "@/app/components/CivicProofZip";
 import { CivicSubscribe } from "@/app/components/CivicSubscribe";
 import { CivicVerify } from "@/app/components/CivicVerify";
 import { Footer } from "@/app/components/Footer";
-import { CITY_SEEDS, citySlug, findCityBySlug } from "@/lib/civic-cities";
+import {
+  CITY_SEEDS,
+  citySlug,
+  civicDisplayName,
+  findCityBySlug,
+} from "@/lib/civic-cities";
 import { asTimestamp } from "@/lib/row";
 import { SITE_URL } from "@/lib/site";
 import sql from "@/lib/supabase";
@@ -43,9 +48,13 @@ export async function generateMetadata({
     (countRows[0] as Record<string, unknown> | undefined)?.monitored ?? 0,
   );
 
+  const titleName = civicDisplayName(seed);
   return {
-    title: `${seed.city}, ${seed.state} Public Records Audit — Beleg`,
-    description: `Cryptographic monitoring of ${monitored} public records from ${seed.city}'s open data portal. Every file hashed and Bitcoin-anchored daily.`,
+    title: `${titleName} Public Records Audit — Beleg`,
+    description:
+      seed.type === "federal"
+        ? `Cryptographic monitoring of ${monitored} federal public records. Every file hashed and Bitcoin-anchored daily.`
+        : `Cryptographic monitoring of ${monitored} public records from ${seed.city}'s open data portal. Every file hashed and Bitcoin-anchored daily.`,
     alternates: {
       canonical: `${SITE_URL}/audit/${citySlug(seed.city)}`,
     },
@@ -120,18 +129,18 @@ export default async function CityAuditPage({
           <nav className="civic-crumb" aria-label="Breadcrumb">
             <Link href="/audit">Audit</Link>
             <span aria-hidden="true"> / </span>
-            <span>
-              {seed.city}, {seed.state}
-            </span>
+            <span>{civicDisplayName(seed)}</span>
           </nav>
           <p className="doc-eyebrow">Live — updated daily</p>
           <h1 className="h1 doc-title">
-            {seed.city}, {seed.state} Civic Audit
+            {seed.type === "federal"
+              ? "US Federal Government"
+              : `${seed.city}, ${seed.state} Civic Audit`}
           </h1>
           <p className="lp-lead">
-            Beleg retrieves public files from {seed.city}&apos;s open data
-            portal, hashes the bytes, and keeps every snapshot. A later hash
-            that does not match is a content change, not a verdict.
+            {seed.type === "federal"
+              ? "Beleg retrieves public files from federal sources, hashes the bytes, and keeps every snapshot. A later hash that does not match is a content change, not a verdict."
+              : `Beleg retrieves public files from ${seed.city}'s open data portal, hashes the bytes, and keeps every snapshot. A later hash that does not match is a content change, not a verdict.`}
           </p>
         </header>
 

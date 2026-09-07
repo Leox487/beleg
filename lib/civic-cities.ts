@@ -1,4 +1,10 @@
-export type CivicPortalType = "ckan" | "socrata";
+export type CivicPortalType = "ckan" | "socrata" | "federal";
+
+export type CivicFederalFile = {
+  id: string;
+  name: string;
+  url: string;
+};
 
 export type CivicCitySeed = {
   city: string;
@@ -6,6 +12,7 @@ export type CivicCitySeed = {
   portal: string;
   type: CivicPortalType;
   datasets: readonly string[];
+  files?: readonly CivicFederalFile[];
 };
 
 /**
@@ -26,6 +33,11 @@ export type CivicCitySeed = {
  * g5cv-6xbg; Los Angeles iru8-2uf4; San Francisco bu6k-3a8i.
  * Chicago wrvz-psew is taxi trips (oversized). LA rq3b-xjk8 is 311.
  * Chicago v6vf-nfxy stays in SKIP_DATASETS.
+ *
+ * Federal files checked 2026-09-07 (direct GET, skip 404/HTML):
+ * USASpending listed CSVs 404; archive zips exist but are 0.9–1.2GB.
+ * CMS 9wzi-peqs 410 (legacy SODA). Replaced with Medicare MSPB hospital CSV.
+ * Federal Reserve h6.htm / h15.htm are HTML — skipped.
  *
  * Not Socrata (views.json is not a JSON array) — skipped:
  * Denver (denvergov.org / data.denvergov.org HTML),
@@ -195,7 +207,59 @@ export const CITY_SEEDS: readonly CivicCitySeed[] = [
       "n9pm-xkyq",
     ],
   },
+  {
+    city: "Federal",
+    state: "US",
+    portal: "https://www.usa.gov",
+    type: "federal",
+    datasets: [],
+    files: [
+      {
+        id: "house-member-data",
+        name: "Current House members",
+        url: "https://clerk.house.gov/xml/lists/MemberData.xml",
+      },
+      {
+        id: "senate-member-data",
+        name: "Current Senate members",
+        url: "https://www.senate.gov/general/contact_information/senators_cfm.xml",
+      },
+      {
+        id: "sec-edgar-company-index-2026-q3",
+        name: "SEC EDGAR company index — 2026 Q3",
+        url: "https://www.sec.gov/Archives/edgar/full-index/2026/QTR3/company.idx",
+      },
+      {
+        id: "sec-edgar-form-index-2026-q3",
+        name: "SEC EDGAR form index — 2026 Q3",
+        url: "https://www.sec.gov/Archives/edgar/full-index/2026/QTR3/form.idx",
+      },
+      {
+        id: "cms-medicare-spending-hospital",
+        name: "Medicare spending per beneficiary — hospital",
+        url: "https://data.cms.gov/provider-data/sites/default/files/resources/69874ce604586980ac088283c1b35095_1785189964/Medicare_Hospital_Spending_Per_Patient-Hospital.csv",
+      },
+      {
+        id: "cdc-provisional-deaths",
+        name: "CDC provisional COVID-19 deaths by sex and age",
+        url: "https://data.cdc.gov/api/views/9bhg-hcku/rows.csv?accessType=DOWNLOAD",
+      },
+      {
+        id: "healthdata-hospital-capacity",
+        name: "Hospital capacity and quality (HHS Protect)",
+        url: "https://healthdata.gov/api/views/g62h-syeh/rows.csv?accessType=DOWNLOAD",
+      },
+    ],
+  },
 ];
+
+export const MUNICIPAL_SEEDS = CITY_SEEDS.filter(
+  (seed) => seed.type !== "federal",
+);
+
+export function civicDisplayName(seed: CivicCitySeed): string {
+  return seed.type === "federal" ? "US Federal Government" : `${seed.city}, ${seed.state}`;
+}
 
 export function citySlug(city: string): string {
   return city
@@ -215,6 +279,7 @@ export function findCity(query: string): CivicCitySeed | undefined {
   return CITY_SEEDS.find(
     (seed) =>
       citySlug(seed.city) === slug ||
-      seed.city.toLowerCase() === trimmed.toLowerCase(),
+      seed.city.toLowerCase() === trimmed.toLowerCase() ||
+      (seed.type === "federal" && /federal/i.test(trimmed)),
   );
 }

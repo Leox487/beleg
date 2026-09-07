@@ -18,8 +18,10 @@ import { SITE_URL } from "@/lib/site";
 import sql from "@/lib/supabase";
 
 const FETCH_MS = 80_000;
+const FEDERAL_FETCH_MS = 60_000;
 const MAX_BYTES = 400 * 1024 * 1024;
 const CONTENT_MAX_BYTES = 5 * 1024 * 1024;
+const FETCH_UA = "BelegCivicAudit/1.0 (+https://belegapp.com; beleg.app@proton.me)";
 const UPGRADE_MIN_AGE_MS = 60 * 60 * 1000;
 
 const SKIP_HOSTS = [
@@ -126,6 +128,7 @@ function wantsTextSnapshot(url: string, contentType: string | null): boolean {
   if (
     type.includes("csv") ||
     type.includes("json") ||
+    type.includes("xml") ||
     type.startsWith("text/")
   ) {
     return true;
@@ -134,19 +137,25 @@ function wantsTextSnapshot(url: string, contentType: string | null): boolean {
     lower.includes("rows.csv") ||
     lower.endsWith(".csv") ||
     lower.endsWith(".json") ||
+    lower.endsWith(".xml") ||
+    lower.endsWith(".idx") ||
     lower.includes("format=csv") ||
     lower.includes("format=json")
   );
 }
 
-async function hashUrl(url: string): Promise<{
+async function hashUrl(
+  url: string,
+  timeoutMs = FETCH_MS,
+): Promise<{
   hash: string;
   size: number;
   content: string | null;
 } | null> {
   const res = await fetch(url, {
     redirect: "follow",
-    signal: AbortSignal.timeout(FETCH_MS),
+    signal: AbortSignal.timeout(timeoutMs),
+    headers: { "User-Agent": FETCH_UA, Accept: "*/*" },
   });
   if (!res.ok || !res.body) return null;
 
@@ -214,6 +223,7 @@ async function insertRecord(input: {
   fileHash: string;
   fileSize: number;
   content: string | null;
+  sourceType: CivicCitySeed["type"];
 }): Promise<void> {
   let otsProof: string | null = null;
   const anchorStatus = "pending";
@@ -226,11 +236,11 @@ async function insertRecord(input: {
   await sql`
     INSERT INTO civic_records (
       city, state, dataset_id, dataset_name, resource_url, file_hash, file_size,
-      ots_proof, anchor_status, content
+      ots_proof, anchor_status, content, source_type
     ) VALUES (
       ${input.city}, ${input.state}, ${input.datasetId}, ${input.datasetName},
       ${input.resourceUrl}, ${input.fileHash}, ${input.fileSize}, ${otsProof},
-      ${anchorStatus}, ${input.content}
+      ${anchorStatus}, ${input.content}, ${input.sourceType}
     )
   `;
 }
@@ -261,6 +271,7 @@ async function ingestResource(
   datasetName: string,
   resourceUrl: string,
   counters: IngestCounters,
+  timeoutMs = FETCH_MS,
 ): Promise<void> {
   if (isSkippedDataset(datasetId)) return;
 
@@ -269,7 +280,7 @@ async function ingestResource(
   let hashed: { hash: string; size: number; content: string | null } | null =
     null;
   try {
-    hashed = await hashUrl(resourceUrl);
+    hashed = await hashUrl(resourceUrl, timeoutMs);
   } catch (error) {
     const message = `Fetch/hash failed for ${resourceUrl}`;
     console.error(message, error);
@@ -303,6 +314,7 @@ async function ingestResource(
       fileHash: hashed.hash,
       fileSize: hashed.size,
       content: hashed.content,
+      sourceType: seed.type,
     });
     counters.new_records += 1;
 
@@ -411,6 +423,23 @@ async function scrapeSocrataCity(
   }
 }
 
+async function scrapeFederalSources(
+  seed: CivicCitySeed,
+  counters: IngestCounters,
+): Promise<void> {
+  for (const file of seed.files ?? []) {
+    if (isSkippedDataset(file.id)) continue;
+    await ingestResource(
+      seed,
+      file.id,
+      file.name,
+      file.url,
+      counters,
+      FEDERAL_FETCH_MS,
+    );
+  }
+}
+
 /**
  * Pulls seeded CKAN packages or Socrata views for each city, hashes
  * downloadable resources, and writes a civic_records row when the bytes
@@ -437,7 +466,9 @@ export async function scrapeCivicRecords(
   };
 
   for (const seed of seeds) {
-    if (seed.type === "socrata") {
+    if (seed.type === "federal") {
+      await scrapeFederalSources(seed, counters);
+    } else if (seed.type === "socrata") {
       await scrapeSocrataCity(seed, counters);
     } else {
       await scrapeCkanCity(seed, counters);

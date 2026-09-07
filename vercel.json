@@ -47,6 +47,10 @@
     {
       "path": "/api/civic/ingest?city=san-francisco",
       "schedule": "40 8 * * *"
+    },
+    {
+      "path": "/api/civic/ingest?city=federal",
+      "schedule": "0 9 * * *"
     }
   ]
 }
