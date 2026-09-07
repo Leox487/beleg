@@ -25,6 +25,9 @@ export function NavBarClient({ signedIn }: { signedIn: boolean }) {
           <Link href="/verify" className="navbar-link navbar-link-info">
             Verify
           </Link>
+          <Link href="/audit" className="navbar-link navbar-link-info">
+            Audit
+          </Link>
           <Link href="/security" className="navbar-link navbar-link-info">
             Security
           </Link>

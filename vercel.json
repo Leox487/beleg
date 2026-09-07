@@ -5,8 +5,24 @@
       "schedule": "0 0 * * *"
     },
     {
-      "path": "/api/civic/ingest",
+      "path": "/api/civic/ingest?city=pittsburgh",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/civic/ingest?city=houston",
+      "schedule": "10 7 * * *"
+    },
+    {
+      "path": "/api/civic/ingest?city=phoenix",
+      "schedule": "20 7 * * *"
+    },
+    {
+      "path": "/api/civic/ingest?city=san-antonio",
+      "schedule": "30 7 * * *"
+    },
+    {
+      "path": "/api/civic/ingest?city=san-jose",
+      "schedule": "40 7 * * *"
     }
   ]
 }

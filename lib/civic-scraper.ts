@@ -2,7 +2,7 @@ import "server-only";
 
 import { createHash } from "crypto";
 
-import { CITY_SEEDS } from "@/lib/civic-cities";
+import { CITY_SEEDS, citySlug } from "@/lib/civic-cities";
 import { stampHashHex, upgradeProofBase64 } from "@/lib/ots";
 import sql from "@/lib/supabase";
 
@@ -157,13 +157,25 @@ async function insertRecord(input: {
 /**
  * Pulls seeded CKAN packages for each city, hashes downloadable resources,
  * and writes a civic_records row when the bytes are new or have changed.
+ * Pass a city slug to process one city; omit it to process all seeds.
  */
-export async function scrapeCivicRecords(): Promise<CivicIngestResult> {
+export async function scrapeCivicRecords(
+  cityFilter?: string,
+): Promise<CivicIngestResult> {
+  const seeds = cityFilter
+    ? CITY_SEEDS.filter((seed) => citySlug(seed.city) === cityFilter)
+    : CITY_SEEDS;
+
+  if (cityFilter && seeds.length === 0) {
+    console.error(`No civic seed for city=${cityFilter}`);
+    return { checked: 0, changed: 0, new_records: 0 };
+  }
+
   let checked = 0;
   let changed = 0;
   let new_records = 0;
 
-  for (const seed of CITY_SEEDS) {
+  for (const seed of seeds) {
     for (const datasetId of seed.datasets) {
       let pack: CkanPackage["result"] | null = null;
       try {
