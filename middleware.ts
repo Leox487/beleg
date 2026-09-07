@@ -42,6 +42,11 @@ const isPublicRoute = createRouteMatcher([
   // Stripe inbound webhooks (verified via per-venture HMAC secret).
   "/api/stripe/webhook/(.*)",
   "/api/civic/proof/(.*)",
+  "/api/civic/cities",
+  "/api/civic/records",
+  "/api/civic/changes",
+  "/api/civic/subscribe",
+  "/api/civic/flag",
 ]);
 
 const isProtectedPage = createRouteMatcher(["/dashboard(.*)", "/v/(.*)"]);

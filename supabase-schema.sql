@@ -147,7 +147,8 @@ create table if not exists public.civic_records (
   file_size bigint,
   retrieved_at timestamptz not null default now(),
   ots_proof text,
-  anchor_status text default 'pending'
+  anchor_status text default 'pending',
+  bitcoin_block_height integer
 );
 create index if not exists civic_records_url_idx on public.civic_records (resource_url);
 create index if not exists civic_records_city_idx on public.civic_records (city);
@@ -172,3 +173,33 @@ alter table public.civic_records
   add column if not exists state text not null default 'PA';
 alter table public.civic_changes
   add column if not exists state text;
+alter table public.civic_records
+  add column if not exists bitcoin_block_height integer;
+
+create table if not exists public.civic_subscribers (
+  id uuid primary key default gen_random_uuid(),
+  city text not null,
+  email text not null,
+  created_at timestamptz not null default now(),
+  unique (city, email)
+);
+
+create table if not exists public.civic_ingest_log (
+  id uuid primary key default gen_random_uuid(),
+  city text not null,
+  run_at timestamptz not null default now(),
+  checked int,
+  changed int,
+  new_records int,
+  errors jsonb,
+  duration_ms int
+);
+
+create table if not exists public.civic_flags (
+  id uuid primary key default gen_random_uuid(),
+  change_id uuid not null references public.civic_changes(id),
+  reporter_name text,
+  reporter_email text,
+  note text,
+  created_at timestamptz not null default now()
+);

@@ -12,6 +12,7 @@ export type CivicRecordRow = {
   retrieved_at: string;
   ots_proof: string | null;
   anchor_status: string | null;
+  bitcoin_block_height: number | null;
 };
 
 export type CivicChangeRow = {
@@ -56,6 +57,10 @@ export function mapRecord(row: Record<string, unknown>): CivicRecordRow {
     retrieved_at: asTimestamp(row.retrieved_at),
     ots_proof: asNullableString(row.ots_proof),
     anchor_status: asNullableString(row.anchor_status),
+    bitcoin_block_height:
+      row.bitcoin_block_height == null
+        ? null
+        : Number(row.bitcoin_block_height),
   };
 }
 

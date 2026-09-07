@@ -2,18 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { CivicChangeList } from "@/app/components/CivicChangeList";
+import { CivicProofZip } from "@/app/components/CivicProofZip";
+import { CivicSubscribe } from "@/app/components/CivicSubscribe";
 import { CivicVerify } from "@/app/components/CivicVerify";
 import { Footer } from "@/app/components/Footer";
 import { CITY_SEEDS, citySlug, findCityBySlug } from "@/lib/civic-cities";
 import { asTimestamp } from "@/lib/row";
+import { SITE_URL } from "@/lib/site";
 import sql from "@/lib/supabase";
 
-import {
-  formatWhen,
-  mapChange,
-  mapRecord,
-  shortHash,
-} from "../civic-map";
+import { formatWhen, mapChange, mapRecord, shortHash } from "../civic-map";
 import "../civic.css";
 
 export const dynamic = "force-dynamic";
@@ -34,9 +33,22 @@ export async function generateMetadata({
   if (!seed) {
     return { title: "Civic Audit · Beleg" };
   }
+
+  const countRows = await sql`
+    SELECT count(DISTINCT resource_url)::int AS monitored
+    FROM civic_records
+    WHERE city = ${seed.city}
+  `;
+  const monitored = Number(
+    (countRows[0] as Record<string, unknown> | undefined)?.monitored ?? 0,
+  );
+
   return {
-    title: `${seed.city} Civic Audit · Beleg`,
-    description: `SHA-256 snapshots of public ${seed.city} datasets, with detected file changes and OpenTimestamps proofs.`,
+    title: `${seed.city}, ${seed.state} Public Records Audit — Beleg`,
+    description: `Cryptographic monitoring of ${monitored} public records from ${seed.city}'s open data portal. Every file hashed and Bitcoin-anchored daily.`,
+    alternates: {
+      canonical: `${SITE_URL}/audit/${citySlug(seed.city)}`,
+    },
   };
 }
 
@@ -53,7 +65,7 @@ export default async function CityAuditPage({
     sql`
       SELECT
         id, city, state, dataset_id, dataset_name, resource_url, file_hash,
-        file_size, retrieved_at, ots_proof, anchor_status
+        file_size, retrieved_at, ots_proof, anchor_status, bitcoin_block_height
       FROM civic_records
       WHERE city = ${seed.city}
       ORDER BY retrieved_at DESC
@@ -70,7 +82,7 @@ export default async function CityAuditPage({
     sql`
       SELECT DISTINCT ON (resource_url)
         id, city, state, dataset_id, dataset_name, resource_url, file_hash,
-        file_size, retrieved_at, ots_proof, anchor_status
+        file_size, retrieved_at, ots_proof, anchor_status, bitcoin_block_height
       FROM civic_records
       WHERE city = ${seed.city}
       ORDER BY resource_url, retrieved_at DESC
@@ -79,7 +91,8 @@ export default async function CityAuditPage({
       SELECT
         (SELECT count(DISTINCT resource_url)::int FROM civic_records WHERE city = ${seed.city}) AS monitored,
         (SELECT max(retrieved_at) FROM civic_records WHERE city = ${seed.city}) AS last_checked,
-        (SELECT count(*)::int FROM civic_changes WHERE city = ${seed.city}) AS changes
+        (SELECT count(*)::int FROM civic_changes WHERE city = ${seed.city}) AS changes,
+        (SELECT count(*)::int FROM civic_records WHERE city = ${seed.city} AND anchor_status = 'confirmed') AS anchors
     `,
   ]);
 
@@ -98,17 +111,22 @@ export default async function CityAuditPage({
     ? formatWhen(asTimestamp(statsRow.last_checked))
     : "Not yet";
   const changeCount = Number(statsRow?.changes ?? 0);
+  const anchorCount = Number(statsRow?.anchors ?? 0);
 
   return (
     <main className="page civic-page">
       <div className="civic-inner">
         <header className="doc-header">
-          <Link href="/audit" className="civic-back">
-            ← All cities
-          </Link>
-          <p className="doc-eyebrow">Cryptographic public record monitor</p>
+          <nav className="civic-crumb" aria-label="Breadcrumb">
+            <Link href="/audit">Audit</Link>
+            <span aria-hidden="true"> / </span>
+            <span>
+              {seed.city}, {seed.state}
+            </span>
+          </nav>
+          <p className="doc-eyebrow">Live — updated daily</p>
           <h1 className="h1 doc-title">
-            {seed.city} Civic Audit
+            {seed.city}, {seed.state} Civic Audit
           </h1>
           <p className="lp-lead">
             Beleg retrieves public files from {seed.city}&apos;s open data
@@ -117,7 +135,7 @@ export default async function CityAuditPage({
           </p>
         </header>
 
-        <ul className="civic-stats">
+        <ul className="civic-stats civic-stats-4">
           <li>
             <strong>{monitored}</strong>
             <span>Records monitored</span>
@@ -130,6 +148,10 @@ export default async function CityAuditPage({
             <strong>{changeCount}</strong>
             <span>Changes detected</span>
           </li>
+          <li>
+            <strong>{anchorCount}</strong>
+            <span>Bitcoin anchors</span>
+          </li>
         </ul>
 
         <section className="civic-section">
@@ -139,30 +161,21 @@ export default async function CityAuditPage({
             may reflect a legitimate update, correction, or deletion — not
             necessarily misconduct.
           </p>
-          {changes.length === 0 ? (
-            <p className="civic-empty">No content changes recorded yet.</p>
-          ) : (
-            <ul className="civic-changes">
-              {changes.map((row) => (
-                <li key={row.id}>
-                  <p className="civic-change-name">{row.dataset_name}</p>
-                  <a href={row.resource_url}>{row.resource_url}</a>
-                  <p className="civic-change-meta">
-                    {formatWhen(row.detected_at)} · {row.change_type}
-                  </p>
-                  <p className="mono civic-hashes">
-                    <span>{shortHash(row.old_hash)}</span>
-                    <span>→</span>
-                    <span>{shortHash(row.new_hash)}</span>
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
+          <CivicChangeList changes={changes} />
         </section>
 
         <section className="civic-section">
-          <h2>Monitored files</h2>
+          <div className="civic-section-head">
+            <h2>Monitored files</h2>
+            <CivicProofZip
+              city={seed.city}
+              records={latest.map((row) => ({
+                id: row.id,
+                dataset_id: row.dataset_id,
+                ots_proof: row.ots_proof,
+              }))}
+            />
+          </div>
           {latest.length === 0 ? (
             <p className="civic-empty">
               No snapshots yet. The daily retrieval has not run.
@@ -189,7 +202,18 @@ export default async function CityAuditPage({
                       </td>
                       <td className="mono">{shortHash(row.file_hash)}</td>
                       <td>{formatWhen(row.retrieved_at)}</td>
-                      <td>{row.anchor_status ?? "pending"}</td>
+                      <td>
+                        {row.anchor_status === "confirmed" ? (
+                          <span className="civic-anchor-ok">
+                            ✓ Bitcoin confirmed
+                            {row.bitcoin_block_height != null
+                              ? ` · block ${row.bitcoin_block_height}`
+                              : ""}
+                          </span>
+                        ) : (
+                          <span className="civic-anchor-pending">Pending</span>
+                        )}
+                      </td>
                       <td>
                         {row.ots_proof ? (
                           <a href={`/api/civic/proof/${row.id}`}>
@@ -205,6 +229,11 @@ export default async function CityAuditPage({
               </table>
             </div>
           )}
+        </section>
+
+        <section className="civic-section">
+          <h2>Subscribe to changes</h2>
+          <CivicSubscribe city={seed.city} />
         </section>
 
         <section className="civic-section">
@@ -224,6 +253,10 @@ export default async function CityAuditPage({
             }))}
           />
         </section>
+
+        <p className="civic-footnote">
+          Public API available — GET /api/civic/records?city={slug}
+        </p>
       </div>
       <Footer />
     </main>

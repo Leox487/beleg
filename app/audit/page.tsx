@@ -1,21 +1,44 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { CivicChangeList } from "@/app/components/CivicChangeList";
 import { Footer } from "@/app/components/Footer";
 import { CITY_SEEDS, citySlug } from "@/lib/civic-cities";
 import { asTimestamp } from "@/lib/row";
+import { SITE_URL } from "@/lib/site";
 import sql from "@/lib/supabase";
 
-import { formatWhen, mapChange, shortHash, type CivicChangeRow } from "./civic-map";
+import { formatWhen, mapChange } from "./civic-map";
 import "./civic.css";
 
 export const metadata: Metadata = {
-  title: "US Municipal Record Audit · Beleg",
+  title: "US Municipal Record Audit — Beleg",
   description:
-    "SHA-256 snapshots of public municipal datasets from CKAN open-data portals, with detected file changes and OpenTimestamps proofs.",
+    "Cryptographic monitoring of public government records across 5+ US cities. Every file hashed and anchored to Bitcoin daily.",
+  alternates: {
+    canonical: `${SITE_URL}/audit`,
+  },
 };
 
 export const dynamic = "force-dynamic";
+
+const HOW_STEPS = [
+  {
+    n: "01",
+    title: "Retrieve",
+    text: "Every day, Beleg fetches each monitored file from the city's official open data portal.",
+  },
+  {
+    n: "02",
+    title: "Hash",
+    text: "The raw bytes of every file are run through SHA-256, producing a unique fingerprint.",
+  },
+  {
+    n: "03",
+    title: "Anchor",
+    text: "That fingerprint is submitted to the Bitcoin blockchain via OpenTimestamps, so its existence at this exact time is publicly provable without trusting Beleg.",
+  },
+] as const;
 
 export default async function NationalAuditPage() {
   const [changeRows, statsRows, cityStatRows, cityChangeRows] =
@@ -33,7 +56,8 @@ export default async function NationalAuditPage() {
           (SELECT count(DISTINCT resource_url)::int FROM civic_records) AS monitored,
           (SELECT count(DISTINCT city)::int FROM civic_records) AS cities,
           (SELECT max(retrieved_at) FROM civic_records) AS last_checked,
-          (SELECT count(*)::int FROM civic_changes) AS changes
+          (SELECT count(*)::int FROM civic_changes) AS changes,
+          (SELECT count(*)::int FROM civic_records WHERE anchor_status = 'confirmed') AS anchors
       `,
       sql`
         SELECT
@@ -60,6 +84,7 @@ export default async function NationalAuditPage() {
     ? formatWhen(asTimestamp(statsRow.last_checked))
     : "Not yet";
   const changeCount = Number(statsRow?.changes ?? 0);
+  const anchorCount = Number(statsRow?.anchors ?? 0);
 
   const statsByCity = new Map<
     string,
@@ -78,11 +103,19 @@ export default async function NationalAuditPage() {
     changesByCity.set(String(row.city), Number(row.changes ?? 0));
   }
 
+  const cities = [...CITY_SEEDS].sort((a, b) => {
+    const aChanges = changesByCity.get(a.city) ?? 0;
+    const bChanges = changesByCity.get(b.city) ?? 0;
+    if (aChanges > 0 && bChanges === 0) return -1;
+    if (bChanges > 0 && aChanges === 0) return 1;
+    return a.city.localeCompare(b.city);
+  });
+
   return (
     <main className="page civic-page">
       <div className="civic-inner">
         <header className="doc-header">
-          <p className="doc-eyebrow">Cryptographic public record monitor</p>
+          <p className="doc-eyebrow">Live — updated daily</p>
           <h1 className="h1 doc-title">US Municipal Record Audit</h1>
           <p className="lp-lead">
             Beleg retrieves public files from municipal CKAN portals, hashes the
@@ -91,7 +124,7 @@ export default async function NationalAuditPage() {
           </p>
         </header>
 
-        <ul className="civic-stats civic-stats-4">
+        <ul className="civic-stats civic-stats-5">
           <li>
             <strong>{monitored}</strong>
             <span>Records monitored</span>
@@ -108,26 +141,43 @@ export default async function NationalAuditPage() {
             <strong>{changeCount}</strong>
             <span>Changes detected</span>
           </li>
+          <li>
+            <strong>{anchorCount}</strong>
+            <span>Bitcoin anchors</span>
+          </li>
         </ul>
 
         <section className="civic-section">
           <h2>Cities</h2>
           <ul className="civic-grid">
-            {CITY_SEEDS.map((seed) => {
+            {cities.map((seed) => {
               const stats = statsByCity.get(seed.city);
               const cityChanges = changesByCity.get(seed.city) ?? 0;
               return (
                 <li key={seed.city}>
                   <Link href={`/audit/${citySlug(seed.city)}`}>
                     <p className="civic-grid-name">
+                      <span
+                        className={
+                          cityChanges > 0
+                            ? "civic-dot civic-dot-warn"
+                            : "civic-dot civic-dot-ok"
+                        }
+                        aria-hidden="true"
+                      />
                       {seed.city}, {seed.state}
                     </p>
                     <p className="civic-grid-meta">
-                      {stats?.monitored ?? 0} records ·{" "}
+                      {stats?.monitored ?? 0} records
+                    </p>
+                    <p className="civic-grid-meta">
+                      Last checked{" "}
                       {stats?.last_checked
                         ? formatWhen(stats.last_checked)
-                        : "Not yet"}{" "}
-                      · {cityChanges} changes
+                        : "Not yet"}
+                    </p>
+                    <p className="civic-grid-meta">
+                      {cityChanges} {cityChanges === 1 ? "change" : "changes"}
                     </p>
                   </Link>
                 </li>
@@ -137,51 +187,36 @@ export default async function NationalAuditPage() {
         </section>
 
         <section className="civic-section">
+          <h2>How this works</h2>
+          <ol className="civic-how">
+            {HOW_STEPS.map((step) => (
+              <li key={step.n}>
+                <p className="civic-how-n">{step.n}</p>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="civic-section">
           <h2>Changes</h2>
           <p className="civic-disclaimer">
             A change means the file content changed since last retrieval. This
             may reflect a legitimate update, correction, or deletion — not
             necessarily misconduct.
           </p>
-          <ChangeFeed changes={changes} showCity />
+          <CivicChangeList changes={changes} showCity />
         </section>
+
+        <p className="civic-footnote">
+          This system monitors public records. A detected change means the
+          file&apos;s bytes changed since last retrieval — not that anything
+          improper occurred. All source data is from official government open
+          data portals.
+        </p>
       </div>
       <Footer />
     </main>
-  );
-}
-
-function ChangeFeed({
-  changes,
-  showCity,
-}: {
-  changes: CivicChangeRow[];
-  showCity?: boolean;
-}) {
-  if (changes.length === 0) {
-    return <p className="civic-empty">No content changes recorded yet.</p>;
-  }
-  return (
-    <ul className="civic-changes">
-      {changes.map((row) => (
-        <li key={row.id}>
-          <p className="civic-change-name">
-            {showCity && row.city
-              ? `${row.city}${row.state ? `, ${row.state}` : ""} · `
-              : null}
-            {row.dataset_name}
-          </p>
-          <a href={row.resource_url}>{row.resource_url}</a>
-          <p className="civic-change-meta">
-            {formatWhen(row.detected_at)} · {row.change_type}
-          </p>
-          <p className="mono civic-hashes">
-            <span>{shortHash(row.old_hash)}</span>
-            <span>→</span>
-            <span>{shortHash(row.new_hash)}</span>
-          </p>
-        </li>
-      ))}
-    </ul>
   );
 }

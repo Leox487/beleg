@@ -28,7 +28,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return PATHS.map((path) => ({
     url: `${SITE_URL}${path === "/" ? "" : path}`,
     lastModified,
-    changeFrequency: path === "/" ? "weekly" : "monthly",
-    priority: path === "/" ? 1 : 0.6,
+    changeFrequency:
+      path === "/" ? "weekly" : path.startsWith("/audit") ? "daily" : "monthly",
+    priority: path === "/" ? 1 : path.startsWith("/audit") ? 0.7 : 0.6,
   }));
 }

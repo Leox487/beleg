@@ -87,3 +87,14 @@ export function citySlug(city: string): string {
 export function findCityBySlug(slug: string): CivicCitySeed | undefined {
   return CITY_SEEDS.find((seed) => citySlug(seed.city) === slug);
 }
+
+export function findCity(query: string): CivicCitySeed | undefined {
+  const trimmed = query.trim();
+  if (!trimmed) return undefined;
+  const slug = citySlug(trimmed);
+  return CITY_SEEDS.find(
+    (seed) =>
+      citySlug(seed.city) === slug ||
+      seed.city.toLowerCase() === trimmed.toLowerCase(),
+  );
+}

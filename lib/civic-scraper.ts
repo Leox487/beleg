@@ -3,11 +3,13 @@ import "server-only";
 import { createHash } from "crypto";
 
 import { CITY_SEEDS, citySlug } from "@/lib/civic-cities";
+import { sendCivicChangeEmail } from "@/lib/civic-email";
 import { stampHashHex, upgradeProofBase64 } from "@/lib/ots";
+import { SITE_URL } from "@/lib/site";
 import sql from "@/lib/supabase";
 
-const FETCH_MS = 45_000;
-const MAX_BYTES = 80 * 1024 * 1024;
+const FETCH_MS = 80_000;
+const MAX_BYTES = 400 * 1024 * 1024;
 const UPGRADE_MIN_AGE_MS = 60 * 60 * 1000;
 
 const SKIP_HOSTS = [
@@ -22,6 +24,7 @@ export interface CivicIngestResult {
   checked: number;
   changed: number;
   new_records: number;
+  errors: string[];
 }
 
 export interface CivicUpgradeResult {
@@ -95,6 +98,7 @@ async function hashUrl(
   });
   if (!res.ok || !res.body) return null;
 
+  // Stream raw bytes into SHA-256 so large CKAN dumps are not buffered.
   const hasher = createHash("sha256");
   let size = 0;
   const reader = res.body.getReader();
@@ -168,12 +172,13 @@ export async function scrapeCivicRecords(
 
   if (cityFilter && seeds.length === 0) {
     console.error(`No civic seed for city=${cityFilter}`);
-    return { checked: 0, changed: 0, new_records: 0 };
+    return { checked: 0, changed: 0, new_records: 0, errors: [`unknown city: ${cityFilter}`] };
   }
 
   let checked = 0;
   let changed = 0;
   let new_records = 0;
+  const errors: string[] = [];
 
   for (const seed of seeds) {
     for (const datasetId of seed.datasets) {
@@ -181,13 +186,13 @@ export async function scrapeCivicRecords(
       try {
         pack = await showPackage(seed.portal, datasetId);
       } catch (error) {
-        console.error(
-          `CKAN lookup failed for ${seed.city}/${datasetId}:`,
-          error,
-        );
+        const message = `CKAN lookup failed for ${seed.city}/${datasetId}`;
+        console.error(message, error);
+        errors.push(message);
         continue;
       }
       if (!pack) {
+        errors.push(`No CKAN package for ${seed.city}/${datasetId}`);
         console.error(`No CKAN package for ${seed.city}/${datasetId}`);
         continue;
       }
@@ -207,10 +212,15 @@ export async function scrapeCivicRecords(
         try {
           hashed = await hashUrl(resourceUrl);
         } catch (error) {
-          console.error(`Fetch/hash failed for ${resourceUrl}:`, error);
+          const message = `Fetch/hash failed for ${resourceUrl}`;
+          console.error(message, error);
+          errors.push(message);
           continue;
         }
-        if (!hashed) continue;
+        if (!hashed) {
+          errors.push(`Could not hash ${resourceUrl}`);
+          continue;
+        }
 
         const previous = await latestHash(resourceUrl);
         if (previous === hashed.hash) continue;
@@ -238,15 +248,56 @@ export async function scrapeCivicRecords(
               )
             `;
             changed += 1;
+            void notifyCitySubscribers({
+              city: seed.city,
+              datasetName,
+              resourceUrl,
+              oldHash: previous,
+              newHash: hashed.hash,
+            }).catch((error) => {
+              console.error("Civic subscriber notify failed:", error);
+            });
           }
         } catch (error) {
-          console.error(`Insert failed for ${resourceUrl}:`, error);
+          const message = `Insert failed for ${resourceUrl}`;
+          console.error(message, error);
+          errors.push(message);
         }
       }
     }
   }
 
-  return { checked, changed, new_records };
+  return { checked, changed, new_records, errors };
+}
+
+async function notifyCitySubscribers(input: {
+  city: string;
+  datasetName: string;
+  resourceUrl: string;
+  oldHash: string;
+  newHash: string;
+}): Promise<void> {
+  const rows = await sql`
+    SELECT email
+    FROM civic_subscribers
+    WHERE city = ${input.city}
+  `;
+  const auditUrl = `${SITE_URL}/audit/${citySlug(input.city)}`;
+  const detectedAt = new Date().toISOString();
+  for (const raw of rows) {
+    const email = String((raw as Record<string, unknown>).email ?? "");
+    if (!email) continue;
+    await sendCivicChangeEmail({
+      to: email,
+      city: input.city,
+      datasetName: input.datasetName,
+      resourceUrl: input.resourceUrl,
+      oldHash: input.oldHash,
+      newHash: input.newHash,
+      detectedAt,
+      auditUrl,
+    });
+  }
 }
 
 /**
@@ -279,7 +330,8 @@ export async function upgradeCivicAnchors(): Promise<CivicUpgradeResult> {
           UPDATE civic_records
           SET
             ots_proof = ${result.proofBase64},
-            anchor_status = ${"confirmed"}
+            anchor_status = ${"confirmed"},
+            bitcoin_block_height = ${result.bitcoinBlockHeight}
           WHERE id = ${id}
         `;
         confirmed += 1;

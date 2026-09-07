@@ -20,6 +20,10 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.civic-stats.civic-stats-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
 .civic-stats li {
   padding: 18px 16px;
   background: #fff;
@@ -92,7 +96,207 @@
 
 .civic-grid-name {
   margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 600;
+  color: var(--bh-ink, #101113);
+}
+
+.civic-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.civic-dot-ok {
+  background: #1f8a4c;
+}
+
+.civic-dot-warn {
+  background: #d97706;
+}
+
+.civic-crumb {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--bh-mute, #66738a);
+}
+
+.civic-crumb a {
+  color: inherit;
+}
+
+.civic-how {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.civic-how li {
+  padding: 18px 16px;
+  background: #fff;
+  border: 1px solid var(--bh-line, rgba(16, 17, 19, 0.1));
+  border-radius: 14px;
+}
+
+.civic-how-n {
+  margin: 0 0 8px;
+  font-family: var(--font-pixel), var(--font-mono), monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--bh-mute, #66738a);
+}
+
+.civic-how h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--bh-ink, #101113);
+}
+
+.civic-how p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-3, #66738a);
+}
+
+.civic-footnote {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--text-3);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.civic-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px;
+}
+
+.civic-section-head h2 {
+  margin: 0;
+}
+
+.civic-change-label {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #b45309;
+}
+
+.civic-hashes-full {
+  flex-direction: column;
+  word-break: break-all;
+}
+
+.civic-hashes-full em {
+  font-style: normal;
+  color: var(--bh-ink, #101113);
+}
+
+.civic-anchor-ok {
+  color: #1f8a4c;
+}
+
+.civic-anchor-pending {
+  color: var(--bh-mute, #66738a);
+}
+
+.civic-btn {
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--bh-ink, #101113);
+  border-radius: 10px;
+  background: var(--bh-ink, #101113);
+  color: #fff;
+  font-size: 14px;
+}
+
+.civic-btn:disabled {
+  opacity: 0.6;
+}
+
+.civic-btn-ghost {
+  background: #fff;
+  color: var(--bh-ink, #101113);
+}
+
+.civic-subscribe,
+.civic-zip {
+  display: grid;
+  gap: 8px;
+}
+
+.civic-subscribe-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.civic-subscribe-row .civic-verify-input {
+  flex: 1 1 220px;
+}
+
+.civic-flag {
+  margin-top: 10px;
+}
+
+.civic-flag-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--bh-mute, #66738a);
+  font-size: 13px;
+  text-decoration: underline;
+}
+
+.civic-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(16, 17, 19, 0.4);
+}
+
+.civic-modal-card {
+  width: min(440px, 100%);
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 14px;
+}
+
+.civic-modal-card h3 {
+  margin: 0;
+}
+
+.civic-modal-card label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--bh-mute, #66738a);
+}
+
+.civic-modal-card input,
+.civic-modal-card textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--bh-line, rgba(16, 17, 19, 0.1));
+  border-radius: 10px;
   color: var(--bh-ink, #101113);
 }
 
@@ -207,8 +411,15 @@
   color: var(--bh-mute, #66738a);
 }
 
+@media (max-width: 1100px) {
+  .civic-stats.civic-stats-5 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 900px) {
   .civic-stats.civic-stats-4,
+  .civic-how,
   .civic-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -217,6 +428,8 @@
 @media (max-width: 720px) {
   .civic-stats,
   .civic-stats.civic-stats-4,
+  .civic-stats.civic-stats-5,
+  .civic-how,
   .civic-grid {
     grid-template-columns: 1fr;
   }
