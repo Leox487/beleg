@@ -19,16 +19,15 @@ export async function GET(
     WHERE id = ${id}
     LIMIT 1
   `;
-  const record = rows[0] as
-    | { id: string; dataset_id: string; ots_proof: string | null }
-    | undefined;
+  const record = rows[0] as Record<string, unknown> | undefined;
 
-  if (!record?.ots_proof) {
+  const proof = record?.ots_proof == null ? null : String(record.ots_proof);
+  if (!record || !proof) {
     return new Response("Proof not found", { status: 404 });
   }
 
-  const bytes = proofBase64ToBytes(record.ots_proof);
-  const filename = `beleg-civic-${record.dataset_id}-${record.id.slice(0, 8)}.ots`;
+  const bytes = proofBase64ToBytes(proof);
+  const filename = `beleg-civic-${String(record.dataset_id)}-${String(record.id).slice(0, 8)}.ots`;
   const arrayBuffer = bytes.buffer.slice(
     bytes.byteOffset,
     bytes.byteOffset + bytes.byteLength,

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { CivicVerify } from "@/app/components/CivicVerify";
 import { Footer } from "@/app/components/Footer";
+import { asNullableString, asTimestamp } from "@/lib/row";
 import sql from "@/lib/supabase";
 
 import "./civic.css";
@@ -53,6 +54,32 @@ function shortHash(hash: string): string {
   return `${hash.slice(0, 8)}…${hash.slice(-6)}`;
 }
 
+function mapRecord(row: Record<string, unknown>): CivicRecordRow {
+  return {
+    id: String(row.id),
+    dataset_id: String(row.dataset_id),
+    dataset_name: String(row.dataset_name),
+    resource_url: String(row.resource_url),
+    file_hash: String(row.file_hash),
+    file_size: row.file_size == null ? null : Number(row.file_size),
+    retrieved_at: asTimestamp(row.retrieved_at),
+    ots_proof: asNullableString(row.ots_proof),
+    anchor_status: asNullableString(row.anchor_status),
+  };
+}
+
+function mapChange(row: Record<string, unknown>): CivicChangeRow {
+  return {
+    id: String(row.id),
+    dataset_name: String(row.dataset_name),
+    resource_url: String(row.resource_url),
+    old_hash: String(row.old_hash),
+    new_hash: String(row.new_hash),
+    detected_at: asTimestamp(row.detected_at),
+    change_type: String(row.change_type ?? "content_modified"),
+  };
+}
+
 export default async function PittsburghAuditPage() {
   const [recordRows, changeRows, latestRows, statsRows] = await Promise.all([
     sql`
@@ -85,12 +112,25 @@ export default async function PittsburghAuditPage() {
     `,
   ]);
 
-  const records = recordRows as CivicRecordRow[];
-  const changes = changeRows as CivicChangeRow[];
-  const latest = latestRows as CivicRecordRow[];
-  const stats = statsRows[0] as
-    | { monitored: number; last_checked: string | null; changes: number }
-    | undefined;
+  const records = [...recordRows].map((row) =>
+    mapRecord(row as Record<string, unknown>),
+  );
+  const changes = [...changeRows].map((row) =>
+    mapChange(row as Record<string, unknown>),
+  );
+  const latest = [...latestRows].map((row) =>
+    mapRecord(row as Record<string, unknown>),
+  );
+  const statsRow = statsRows[0] as Record<string, unknown> | undefined;
+  const stats = statsRow
+    ? {
+        monitored: Number(statsRow.monitored ?? 0),
+        last_checked: statsRow.last_checked
+          ? asTimestamp(statsRow.last_checked)
+          : null,
+        changes: Number(statsRow.changes ?? 0),
+      }
+    : undefined;
 
   const monitored = stats?.monitored ?? 0;
   const lastChecked = stats?.last_checked

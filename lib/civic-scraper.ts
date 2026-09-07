@@ -119,8 +119,8 @@ async function latestHash(url: string): Promise<string | null> {
     ORDER BY retrieved_at DESC
     LIMIT 1
   `;
-  const row = rows[0] as { file_hash?: string } | undefined;
-  return row?.file_hash ?? null;
+  const row = rows[0] as Record<string, unknown> | undefined;
+  return row?.file_hash == null ? null : String(row.file_hash);
 }
 
 async function insertRecord(input: {
