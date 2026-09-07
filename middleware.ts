@@ -72,7 +72,8 @@ export default function middleware(
   // would treat that Bearer token as a JWT and reject the request.
   if (
     req.nextUrl.pathname === "/api/anchor/upgrade" ||
-    req.nextUrl.pathname === "/api/civic/ingest"
+    req.nextUrl.pathname === "/api/civic/ingest" ||
+    req.nextUrl.pathname === "/api/civic/discover"
   ) {
     return NextResponse.next();
   }

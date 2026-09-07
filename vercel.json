@@ -51,6 +51,54 @@
     {
       "path": "/api/civic/ingest?city=federal",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/civic/discover?city=pittsburgh",
+      "schedule": "0 6 * * 0"
+    },
+    {
+      "path": "/api/civic/discover?city=houston",
+      "schedule": "15 6 * * 0"
+    },
+    {
+      "path": "/api/civic/discover?city=phoenix",
+      "schedule": "30 6 * * 0"
+    },
+    {
+      "path": "/api/civic/discover?city=san-antonio",
+      "schedule": "45 6 * * 0"
+    },
+    {
+      "path": "/api/civic/discover?city=san-jose",
+      "schedule": "0 7 * * 0"
+    },
+    {
+      "path": "/api/civic/discover?city=boston",
+      "schedule": "15 7 * * 0"
+    },
+    {
+      "path": "/api/civic/discover?city=chicago",
+      "schedule": "30 7 * * 0"
+    },
+    {
+      "path": "/api/civic/discover?city=seattle",
+      "schedule": "45 7 * * 0"
+    },
+    {
+      "path": "/api/civic/discover?city=austin",
+      "schedule": "0 8 * * 0"
+    },
+    {
+      "path": "/api/civic/discover?city=los-angeles",
+      "schedule": "15 8 * * 0"
+    },
+    {
+      "path": "/api/civic/discover?city=san-francisco",
+      "schedule": "30 8 * * 0"
+    },
+    {
+      "path": "/api/civic/discover?city=federal",
+      "schedule": "45 8 * * 0"
     }
   ]
 }

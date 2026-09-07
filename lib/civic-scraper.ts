@@ -17,12 +17,14 @@ import { stampHashHex, upgradeProofBase64 } from "@/lib/ots";
 import { SITE_URL } from "@/lib/site";
 import sql from "@/lib/supabase";
 
-const FETCH_MS = 80_000;
-const FEDERAL_FETCH_MS = 60_000;
-const MAX_BYTES = 400 * 1024 * 1024;
-const CONTENT_MAX_BYTES = 5 * 1024 * 1024;
-const FETCH_UA = "BelegCivicAudit/1.0 (+https://belegapp.com; beleg.app@proton.me)";
+export const FETCH_MS = 80_000;
+export const FEDERAL_FETCH_MS = 60_000;
+export const MAX_BYTES = 50 * 1024 * 1024;
+export const CONTENT_MAX_BYTES = 5 * 1024 * 1024;
+export const FETCH_UA =
+  "BelegCivicAudit/1.0 (+https://belegapp.com; beleg.app@proton.me)";
 const UPGRADE_MIN_AGE_MS = 60 * 60 * 1000;
+const INGEST_BUDGET_MS = 75_000;
 
 const SKIP_HOSTS = [
   "docs.google.com",
@@ -34,11 +36,15 @@ const SKIP_HOSTS = [
 
 const SKIP_DATASETS = new Set(["v6vf-nfxy"]);
 
-function isSkippedDataset(id: string): boolean {
+export function isSkippedDataset(id: string): boolean {
   if (!SKIP_DATASETS.has(id)) return false;
   console.log(`skipped (oversized) ${id}`);
   return true;
 }
+
+export type CivicHashResult =
+  | { ok: true; hash: string; size: number; content: string | null }
+  | { ok: false; reason: "oversized" | "fetch" };
 
 export interface CivicIngestResult {
   checked: number;
@@ -53,27 +59,6 @@ export interface CivicUpgradeResult {
   updated: number;
 }
 
-interface CkanResource {
-  url?: string;
-  name?: string;
-  format?: string;
-}
-
-interface CkanPackage {
-  success?: boolean;
-  result?: {
-    name?: string;
-    title?: string;
-    resources?: CkanResource[];
-  };
-}
-
-interface SocrataView {
-  id?: string;
-  name?: string;
-  error?: boolean;
-}
-
 type IngestCounters = {
   checked: number;
   changed: number;
@@ -81,7 +66,7 @@ type IngestCounters = {
   errors: string[];
 };
 
-function isDownloadable(url: string, format?: string): boolean {
+export function isDownloadable(url: string, format?: string): boolean {
   const fmt = (format ?? "").trim().toUpperCase();
   if (fmt === "HTML" || fmt === "ARC GIS GEOSERVICES REST API") {
     return false;
@@ -102,24 +87,6 @@ function isDownloadable(url: string, format?: string): boolean {
   } catch {
     return false;
   }
-}
-
-async function showPackage(
-  portal: string,
-  id: string,
-): Promise<CkanPackage["result"] | null> {
-  const base = portal.replace(/\/$/, "");
-  const res = await fetch(
-    `${base}/api/3/action/package_show?id=${encodeURIComponent(id)}`,
-    {
-      signal: AbortSignal.timeout(15_000),
-      headers: { Accept: "application/json" },
-    },
-  );
-  if (!res.ok) return null;
-  const body = (await res.json()) as CkanPackage;
-  if (!body.success || !body.result) return null;
-  return body.result;
 }
 
 function wantsTextSnapshot(url: string, contentType: string | null): boolean {
@@ -144,20 +111,44 @@ function wantsTextSnapshot(url: string, contentType: string | null): boolean {
   );
 }
 
+export async function probeContentLength(
+  url: string,
+): Promise<{ length: number | null; skip: boolean }> {
+  try {
+    const res = await fetch(url, {
+      method: "HEAD",
+      redirect: "follow",
+      signal: AbortSignal.timeout(15_000),
+      headers: { "User-Agent": FETCH_UA, Accept: "*/*" },
+    });
+    const raw = res.headers.get("content-length");
+    if (raw == null || raw === "") return { length: null, skip: false };
+    const length = Number(raw);
+    if (!Number.isFinite(length) || length < 0) {
+      return { length: null, skip: false };
+    }
+    return { length, skip: length > MAX_BYTES };
+  } catch {
+    return { length: null, skip: false };
+  }
+}
+
 async function hashUrl(
   url: string,
   timeoutMs = FETCH_MS,
-): Promise<{
-  hash: string;
-  size: number;
-  content: string | null;
-} | null> {
+): Promise<CivicHashResult> {
   const res = await fetch(url, {
     redirect: "follow",
     signal: AbortSignal.timeout(timeoutMs),
     headers: { "User-Agent": FETCH_UA, Accept: "*/*" },
   });
-  if (!res.ok || !res.body) return null;
+  if (!res.ok || !res.body) return { ok: false, reason: "fetch" };
+
+  const declared = Number(res.headers.get("content-length") ?? "");
+  if (Number.isFinite(declared) && declared > MAX_BYTES) {
+    await res.body.cancel();
+    return { ok: false, reason: "oversized" };
+  }
 
   // Stream raw bytes into SHA-256 so large dumps are not fully buffered.
   // Keep a text snapshot only while the file stays under 5MB.
@@ -173,7 +164,7 @@ async function hashUrl(
     size += value.byteLength;
     if (size > MAX_BYTES) {
       await reader.cancel();
-      return null;
+      return { ok: false, reason: "oversized" };
     }
     hasher.update(value);
     if (keepText) {
@@ -187,10 +178,25 @@ async function hashUrl(
   }
 
   return {
+    ok: true,
     hash: hasher.digest("hex"),
     size,
     content: keepText && chunks.length > 0 ? Buffer.concat(chunks).toString("utf8") : null,
   };
+}
+
+export async function hashResource(
+  url: string,
+  timeoutMs = FETCH_MS,
+): Promise<CivicHashResult> {
+  const probe = await probeContentLength(url);
+  if (probe.skip) return { ok: false, reason: "oversized" };
+  try {
+    return await hashUrl(url, timeoutMs);
+  } catch (error) {
+    console.error(`Fetch/hash failed for ${url}`, error);
+    return { ok: false, reason: "fetch" };
+  }
 }
 
 async function latestSnapshot(url: string): Promise<{
@@ -214,7 +220,7 @@ async function latestSnapshot(url: string): Promise<{
   };
 }
 
-async function insertRecord(input: {
+export async function insertRecord(input: {
   city: string;
   state: string;
   datasetId: string;
@@ -245,26 +251,6 @@ async function insertRecord(input: {
   `;
 }
 
-async function showSocrataView(
-  portal: string,
-  id: string,
-): Promise<{ id: string; name: string } | null> {
-  const base = portal.replace(/\/$/, "");
-  const res = await fetch(`${base}/api/views/${encodeURIComponent(id)}.json`, {
-    signal: AbortSignal.timeout(15_000),
-    headers: { Accept: "application/json" },
-  });
-  if (!res.ok) return null;
-  const body = (await res.json()) as SocrataView;
-  if (!body || body.error || !body.id) return null;
-  return { id: String(body.id), name: String(body.name || body.id) };
-}
-
-function socrataCsvUrl(portal: string, id: string): string {
-  const base = portal.replace(/\/$/, "");
-  return `${base}/api/views/${encodeURIComponent(id)}/rows.csv?accessType=DOWNLOAD`;
-}
-
 async function ingestResource(
   seed: CivicCitySeed,
   datasetId: string,
@@ -277,17 +263,12 @@ async function ingestResource(
 
   counters.checked += 1;
 
-  let hashed: { hash: string; size: number; content: string | null } | null =
-    null;
-  try {
-    hashed = await hashUrl(resourceUrl, timeoutMs);
-  } catch (error) {
-    const message = `Fetch/hash failed for ${resourceUrl}`;
-    console.error(message, error);
-    counters.errors.push(message);
-    return;
-  }
-  if (!hashed) {
+  const hashed = await hashResource(resourceUrl, timeoutMs);
+  if (!hashed.ok) {
+    if (hashed.reason === "oversized") {
+      console.log(`skipped (oversized) ${resourceUrl}`);
+      return;
+    }
     counters.errors.push(`Could not hash ${resourceUrl}`);
     return;
   }
@@ -352,98 +333,43 @@ async function ingestResource(
   }
 }
 
-async function scrapeCkanCity(
-  seed: CivicCitySeed,
-  counters: IngestCounters,
-): Promise<void> {
-  for (const datasetId of seed.datasets) {
-    if (isSkippedDataset(datasetId)) continue;
-    let pack: CkanPackage["result"] | null = null;
-    try {
-      pack = await showPackage(seed.portal, datasetId);
-    } catch (error) {
-      const message = `CKAN lookup failed for ${seed.city}/${datasetId}`;
-      console.error(message, error);
-      counters.errors.push(message);
-      continue;
-    }
-    if (!pack) {
-      counters.errors.push(`No CKAN package for ${seed.city}/${datasetId}`);
-      console.error(`No CKAN package for ${seed.city}/${datasetId}`);
-      continue;
-    }
-
-    const resolvedId = pack.name || datasetId;
-    const datasetName = pack.title || datasetId;
-    const resources = (pack.resources ?? []).filter(
-      (resource) =>
-        resource.url && isDownloadable(resource.url, resource.format),
-    );
-
-    for (const resource of resources) {
-      await ingestResource(
-        seed,
-        resolvedId,
-        datasetName,
-        resource.url as string,
-        counters,
-      );
-    }
-  }
-}
-
-async function scrapeSocrataCity(
-  seed: CivicCitySeed,
-  counters: IngestCounters,
-): Promise<void> {
-  for (const datasetId of seed.datasets) {
-    if (isSkippedDataset(datasetId)) continue;
-    let view: { id: string; name: string } | null = null;
-    try {
-      view = await showSocrataView(seed.portal, datasetId);
-    } catch (error) {
-      const message = `Socrata lookup failed for ${seed.city}/${datasetId}`;
-      console.error(message, error);
-      counters.errors.push(message);
-      continue;
-    }
-    if (!view) {
-      counters.errors.push(`No Socrata view for ${seed.city}/${datasetId}`);
-      console.error(`No Socrata view for ${seed.city}/${datasetId}`);
-      continue;
-    }
-
-    await ingestResource(
-      seed,
-      view.id,
-      view.name,
-      socrataCsvUrl(seed.portal, view.id),
-      counters,
-    );
-  }
-}
-
-async function scrapeFederalSources(
-  seed: CivicCitySeed,
-  counters: IngestCounters,
-): Promise<void> {
-  for (const file of seed.files ?? []) {
-    if (isSkippedDataset(file.id)) continue;
-    await ingestResource(
-      seed,
-      file.id,
-      file.name,
-      file.url,
-      counters,
-      FEDERAL_FETCH_MS,
-    );
-  }
+async function existingTargets(city: string): Promise<
+  Array<{
+    datasetId: string;
+    datasetName: string;
+    resourceUrl: string;
+    retrievedAt: string;
+  }>
+> {
+  const rows = await sql`
+    SELECT DISTINCT ON (resource_url)
+      dataset_id, dataset_name, resource_url, retrieved_at
+    FROM civic_records
+    WHERE city = ${city}
+    ORDER BY resource_url, retrieved_at DESC
+  `;
+  return [...rows]
+    .map((raw) => {
+      const row = raw as Record<string, unknown>;
+      return {
+        datasetId: String(row.dataset_id ?? ""),
+        datasetName: String(row.dataset_name ?? row.dataset_id ?? ""),
+        resourceUrl: String(row.resource_url ?? ""),
+        retrievedAt: String(row.retrieved_at ?? ""),
+      };
+    })
+    .filter((row) => row.resourceUrl)
+    .sort((a, b) => {
+      const aTime = Date.parse(a.retrievedAt) || 0;
+      const bTime = Date.parse(b.retrievedAt) || 0;
+      return aTime - bTime;
+    });
 }
 
 /**
- * Pulls seeded CKAN packages or Socrata views for each city, hashes
- * downloadable resources, and writes a civic_records row when the bytes
- * are new or have changed.
+ * Re-hashes URLs already stored for each city and writes a civic_records
+ * row when the bytes are new or have changed. Discovery adds new URLs;
+ * this path does not crawl the portal catalog.
  * Pass a city slug to process one city; omit it to process all seeds.
  */
 export async function scrapeCivicRecords(
@@ -465,13 +391,20 @@ export async function scrapeCivicRecords(
     errors: [],
   };
 
+  const started = Date.now();
   for (const seed of seeds) {
-    if (seed.type === "federal") {
-      await scrapeFederalSources(seed, counters);
-    } else if (seed.type === "socrata") {
-      await scrapeSocrataCity(seed, counters);
-    } else {
-      await scrapeCkanCity(seed, counters);
+    const timeoutMs = seed.type === "federal" ? FEDERAL_FETCH_MS : FETCH_MS;
+    const targets = await existingTargets(seed.city);
+    for (const target of targets) {
+      if (Date.now() - started > INGEST_BUDGET_MS) break;
+      await ingestResource(
+        seed,
+        target.datasetId,
+        target.datasetName,
+        target.resourceUrl,
+        counters,
+        timeoutMs,
+      );
     }
   }
 

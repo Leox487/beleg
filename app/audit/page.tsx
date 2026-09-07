@@ -26,7 +26,7 @@ const HOW_STEPS = [
   {
     n: "01",
     title: "Retrieve",
-    text: "Every day, Beleg fetches each monitored file from the city's official open data portal.",
+    text: "Beleg discovers published datasets on each official portal, then fetches every monitorable file.",
   },
   {
     n: "02",

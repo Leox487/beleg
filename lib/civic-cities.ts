@@ -16,6 +16,10 @@ export type CivicCitySeed = {
 };
 
 /**
+ * Portal registry. Dataset ID arrays are the original hand-checked seeds.
+ * Discovery (`lib/civic-discovery.ts`) crawls every dataset on the portal;
+ * ingest hashes URLs already stored in civic_records.
+ *
  * CKAN: GET ${portal}/api/3/action/site_read → { success: true }
  * (WPRDC is CKAN but does not implement site_read.)
  *
@@ -252,6 +256,16 @@ export const CITY_SEEDS: readonly CivicCitySeed[] = [
     ],
   },
 ];
+
+/** Data.gov org slugs for federal auto-discovery (CKAN fq + current catalog API). */
+export const FEDERAL_DATA_GOV_AGENCIES = [
+  { ckanOrg: "hhs-gov", catalogSlug: "hhs", query: "" },
+  { ckanOrg: "cdc-gov", catalogSlug: "hhs", query: "CDC" },
+  { ckanOrg: "cms", catalogSlug: "hhs", query: "CMS" },
+  { ckanOrg: "sec-gov", catalogSlug: "sec", query: "" },
+  { ckanOrg: "treasury", catalogSlug: "treasury", query: "" },
+  { ckanOrg: "doj-gov", catalogSlug: "doj", query: "" },
+] as const;
 
 export const MUNICIPAL_SEEDS = CITY_SEEDS.filter(
   (seed) => seed.type !== "federal",
