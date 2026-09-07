@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { upgradeCivicAnchors } from "@/lib/civic-scraper";
 import { mapAnchor } from "@/lib/row";
 import { upgradeProofBase64 } from "@/lib/ots";
 import { pruneRateLimits } from "@/lib/rateLimit";
@@ -9,6 +10,7 @@ import type { Anchor } from "@/lib/types";
 // OpenTimestamps is Node-only. This route is not user-facing; it is triggered
 // by a scheduled cron (see vercel.json) and guarded by CRON_SECRET.
 export const runtime = "nodejs";
+export const maxDuration = 300;
 
 // Bitcoin confirmations take at least an hour in practice; there is no point
 // hammering the calendars for anchors younger than this.
@@ -102,11 +104,19 @@ async function handleUpgrade(req: Request) {
     console.error("Failed to prune rate_limits:", error);
   }
 
+  let civic = { checked: 0, confirmed: 0, updated: 0 };
+  try {
+    civic = await upgradeCivicAnchors();
+  } catch (error) {
+    console.error("Civic OTS upgrade failed:", error);
+  }
+
   return NextResponse.json({
     checked: anchors.length,
     confirmed,
     updated,
     prunedRateLimits,
+    civic,
   });
 }
 

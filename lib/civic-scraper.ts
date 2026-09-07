@@ -2,7 +2,7 @@ import "server-only";
 
 import { createHash } from "crypto";
 
-import { stampHashHex } from "@/lib/ots";
+import { stampHashHex, upgradeProofBase64 } from "@/lib/ots";
 import sql from "@/lib/supabase";
 
 const CKAN = "https://data.wprdc.org/api/3/action/package_show";
@@ -34,6 +34,14 @@ export interface CivicIngestResult {
   changed: number;
   new_records: number;
 }
+
+export interface CivicUpgradeResult {
+  checked: number;
+  confirmed: number;
+  updated: number;
+}
+
+const UPGRADE_MIN_AGE_MS = 60 * 60 * 1000;
 
 interface CkanResource {
   url?: string;
@@ -221,4 +229,54 @@ export async function scrapeCivicRecords(): Promise<CivicIngestResult> {
   }
 
   return { checked, changed, new_records };
+}
+
+/**
+ * Upgrade pending civic OpenTimestamps proofs. Stamp only submits to
+ * calendars; Bitcoin confirmation needs a later upgrade pass.
+ */
+export async function upgradeCivicAnchors(): Promise<CivicUpgradeResult> {
+  const cutoff = new Date(Date.now() - UPGRADE_MIN_AGE_MS).toISOString();
+  const pendingRows = await sql`
+    SELECT id, ots_proof
+    FROM civic_records
+    WHERE anchor_status = 'pending'
+      AND ots_proof IS NOT NULL
+      AND retrieved_at < ${cutoff}
+  `;
+
+  let confirmed = 0;
+  let updated = 0;
+
+  for (const raw of pendingRows) {
+    const row = raw as Record<string, unknown>;
+    const id = String(row.id);
+    const proof = row.ots_proof == null ? null : String(row.ots_proof);
+    if (!proof) continue;
+
+    try {
+      const result = await upgradeProofBase64(proof);
+      if (result.confirmed) {
+        await sql`
+          UPDATE civic_records
+          SET
+            ots_proof = ${result.proofBase64},
+            anchor_status = ${"confirmed"}
+          WHERE id = ${id}
+        `;
+        confirmed += 1;
+      } else if (result.changed) {
+        await sql`
+          UPDATE civic_records
+          SET ots_proof = ${result.proofBase64}
+          WHERE id = ${id}
+        `;
+        updated += 1;
+      }
+    } catch (error) {
+      console.error(`Civic OTS upgrade failed for ${id}:`, error);
+    }
+  }
+
+  return { checked: pendingRows.length, confirmed, updated };
 }
