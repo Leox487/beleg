@@ -1,5 +1,6 @@
 import { CivicFlag } from "@/app/components/CivicFlag";
 import { formatWhen, type CivicChangeRow } from "@/app/audit/civic-map";
+import { formatDiffSummary } from "@/lib/civic-diff";
 
 export function CivicChangeList({
   changes,
@@ -18,6 +19,7 @@ export function CivicChangeList({
         const cityLabel = row.city
           ? `${row.city}${row.state ? `, ${row.state}` : ""}`
           : "unknown";
+        const diff = row.content_diff;
         return (
           <li key={row.id}>
             <p className="civic-change-name">
@@ -31,6 +33,33 @@ export function CivicChangeList({
             <p className="civic-change-meta">
               Detected {formatWhen(row.detected_at)}
             </p>
+            {diff ? (
+              <>
+                <p className="civic-diff-summary">{formatDiffSummary(diff)}</p>
+                <pre className="civic-diff-block">
+                  {diff.added_preview.slice(0, 3).map((line) => (
+                    <span key={`a-${line}`} className="civic-diff-add">
+                      + {line}
+                      {"\n"}
+                    </span>
+                  ))}
+                  {diff.removed_preview.slice(0, 3).map((line) => (
+                    <span key={`r-${line}`} className="civic-diff-del">
+                      - {line}
+                      {"\n"}
+                    </span>
+                  ))}
+                  {diff.modified_preview.slice(0, 3).map((line) => (
+                    <span key={`m-${line.old}`} className="civic-diff-mod">
+                      ~ {line.old}
+                      {" → "}
+                      {line.new}
+                      {"\n"}
+                    </span>
+                  ))}
+                </pre>
+              </>
+            ) : null}
             <p className="mono civic-hashes civic-hashes-full">
               <span>
                 <em>Old</em> {row.old_hash}

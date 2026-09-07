@@ -46,7 +46,7 @@ export default async function NationalAuditPage() {
       sql`
         SELECT
           id, city, state, dataset_name, resource_url, old_hash, new_hash,
-          detected_at, change_type
+          detected_at, change_type, content_diff
         FROM civic_changes
         ORDER BY detected_at DESC
         LIMIT 100

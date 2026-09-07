@@ -1,6 +1,7 @@
 import { findCityBySlug } from "@/lib/civic-cities";
 import { civicJson, civicOptions, civicTooMany } from "@/lib/civic-api";
 import { clientIp, rateLimitOk } from "@/lib/rateLimit";
+import { parseStoredDiff } from "@/lib/civic-diff";
 import { asTimestamp } from "@/lib/row";
 import sql from "@/lib/supabase";
 
@@ -28,7 +29,7 @@ export async function GET(req: Request) {
   const rows = await sql`
     SELECT
       id, city, state, dataset_name, resource_url, old_hash, new_hash,
-      detected_at, change_type
+      detected_at, change_type, content_diff
     FROM civic_changes
     WHERE city = ${seed.city}
     ORDER BY detected_at DESC
@@ -48,6 +49,7 @@ export async function GET(req: Request) {
         new_hash: String(row.new_hash),
         detected_at: asTimestamp(row.detected_at),
         change_type: String(row.change_type ?? "content_modified"),
+        content_diff: parseStoredDiff(row.content_diff),
       };
     }),
   );

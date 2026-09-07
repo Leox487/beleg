@@ -1,6 +1,25 @@
 import "server-only";
 
+import type { CivicContentDiff } from "@/lib/civic-diff";
 import { Resend } from "resend";
+
+function renderDiffPreview(diff: CivicContentDiff | null | undefined): string {
+  if (!diff) return "";
+  const lines: string[] = [];
+  for (const row of diff.added_preview.slice(0, 3)) {
+    lines.push(`<div style="color:#157a3a">+ ${escapeHtml(row)}</div>`);
+  }
+  for (const row of diff.removed_preview.slice(0, 3)) {
+    lines.push(`<div style="color:#b42318">- ${escapeHtml(row)}</div>`);
+  }
+  for (const row of diff.modified_preview.slice(0, 3)) {
+    lines.push(
+      `<div style="color:#a16207">~ ${escapeHtml(row.old)} → ${escapeHtml(row.new)}</div>`,
+    );
+  }
+  if (lines.length === 0) return "";
+  return `<pre style="font-size:12px;white-space:pre-wrap;background:#f6f6f4;padding:12px;border-radius:8px">${lines.join("")}</pre>`;
+}
 
 function escapeHtml(value: string): string {
   return value
@@ -34,6 +53,8 @@ export async function sendCivicChangeEmail(input: {
   newHash: string;
   detectedAt: string;
   auditUrl: string;
+  diffSummary?: string | null;
+  contentDiff?: CivicContentDiff | null;
 }): Promise<void> {
   const resend = getResend();
   if (!resend) {
@@ -51,6 +72,11 @@ export async function sendCivicChangeEmail(input: {
         <p>A monitored public file in <strong>${escapeHtml(input.city)}</strong> changed.</p>
         <p><strong>Dataset</strong><br />${escapeHtml(input.datasetName)}</p>
         <p><strong>URL</strong><br /><a href="${escapeHtml(input.resourceUrl)}">${escapeHtml(input.resourceUrl)}</a></p>
+        ${
+          input.diffSummary
+            ? `<p><strong>What changed</strong><br />${escapeHtml(input.diffSummary)}</p>${renderDiffPreview(input.contentDiff)}`
+            : ""
+        }
         <p><strong>Previous hash</strong><br /><code>${escapeHtml(input.oldHash)}</code></p>
         <p><strong>New hash</strong><br /><code>${escapeHtml(input.newHash)}</code></p>
         <p><strong>Detected</strong><br />${escapeHtml(input.detectedAt)}</p>

@@ -73,7 +73,7 @@ export default async function CityAuditPage({
     sql`
       SELECT
         id, city, state, dataset_name, resource_url, old_hash, new_hash,
-        detected_at, change_type
+        detected_at, change_type, content_diff
       FROM civic_changes
       WHERE city = ${seed.city}
       ORDER BY detected_at DESC

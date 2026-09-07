@@ -1,3 +1,7 @@
+import {
+  parseStoredDiff,
+  type CivicContentDiff,
+} from "@/lib/civic-diff";
 import { asNullableString, asTimestamp } from "@/lib/row";
 
 export type CivicRecordRow = {
@@ -25,6 +29,7 @@ export type CivicChangeRow = {
   new_hash: string;
   detected_at: string;
   change_type: string;
+  content_diff: CivicContentDiff | null;
 };
 
 export function formatWhen(iso: string): string {
@@ -75,5 +80,6 @@ export function mapChange(row: Record<string, unknown>): CivicChangeRow {
     new_hash: String(row.new_hash),
     detected_at: asTimestamp(row.detected_at),
     change_type: String(row.change_type ?? "content_modified"),
+    content_diff: parseStoredDiff(row.content_diff),
   };
 }

@@ -205,6 +205,38 @@
   color: var(--bh-ink, #101113);
 }
 
+.civic-diff-summary {
+  margin: 10px 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bh-ink, #101113);
+}
+
+.civic-diff-block {
+  margin: 0 0 8px;
+  padding: 12px;
+  overflow-x: auto;
+  background: #f6f6f4;
+  border-radius: 10px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.civic-diff-add {
+  color: #157a3a;
+}
+
+.civic-diff-del {
+  color: #b42318;
+}
+
+.civic-diff-mod {
+  color: #a16207;
+}
+
 .civic-anchor-ok {
   color: #1f8a4c;
 }

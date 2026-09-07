@@ -7,6 +7,11 @@ import {
   citySlug,
   type CivicCitySeed,
 } from "@/lib/civic-cities";
+import {
+  diffTextFiles,
+  formatDiffSummary,
+  type CivicContentDiff,
+} from "@/lib/civic-diff";
 import { sendCivicChangeEmail } from "@/lib/civic-email";
 import { stampHashHex, upgradeProofBase64 } from "@/lib/ots";
 import { SITE_URL } from "@/lib/site";
@@ -14,6 +19,7 @@ import sql from "@/lib/supabase";
 
 const FETCH_MS = 80_000;
 const MAX_BYTES = 400 * 1024 * 1024;
+const CONTENT_MAX_BYTES = 5 * 1024 * 1024;
 const UPGRADE_MIN_AGE_MS = 60 * 60 * 1000;
 
 const SKIP_HOSTS = [
@@ -114,18 +120,42 @@ async function showPackage(
   return body.result;
 }
 
-async function hashUrl(
-  url: string,
-): Promise<{ hash: string; size: number } | null> {
+function wantsTextSnapshot(url: string, contentType: string | null): boolean {
+  const type = (contentType ?? "").toLowerCase();
+  const lower = url.toLowerCase();
+  if (
+    type.includes("csv") ||
+    type.includes("json") ||
+    type.startsWith("text/")
+  ) {
+    return true;
+  }
+  return (
+    lower.includes("rows.csv") ||
+    lower.endsWith(".csv") ||
+    lower.endsWith(".json") ||
+    lower.includes("format=csv") ||
+    lower.includes("format=json")
+  );
+}
+
+async function hashUrl(url: string): Promise<{
+  hash: string;
+  size: number;
+  content: string | null;
+} | null> {
   const res = await fetch(url, {
     redirect: "follow",
     signal: AbortSignal.timeout(FETCH_MS),
   });
   if (!res.ok || !res.body) return null;
 
-  // Stream raw bytes into SHA-256 so large CKAN dumps are not buffered.
+  // Stream raw bytes into SHA-256 so large dumps are not fully buffered.
+  // Keep a text snapshot only while the file stays under 5MB.
   const hasher = createHash("sha256");
   let size = 0;
+  let keepText = wantsTextSnapshot(url, res.headers.get("content-type"));
+  const chunks: Buffer[] = [];
   const reader = res.body.getReader();
 
   while (true) {
@@ -137,21 +167,42 @@ async function hashUrl(
       return null;
     }
     hasher.update(value);
+    if (keepText) {
+      if (size > CONTENT_MAX_BYTES) {
+        keepText = false;
+        chunks.length = 0;
+      } else {
+        chunks.push(Buffer.from(value));
+      }
+    }
   }
 
-  return { hash: hasher.digest("hex"), size };
+  return {
+    hash: hasher.digest("hex"),
+    size,
+    content: keepText && chunks.length > 0 ? Buffer.concat(chunks).toString("utf8") : null,
+  };
 }
 
-async function latestHash(url: string): Promise<string | null> {
+async function latestSnapshot(url: string): Promise<{
+  id: string;
+  hash: string;
+  content: string | null;
+} | null> {
   const rows = await sql`
-    SELECT file_hash
+    SELECT id, file_hash, content
     FROM civic_records
     WHERE resource_url = ${url}
     ORDER BY retrieved_at DESC
     LIMIT 1
   `;
   const row = rows[0] as Record<string, unknown> | undefined;
-  return row?.file_hash == null ? null : String(row.file_hash);
+  if (!row?.id || row.file_hash == null) return null;
+  return {
+    id: String(row.id),
+    hash: String(row.file_hash),
+    content: row.content == null ? null : String(row.content),
+  };
 }
 
 async function insertRecord(input: {
@@ -162,6 +213,7 @@ async function insertRecord(input: {
   resourceUrl: string;
   fileHash: string;
   fileSize: number;
+  content: string | null;
 }): Promise<void> {
   let otsProof: string | null = null;
   const anchorStatus = "pending";
@@ -174,11 +226,11 @@ async function insertRecord(input: {
   await sql`
     INSERT INTO civic_records (
       city, state, dataset_id, dataset_name, resource_url, file_hash, file_size,
-      ots_proof, anchor_status
+      ots_proof, anchor_status, content
     ) VALUES (
       ${input.city}, ${input.state}, ${input.datasetId}, ${input.datasetName},
       ${input.resourceUrl}, ${input.fileHash}, ${input.fileSize}, ${otsProof},
-      ${anchorStatus}
+      ${anchorStatus}, ${input.content}
     )
   `;
 }
@@ -214,7 +266,8 @@ async function ingestResource(
 
   counters.checked += 1;
 
-  let hashed: { hash: string; size: number } | null = null;
+  let hashed: { hash: string; size: number; content: string | null } | null =
+    null;
   try {
     hashed = await hashUrl(resourceUrl);
   } catch (error) {
@@ -228,8 +281,17 @@ async function ingestResource(
     return;
   }
 
-  const previous = await latestHash(resourceUrl);
-  if (previous === hashed.hash) return;
+  const previous = await latestSnapshot(resourceUrl);
+  if (previous?.hash === hashed.hash) {
+    if (hashed.content && !previous.content) {
+      await sql`
+        UPDATE civic_records
+        SET content = ${hashed.content}
+        WHERE id = ${previous.id} AND content IS NULL
+      `;
+    }
+    return;
+  }
 
   try {
     await insertRecord({
@@ -240,17 +302,23 @@ async function ingestResource(
       resourceUrl,
       fileHash: hashed.hash,
       fileSize: hashed.size,
+      content: hashed.content,
     });
     counters.new_records += 1;
 
     if (previous) {
+      const contentDiff =
+        previous.content && hashed.content
+          ? diffTextFiles(previous.content, hashed.content, resourceUrl)
+          : null;
       await sql`
         INSERT INTO civic_changes (
           city, state, dataset_name, resource_url, old_hash, new_hash,
-          change_type
+          change_type, content_diff
         ) VALUES (
           ${seed.city}, ${seed.state}, ${datasetName}, ${resourceUrl},
-          ${previous}, ${hashed.hash}, ${"content_modified"}
+          ${previous.hash}, ${hashed.hash}, ${"content_modified"},
+          ${contentDiff ? sql.json(contentDiff) : null}
         )
       `;
       counters.changed += 1;
@@ -258,8 +326,9 @@ async function ingestResource(
         city: seed.city,
         datasetName,
         resourceUrl,
-        oldHash: previous,
+        oldHash: previous.hash,
         newHash: hashed.hash,
+        contentDiff,
       }).catch((error) => {
         console.error("Civic subscriber notify failed:", error);
       });
@@ -384,6 +453,7 @@ async function notifyCitySubscribers(input: {
   resourceUrl: string;
   oldHash: string;
   newHash: string;
+  contentDiff: CivicContentDiff | null;
 }): Promise<void> {
   const rows = await sql`
     SELECT email
@@ -404,6 +474,10 @@ async function notifyCitySubscribers(input: {
       newHash: input.newHash,
       detectedAt,
       auditUrl,
+      diffSummary: input.contentDiff
+        ? formatDiffSummary(input.contentDiff)
+        : null,
+      contentDiff: input.contentDiff,
     });
   }
 }
