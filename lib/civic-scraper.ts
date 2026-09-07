@@ -24,6 +24,14 @@ const SKIP_HOSTS = [
   "powerbi.com",
 ];
 
+const SKIP_DATASETS = new Set(["v6vf-nfxy"]);
+
+function isSkippedDataset(id: string): boolean {
+  if (!SKIP_DATASETS.has(id)) return false;
+  console.log(`skipped (oversized) ${id}`);
+  return true;
+}
+
 export interface CivicIngestResult {
   checked: number;
   changed: number;
@@ -202,6 +210,8 @@ async function ingestResource(
   resourceUrl: string,
   counters: IngestCounters,
 ): Promise<void> {
+  if (isSkippedDataset(datasetId)) return;
+
   counters.checked += 1;
 
   let hashed: { hash: string; size: number } | null = null;
@@ -266,6 +276,7 @@ async function scrapeCkanCity(
   counters: IngestCounters,
 ): Promise<void> {
   for (const datasetId of seed.datasets) {
+    if (isSkippedDataset(datasetId)) continue;
     let pack: CkanPackage["result"] | null = null;
     try {
       pack = await showPackage(seed.portal, datasetId);
@@ -305,6 +316,7 @@ async function scrapeSocrataCity(
   counters: IngestCounters,
 ): Promise<void> {
   for (const datasetId of seed.datasets) {
+    if (isSkippedDataset(datasetId)) continue;
     let view: { id: string; name: string } | null = null;
     try {
       view = await showSocrataView(seed.portal, datasetId);
