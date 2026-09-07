@@ -25,6 +25,7 @@ import { StickyCta } from "./components/StickyCta";
 import "./globals.css";
 import "./beleg.css";
 import "./home-experience.css";
+import "./beleg-pages.css";
 
 const sans = Inter({
   subsets: ["latin"],

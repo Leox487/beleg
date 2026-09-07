@@ -14100,8 +14100,9 @@ html.is-idle .idle-veil {
    ========================================================================= */
 
 .nav-wrap {
-  position: relative;
-  z-index: 50;
+  position: sticky;
+  top: 0;
+  z-index: 80;
   overflow: visible;
 }
 

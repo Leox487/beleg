@@ -1,0 +1,297 @@
+/* Public pages inherit the paper Beleg shell. */
+
+html.beleg .landing.lp,
+html.beleg .landing,
+html.beleg main.page,
+html.beleg main.landing,
+html.beleg .page {
+  --bg: #f4f0e7;
+  --bg-raised: #fff;
+  --bg-raised-2: #efebe2;
+  --border: rgba(16, 17, 19, 0.1);
+  --border-hover: rgba(16, 17, 19, 0.18);
+  --border-strong: rgba(16, 17, 19, 0.16);
+  --text: #101113;
+  --text-2: #66738a;
+  --text-3: #66738a;
+  --accent: #315cff;
+  --accent-dim: #2448d6;
+  --accent-glow: rgba(49, 92, 255, 0.12);
+  --brand: #315cff;
+  --brand-bright: #315cff;
+  --brand-tint: rgba(49, 92, 255, 0.12);
+  --paper: #f4f0e7;
+  --paper-raised: #fff;
+  --ink: #101113;
+  --ink-2: #66738a;
+  --ink-3: #66738a;
+  --ink-soft: #66738a;
+  --muted: #66738a;
+  --rule: rgba(16, 17, 19, 0.1);
+  --surface: #fff;
+  --background: #f4f0e7;
+  --foreground: #101113;
+  --success: #20a36a;
+  background: var(--bh-bg) !important;
+  background-image: none !important;
+  color: var(--bh-ink);
+}
+
+html.beleg .lp-hero,
+html.beleg .lp-section,
+html.beleg .ip-hero,
+html.beleg .ip-section {
+  background: transparent;
+}
+
+html.beleg .lp-hero-wash,
+html.beleg .landing .lp-hero-wash,
+html.beleg .chain-field {
+  display: none !important;
+}
+
+html.beleg .lp-kicker,
+html.beleg .lp-eyebrow,
+html.beleg .doc-eyebrow {
+  color: var(--bh-accent) !important;
+}
+
+html.beleg .lp-h1,
+html.beleg .lp-h2,
+html.beleg .h1,
+html.beleg .doc-title,
+html.beleg .page-title,
+html.beleg .legal-band-title,
+html.beleg .how-facts h2,
+html.beleg .tool-card-copy h2,
+html.beleg .lab-entry-title,
+html.beleg .lab-entry-seq {
+  color: var(--bh-ink);
+}
+
+html.beleg .lp-lead,
+html.beleg .lp-body,
+html.beleg .doc-body,
+html.beleg .doc-body p,
+html.beleg .page p,
+html.beleg .how-facts p,
+html.beleg .ip-note {
+  color: var(--bh-mute);
+}
+
+html.beleg .lp-body a,
+html.beleg .doc-body a,
+html.beleg .page a:not(.navbar-link):not(.navbar-signup):not(.wordmark):not(.tool-card):not(.lp-btn):not(.btn) {
+  color: var(--bh-accent);
+}
+
+html.beleg .legal-card,
+html.beleg .legal-detail,
+html.beleg .legal-arrow,
+html.beleg .tools-deck,
+html.beleg .tool-card,
+html.beleg .tool-card.is-featured,
+html.beleg .card,
+html.beleg .how-facts li,
+html.beleg .how-play,
+html.beleg .how-play-row,
+html.beleg .limit-item,
+html.beleg .limit-stage,
+html.beleg .limit-mock,
+html.beleg .limit-stack span,
+html.beleg .limit-dialog,
+html.beleg .about-compare,
+html.beleg .about-compare-col,
+html.beleg .about-compare-col + .about-compare-col,
+html.beleg .lp-honest-col,
+html.beleg .lp-honest .lp-art,
+html.beleg .ip .uses-menu,
+html.beleg .ip .uses-search,
+html.beleg .ip .uses-detail,
+html.beleg .ip .uses-detail-media,
+html.beleg .lab-entry,
+html.beleg .lab-input {
+  background: #fff;
+  background-image: none;
+  border-color: var(--bh-line);
+  color: var(--bh-ink);
+  box-shadow: none;
+}
+
+html.beleg .legal-card:hover,
+html.beleg .legal-card.is-open,
+html.beleg .tool-card:hover,
+html.beleg .limit-item:hover,
+html.beleg .limit-item.is-on {
+  background: #fff;
+  border-color: rgba(49, 92, 255, 0.28);
+  box-shadow: none;
+  transform: none;
+}
+
+html.beleg .legal-card strong,
+html.beleg .legal-card em,
+html.beleg .legal-updated,
+html.beleg .limit-item strong,
+html.beleg .limit-dialog p,
+html.beleg .tool-card-copy h2 {
+  color: var(--bh-ink);
+}
+
+html.beleg .legal-card > span,
+html.beleg .legal-detail p,
+html.beleg .limit-item span,
+html.beleg .about-compare-label,
+html.beleg .lp-honest-label,
+html.beleg .tool-card-copy p {
+  color: var(--bh-mute);
+}
+
+html.beleg .about-compare-col.is-ledger i {
+  box-shadow: 0 0 0 4px #fff;
+}
+
+html.beleg .lp-honest-col:first-child {
+  border-color: rgba(49, 92, 255, 0.28);
+}
+
+html.beleg .legal-icon {
+  color: var(--bh-accent);
+  background: var(--bh-accent-soft);
+  box-shadow: none;
+}
+
+html.beleg .legal-band-head,
+html.beleg .tool-card-chrome,
+html.beleg .ip-facts,
+html.beleg .ip-facts li + li,
+html.beleg .landing.lp .site-footer {
+  border-color: var(--bh-line);
+}
+
+html.beleg .legal-arrow {
+  color: var(--bh-ink);
+}
+
+html.beleg .legal-arrow:hover:not(:disabled) {
+  background: var(--bh-accent-soft);
+  border-color: rgba(49, 92, 255, 0.28);
+}
+
+html.beleg .acc {
+  border-color: var(--bh-line);
+  background: #fff;
+  box-shadow: none;
+}
+
+html.beleg .acc-title {
+  color: var(--bh-ink);
+}
+
+html.beleg .acc-summary:hover .acc-title,
+html.beleg .acc.is-open .acc-title {
+  color: var(--bh-accent);
+}
+
+html.beleg .acc-body,
+html.beleg .acc-body p {
+  color: var(--bh-mute);
+}
+
+html.beleg .acc-icon::before,
+html.beleg .acc-icon::after {
+  background: var(--bh-ink);
+}
+
+html.beleg .site-footer,
+html.beleg .landing.lp .site-footer,
+html.beleg .landing .site-footer,
+html.beleg .page > .site-footer {
+  background: var(--bh-bg);
+  border-top: 1px solid var(--bh-line);
+  color: var(--bh-mute);
+}
+
+html.beleg .site-footer-wordmark,
+html.beleg .site-footer-heading,
+html.beleg .site-footer-bottom p {
+  color: var(--bh-ink);
+}
+
+html.beleg .site-footer-tagline,
+html.beleg .site-footer-anchor,
+html.beleg .site-footer .footer-link {
+  color: var(--bh-mute);
+}
+
+html.beleg .site-footer .footer-link:hover,
+html.beleg .site-footer-address a {
+  color: var(--bh-accent);
+}
+
+html.beleg .ip .uses-chip,
+html.beleg .ip .uses-trigger {
+  background: #fff;
+  border-color: var(--bh-line);
+  color: var(--bh-ink);
+}
+
+html.beleg .ip .uses-chip.is-active {
+  background: var(--bh-ink);
+  border-color: var(--bh-ink);
+  color: #fff;
+}
+
+html.beleg .ip .uses-option {
+  color: var(--bh-ink);
+}
+
+html.beleg .ip .uses-option:hover {
+  background: var(--bh-accent-soft);
+  color: var(--bh-ink);
+}
+
+html.beleg .tool-card,
+html.beleg .tool-card:hover {
+  color: var(--bh-ink);
+}
+
+html.beleg .tool-card-go {
+  color: var(--bh-accent);
+}
+
+html.beleg .tool-stage {
+  background: var(--bh-paper);
+  border-color: var(--bh-line);
+  color: var(--bh-mute);
+}
+
+html.beleg .how-play-row {
+  color: var(--bh-ink);
+}
+
+html.beleg .how-play-row i {
+  background: var(--bh-line);
+}
+
+html.beleg .how-play-btn,
+html.beleg .limit-mock-btn {
+  color: #fff;
+}
+
+html.beleg .lab-hint,
+html.beleg .lab-hash-label,
+html.beleg .lab-entry-note {
+  color: var(--bh-mute);
+}
+
+html.beleg .verify-tool-input,
+html.beleg input,
+html.beleg textarea,
+html.beleg select {
+  color: var(--bh-ink);
+}
+
+html.beleg .cookie-banner {
+  z-index: 210;
+}

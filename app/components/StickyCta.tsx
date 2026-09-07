@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { useEffect } from "react";
 
+import { isBelegShellPath } from "@/lib/beleg-shell";
+
 const HIDE = [
-  /^\/$/,
-  /^\/verify$/,
   /^\/dashboard/,
   /^\/v\//,
   /^\/p\//,
@@ -20,7 +20,8 @@ const HIDE = [
 export function StickyCta() {
   const pathname = usePathname() ?? "/";
   const { isSignedIn } = useAuth();
-  const hidden = HIDE.some((re) => re.test(pathname));
+  const hidden =
+    isBelegShellPath(pathname) || HIDE.some((re) => re.test(pathname));
   const href = isSignedIn ? "/dashboard" : "/sign-up";
   const label = isSignedIn ? "Go to your ledger" : "Get started";
 

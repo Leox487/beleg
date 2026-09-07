@@ -11,6 +11,33 @@ html.beleg {
   --bh-warn: #d99a25;
   --bh-paper: #efebe2;
   --bh-width: 1320px;
+  --bg: #f4f0e7;
+  --bg-raised: #fff;
+  --bg-raised-2: #efebe2;
+  --border: rgba(16, 17, 19, 0.1);
+  --border-hover: rgba(16, 17, 19, 0.18);
+  --text: #101113;
+  --text-2: #66738a;
+  --text-3: #66738a;
+  --accent: #315cff;
+  --accent-dim: #2448d6;
+  --accent-glow: rgba(49, 92, 255, 0.12);
+  --brand: #315cff;
+  --brand-bright: #315cff;
+  --brand-tint: rgba(49, 92, 255, 0.12);
+  --paper: #f4f0e7;
+  --paper-raised: #fff;
+  --paper-sunken: #efebe2;
+  --ink: #101113;
+  --ink-2: #66738a;
+  --ink-3: #66738a;
+  --ink-soft: #66738a;
+  --muted: #66738a;
+  --rule: rgba(16, 17, 19, 0.1);
+  --surface: #fff;
+  --background: #f4f0e7;
+  --foreground: #101113;
+  --success: #20a36a;
   color-scheme: light;
   background: var(--bh-bg);
 }
@@ -28,8 +55,22 @@ html.beleg .idle-veil {
   display: none;
 }
 
+html.beleg {
+  scroll-padding-top: 96px;
+}
+
+html.beleg body {
+  padding-top: 82px;
+}
+
 html.beleg .nav-wrap {
-  padding: 14px 20px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  padding: 14px 20px 12px;
+  background: var(--bh-bg);
 }
 
 html.beleg header.navbar,
@@ -41,6 +82,7 @@ html.beleg .nav-scrolled .navbar-bar {
 }
 
 html.beleg header.navbar {
+  position: relative;
   background: transparent !important;
 }
 
@@ -142,6 +184,7 @@ html.beleg .beta-notice-close:hover {
 }
 
 html.beleg .cookie-banner {
+  z-index: 210;
   background: var(--bh-ink);
   color: var(--bh-bg);
   border: 0;
