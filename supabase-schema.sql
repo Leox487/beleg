@@ -149,7 +149,6 @@ create table if not exists public.civic_records (
   ots_proof text,
   anchor_status text default 'pending',
   bitcoin_block_height integer,
-  content text,
   source_type text not null default 'ckan'
 );
 create index if not exists civic_records_url_idx on public.civic_records (resource_url);
@@ -179,7 +178,7 @@ alter table public.civic_changes
 alter table public.civic_records
   add column if not exists bitcoin_block_height integer;
 alter table public.civic_records
-  add column if not exists content text;
+  drop column if exists content;
 alter table public.civic_changes
   add column if not exists content_diff jsonb;
 alter table public.civic_records

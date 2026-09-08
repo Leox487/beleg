@@ -7,11 +7,6 @@ import {
   citySlug,
   type CivicCitySeed,
 } from "@/lib/civic-cities";
-import {
-  diffTextFiles,
-  formatDiffSummary,
-  type CivicContentDiff,
-} from "@/lib/civic-diff";
 import { sendCivicChangeEmail } from "@/lib/civic-email";
 import { stampHashHex, upgradeProofBase64 } from "@/lib/ots";
 import { SITE_URL } from "@/lib/site";
@@ -20,7 +15,6 @@ import sql from "@/lib/supabase";
 export const FETCH_MS = 80_000;
 export const FEDERAL_FETCH_MS = 60_000;
 export const MAX_BYTES = 50 * 1024 * 1024;
-export const CONTENT_MAX_BYTES = 5 * 1024 * 1024;
 export const FETCH_UA =
   "BelegCivicAudit/1.0 (+https://belegapp.com; beleg.app@proton.me)";
 const UPGRADE_MIN_AGE_MS = 60 * 60 * 1000;
@@ -43,7 +37,7 @@ export function isSkippedDataset(id: string): boolean {
 }
 
 export type CivicHashResult =
-  | { ok: true; hash: string; size: number; content: string | null }
+  | { ok: true; hash: string; size: number }
   | { ok: false; reason: "oversized" | "fetch" };
 
 export interface CivicIngestResult {
@@ -89,28 +83,6 @@ export function isDownloadable(url: string, format?: string): boolean {
   }
 }
 
-function wantsTextSnapshot(url: string, contentType: string | null): boolean {
-  const type = (contentType ?? "").toLowerCase();
-  const lower = url.toLowerCase();
-  if (
-    type.includes("csv") ||
-    type.includes("json") ||
-    type.includes("xml") ||
-    type.startsWith("text/")
-  ) {
-    return true;
-  }
-  return (
-    lower.includes("rows.csv") ||
-    lower.endsWith(".csv") ||
-    lower.endsWith(".json") ||
-    lower.endsWith(".xml") ||
-    lower.endsWith(".idx") ||
-    lower.includes("format=csv") ||
-    lower.includes("format=json")
-  );
-}
-
 export async function probeContentLength(
   url: string,
 ): Promise<{ length: number | null; skip: boolean }> {
@@ -150,12 +122,8 @@ async function hashUrl(
     return { ok: false, reason: "oversized" };
   }
 
-  // Stream raw bytes into SHA-256 so large dumps are not fully buffered.
-  // Keep a text snapshot only while the file stays under 5MB.
   const hasher = createHash("sha256");
   let size = 0;
-  let keepText = wantsTextSnapshot(url, res.headers.get("content-type"));
-  const chunks: Buffer[] = [];
   const reader = res.body.getReader();
 
   while (true) {
@@ -167,21 +135,12 @@ async function hashUrl(
       return { ok: false, reason: "oversized" };
     }
     hasher.update(value);
-    if (keepText) {
-      if (size > CONTENT_MAX_BYTES) {
-        keepText = false;
-        chunks.length = 0;
-      } else {
-        chunks.push(Buffer.from(value));
-      }
-    }
   }
 
   return {
     ok: true,
     hash: hasher.digest("hex"),
     size,
-    content: keepText && chunks.length > 0 ? Buffer.concat(chunks).toString("utf8") : null,
   };
 }
 
@@ -202,10 +161,9 @@ export async function hashResource(
 async function latestSnapshot(url: string): Promise<{
   id: string;
   hash: string;
-  content: string | null;
 } | null> {
   const rows = await sql`
-    SELECT id, file_hash, content
+    SELECT id, file_hash
     FROM civic_records
     WHERE resource_url = ${url}
     ORDER BY retrieved_at DESC
@@ -216,7 +174,6 @@ async function latestSnapshot(url: string): Promise<{
   return {
     id: String(row.id),
     hash: String(row.file_hash),
-    content: row.content == null ? null : String(row.content),
   };
 }
 
@@ -228,7 +185,6 @@ export async function insertRecord(input: {
   resourceUrl: string;
   fileHash: string;
   fileSize: number;
-  content: string | null;
   sourceType: CivicCitySeed["type"];
 }): Promise<void> {
   let otsProof: string | null = null;
@@ -242,11 +198,11 @@ export async function insertRecord(input: {
   await sql`
     INSERT INTO civic_records (
       city, state, dataset_id, dataset_name, resource_url, file_hash, file_size,
-      ots_proof, anchor_status, content, source_type
+      ots_proof, anchor_status, source_type
     ) VALUES (
       ${input.city}, ${input.state}, ${input.datasetId}, ${input.datasetName},
       ${input.resourceUrl}, ${input.fileHash}, ${input.fileSize}, ${otsProof},
-      ${anchorStatus}, ${input.content}, ${input.sourceType}
+      ${anchorStatus}, ${input.sourceType}
     )
   `;
 }
@@ -275,13 +231,6 @@ async function ingestResource(
 
   const previous = await latestSnapshot(resourceUrl);
   if (previous?.hash === hashed.hash) {
-    if (hashed.content && !previous.content) {
-      await sql`
-        UPDATE civic_records
-        SET content = ${hashed.content}
-        WHERE id = ${previous.id} AND content IS NULL
-      `;
-    }
     return;
   }
 
@@ -294,16 +243,11 @@ async function ingestResource(
       resourceUrl,
       fileHash: hashed.hash,
       fileSize: hashed.size,
-      content: hashed.content,
       sourceType: seed.type,
     });
     counters.new_records += 1;
 
     if (previous) {
-      const contentDiff =
-        previous.content && hashed.content
-          ? diffTextFiles(previous.content, hashed.content, resourceUrl)
-          : null;
       await sql`
         INSERT INTO civic_changes (
           city, state, dataset_name, resource_url, old_hash, new_hash,
@@ -311,7 +255,7 @@ async function ingestResource(
         ) VALUES (
           ${seed.city}, ${seed.state}, ${datasetName}, ${resourceUrl},
           ${previous.hash}, ${hashed.hash}, ${"content_modified"},
-          ${contentDiff ? sql.json(contentDiff) : null}
+          ${null}
         )
       `;
       counters.changed += 1;
@@ -321,7 +265,6 @@ async function ingestResource(
         resourceUrl,
         oldHash: previous.hash,
         newHash: hashed.hash,
-        contentDiff,
       }).catch((error) => {
         console.error("Civic subscriber notify failed:", error);
       });
@@ -417,7 +360,6 @@ async function notifyCitySubscribers(input: {
   resourceUrl: string;
   oldHash: string;
   newHash: string;
-  contentDiff: CivicContentDiff | null;
 }): Promise<void> {
   const rows = await sql`
     SELECT email
@@ -438,10 +380,8 @@ async function notifyCitySubscribers(input: {
       newHash: input.newHash,
       detectedAt,
       auditUrl,
-      diffSummary: input.contentDiff
-        ? formatDiffSummary(input.contentDiff)
-        : null,
-      contentDiff: input.contentDiff,
+      diffSummary: null,
+      contentDiff: null,
     });
   }
 }

@@ -419,7 +419,6 @@ export async function discoverCityRecords(
         resourceUrl: resource.url,
         fileHash: hashed.hash,
         fileSize: hashed.size,
-        content: hashed.content,
         sourceType: seed.type,
       });
       known.add(resource.url);
