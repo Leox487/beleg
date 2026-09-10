@@ -42,11 +42,24 @@ export type CivicCitySeed = {
  * USASpending listed CSVs 404; archive zips exist but are 0.9–1.2GB.
  * CMS 9wzi-peqs 410 (legacy SODA). Replaced with Medicare MSPB hospital CSV.
  * Federal Reserve h6.htm / h15.htm are HTML — skipped.
+ * Rechecked 2026-09-10: added GovInfo bills/CREC RSS, FEC DEMO_KEY filings,
+ * Senate LDA filings. Skipped SEC EFTS search-index (500), House roll-call
+ * index (HTML), CourtListener opinions (auth required). Chicago/Austin/SF
+ * crime CSVs estimated well over 50MB — skipped.
  *
  * Not Socrata (views.json is not a JSON array) — skipped:
  * Denver (denvergov.org / data.denvergov.org HTML),
  * Nashville (data.nashville.gov 404),
  * Baltimore (data.baltimorecity.gov 404).
+ *
+ * Rechecked 2026-09-10 (CKAN site_read or Socrata views.json?limit=5):
+ * Added: Edmonton (Socrata), New Orleans, Kansas City.
+ * Still not CKAN/Socrata: Ottawa, Vancouver (Huwise), Denver (HTML catalog),
+ * Baltimore, Nashville, Detroit, Louisville, Memphis, Minneapolis,
+ * Charlotte, Indianapolis, Oklahoma City, Albuquerque, Sacramento,
+ * Long Beach (Huwise). Fetch failed: Atlanta, Columbus, Tucson,
+ * Virginia Beach, Omaha. ArcGIS skipped: Raleigh, Fresno, Miami.
+ * Mesa and Colorado Springs have no verified portal.
  */
 export const CITY_SEEDS: readonly CivicCitySeed[] = [
   {
@@ -212,6 +225,27 @@ export const CITY_SEEDS: readonly CivicCitySeed[] = [
     ],
   },
   {
+    city: "Edmonton",
+    state: "AB",
+    portal: "https://data.edmonton.ca",
+    type: "socrata",
+    datasets: [],
+  },
+  {
+    city: "New Orleans",
+    state: "LA",
+    portal: "https://data.nola.gov",
+    type: "socrata",
+    datasets: [],
+  },
+  {
+    city: "Kansas City",
+    state: "MO",
+    portal: "https://data.kcmo.org",
+    type: "socrata",
+    datasets: [],
+  },
+  {
     city: "Federal",
     state: "US",
     portal: "https://www.usa.gov",
@@ -252,6 +286,26 @@ export const CITY_SEEDS: readonly CivicCitySeed[] = [
         id: "healthdata-hospital-capacity",
         name: "Hospital capacity and quality (HHS Protect)",
         url: "https://healthdata.gov/api/views/g62h-syeh/rows.csv?accessType=DOWNLOAD",
+      },
+      {
+        id: "govinfo-bills-rss",
+        name: "New bills introduced (GovInfo)",
+        url: "https://www.govinfo.gov/rss/bills.xml",
+      },
+      {
+        id: "govinfo-crec-rss",
+        name: "Congressional Record daily (GovInfo)",
+        url: "https://www.govinfo.gov/rss/crec.xml",
+      },
+      {
+        id: "fec-recent-filings",
+        name: "FEC campaign finance filings",
+        url: "https://api.open.fec.gov/v1/filings/?api_key=DEMO_KEY&per_page=20&sort=-receipt_date",
+      },
+      {
+        id: "senate-lda-filings",
+        name: "Senate lobbying disclosures",
+        url: "https://lda.senate.gov/api/v1/filings/?format=json&filing_year=2026&limit=20",
       },
     ],
   },

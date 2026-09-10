@@ -30,6 +30,7 @@ export type CivicChangeRow = {
   detected_at: string;
   change_type: string;
   content_diff: CivicDiffSummary | null;
+  story: string | null;
 };
 
 export function formatWhen(iso: string): string {
@@ -81,5 +82,6 @@ export function mapChange(row: Record<string, unknown>): CivicChangeRow {
     detected_at: asTimestamp(row.detected_at),
     change_type: String(row.change_type ?? "content_modified"),
     content_diff: parseStoredDiff(row.content_diff),
+    story: asNullableString(row.story),
   };
 }

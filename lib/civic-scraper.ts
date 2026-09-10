@@ -11,11 +11,14 @@ import {
   civicSnapshotToText,
   diffCivicContent,
   extractCivicSnapshot,
+  parseStoredDiff,
   refineDiffWithTotals,
   type CivicDiffSummary,
   type CivicRowSnapshot,
 } from "@/lib/civic-diff";
+import { asTimestamp } from "@/lib/row";
 import { sendCivicChangeEmail } from "@/lib/civic-email";
+import { generateChangeStory } from "@/lib/civic-story";
 import { stampHashHex, upgradeProofBase64 } from "@/lib/ots";
 import { SITE_URL } from "@/lib/site";
 import sql from "@/lib/supabase";
@@ -36,7 +39,12 @@ const SKIP_HOSTS = [
   "powerbi.com",
 ];
 
-const SKIP_DATASETS = new Set(["v6vf-nfxy"]);
+const SKIP_DATASETS = new Set([
+  "v6vf-nfxy",
+  "ijzp-q8t2",
+  "fdj4-gpfu",
+  "wg3w-h783",
+]);
 
 export function isSkippedDataset(id: string): boolean {
   if (!SKIP_DATASETS.has(id)) return false;
@@ -348,14 +356,32 @@ async function ingestResource(
         hashed.snapshot,
         datasetName,
       );
+      const detectedAt = new Date().toISOString();
+      let story: string | null = null;
+      if (contentDiff?.notable_changes.length) {
+        try {
+          const text = await generateChangeStory({
+            city: seed.city,
+            state: seed.state,
+            datasetName,
+            resourceUrl,
+            detectedAt,
+            diff: contentDiff,
+          });
+          story = text || null;
+        } catch (error) {
+          console.error("Civic story generation failed:", error);
+        }
+      }
       await sql`
         INSERT INTO civic_changes (
           city, state, dataset_name, resource_url, old_hash, new_hash,
-          change_type, content_diff
+          change_type, content_diff, story
         ) VALUES (
           ${seed.city}, ${seed.state}, ${datasetName}, ${resourceUrl},
           ${previous.hash}, ${hashed.hash}, ${"content_modified"},
-          ${contentDiff ? sql.json(JSON.parse(JSON.stringify(contentDiff))) : null}
+          ${contentDiff ? sql.json(JSON.parse(JSON.stringify(contentDiff))) : null},
+          ${story}
         )
       `;
       counters.changed += 1;
@@ -452,7 +478,54 @@ export async function scrapeCivicRecords(
     }
   }
 
+  await backfillChangeStories(cityFilter ? seeds[0]?.city : undefined);
   return counters;
+}
+
+async function backfillChangeStories(city?: string): Promise<void> {
+  const rows = city
+    ? await sql`
+        SELECT id, city, state, dataset_name, resource_url, detected_at, content_diff
+        FROM civic_changes
+        WHERE city = ${city}
+          AND story IS NULL
+          AND content_diff IS NOT NULL
+        ORDER BY detected_at DESC
+        LIMIT 20
+      `
+    : await sql`
+        SELECT id, city, state, dataset_name, resource_url, detected_at, content_diff
+        FROM civic_changes
+        WHERE story IS NULL
+          AND content_diff IS NOT NULL
+        ORDER BY detected_at DESC
+        LIMIT 20
+      `;
+
+  for (const raw of rows) {
+    const row = raw as Record<string, unknown>;
+    const diff = parseStoredDiff(row.content_diff);
+    if (!diff?.notable_changes.length) continue;
+    try {
+      const text = await generateChangeStory({
+        city: String(row.city ?? ""),
+        state: String(row.state ?? ""),
+        datasetName: String(row.dataset_name ?? ""),
+        resourceUrl: String(row.resource_url ?? ""),
+        detectedAt: asTimestamp(row.detected_at),
+        diff,
+      });
+      if (!text) continue;
+      await sql`
+        UPDATE civic_changes
+        SET story = ${text}
+        WHERE id = ${String(row.id)}
+          AND story IS NULL
+      `;
+    } catch (error) {
+      console.error("Civic story backfill failed:", error);
+    }
+  }
 }
 
 async function backfillSnapshot(

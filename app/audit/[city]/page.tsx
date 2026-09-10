@@ -84,7 +84,7 @@ export default async function CityAuditPage({
       FROM (
         SELECT DISTINCT ON (resource_url)
           id, city, state, dataset_name, resource_url, old_hash, new_hash,
-          detected_at, change_type, content_diff
+          detected_at, change_type, content_diff, story
         FROM civic_changes
         WHERE city = ${seed.city}
         ORDER BY resource_url, detected_at DESC

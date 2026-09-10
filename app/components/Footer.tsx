@@ -14,6 +14,7 @@ const COLUMNS = [
       { href: "/verify-guide", label: "Verify it yourself" },
       { href: "/changelog", label: "Changelog" },
       { href: "/audit", label: "Municipal Audit" },
+      { href: "/audit/stories", label: "Government Data Stories" },
       { href: "/audit/pittsburgh", label: "Pittsburgh Audit" },
     ],
   },

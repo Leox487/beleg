@@ -48,7 +48,7 @@ export default async function NationalAuditPage() {
         FROM (
           SELECT DISTINCT ON (resource_url)
             id, city, state, dataset_name, resource_url, old_hash, new_hash,
-            detected_at, change_type, content_diff
+            detected_at, change_type, content_diff, story
           FROM civic_changes
           ORDER BY resource_url, detected_at DESC
         ) latest
@@ -243,7 +243,10 @@ export default async function NationalAuditPage() {
         </section>
 
         <section className="civic-section">
-          <h2>Changes</h2>
+          <div className="civic-section-head">
+            <h2>Changes</h2>
+            <Link href="/audit/stories">Government data stories</Link>
+          </div>
           <p className="civic-disclaimer">
             A change means the file content changed since last retrieval. This
             may reflect a legitimate update, correction, or deletion — not

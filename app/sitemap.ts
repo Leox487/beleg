@@ -20,6 +20,7 @@ const PATHS = [
   "/privacy",
   "/terms",
   "/audit",
+  "/audit/stories",
   ...CITY_SEEDS.map((seed) => `/audit/${citySlug(seed.city)}`),
 ];
 

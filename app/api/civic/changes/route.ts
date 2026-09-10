@@ -29,7 +29,7 @@ export async function GET(req: Request) {
   const rows = await sql`
     SELECT
       id, city, state, dataset_name, resource_url, old_hash, new_hash,
-      detected_at, change_type, content_diff
+      detected_at, change_type, content_diff, story
     FROM civic_changes
     WHERE city = ${seed.city}
     ORDER BY detected_at DESC
@@ -51,6 +51,7 @@ export async function GET(req: Request) {
         detected_at: asTimestamp(row.detected_at),
         change_type: String(row.change_type ?? "content_modified"),
         summary: content_diff?.notable_changes[0] ?? null,
+        story: row.story == null ? null : String(row.story),
         content_diff,
       };
     }),

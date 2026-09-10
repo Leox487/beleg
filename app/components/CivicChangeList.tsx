@@ -23,14 +23,15 @@ export function CivicChangeList({
           ? `${row.city}${row.state ? `, ${row.state}` : ""}`
           : "unknown";
         const diff = row.content_diff;
-        const headline = diff?.notable_changes[0] ?? null;
+        const headline = row.story || diff?.notable_changes[0] || null;
         return (
           <li key={row.id}>
+            {row.story ? <p className="civic-story">{row.story}</p> : null}
             <p className="civic-change-name">
               {showCity && row.city ? `${cityLabel} · ` : null}
               {row.dataset_name}
             </p>
-            {headline ? (
+            {row.story ? null : headline ? (
               <p className="civic-change-headline">{headline}</p>
             ) : (
               <p className="civic-change-label">

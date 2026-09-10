@@ -189,6 +189,8 @@ alter table public.civic_records
   add column if not exists col_names text[];
 alter table public.civic_records
   add column if not exists sample_rows jsonb;
+alter table public.civic_changes
+  add column if not exists story text;
 
 create table if not exists public.civic_subscribers (
   id uuid primary key default gen_random_uuid(),
