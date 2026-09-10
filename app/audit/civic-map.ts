@@ -1,6 +1,6 @@
 import {
   parseStoredDiff,
-  type CivicContentDiff,
+  type CivicDiffSummary,
 } from "@/lib/civic-diff";
 import { asNullableString, asTimestamp } from "@/lib/row";
 
@@ -29,7 +29,7 @@ export type CivicChangeRow = {
   new_hash: string;
   detected_at: string;
   change_type: string;
-  content_diff: CivicContentDiff | null;
+  content_diff: CivicDiffSummary | null;
 };
 
 export function formatWhen(iso: string): string {

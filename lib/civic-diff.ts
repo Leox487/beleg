@@ -1,36 +1,50 @@
-export type CivicContentDiff = {
-  added: number;
-  removed: number;
-  modified: number;
-  key: string | null;
-  added_preview: string[];
-  removed_preview: string[];
-  modified_preview: { old: string; new: string }[];
-};
+import "server-only";
 
-const PREVIEW = 8;
-const KEY_NAMES = new Set([
-  "id",
-  "uid",
-  "uuid",
-  "sr_number",
-  "request_number",
-  "contract_number",
-  "contract_id",
-  "employee_id",
-  "vendor_id",
-  "vendor_number",
-  "po_number",
-  "purchase_order",
-  "payment_id",
-  "check_number",
-]);
+const SAMPLE_ROW_LIMIT = 20;
+const SAMPLE_PREVIEW = 3;
+const MAX_NOTABLE = 5;
+const MAX_CELL_CHARS = 240;
 
-export function formatDiffSummary(diff: CivicContentDiff): string {
-  return `${diff.added} rows added, ${diff.removed} rows removed, ${diff.modified} rows modified`;
+export interface CivicDiffSummary {
+  rows_added: number;
+  rows_removed: number;
+  rows_modified: number;
+  total_rows_before: number;
+  total_rows_after: number;
+  columns: string[];
+  sample_added: Record<string, string>[];
+  sample_removed: Record<string, string>[];
+  sample_modified: {
+    before: Record<string, string>;
+    after: Record<string, string>;
+    changed_fields: string[];
+  }[];
+  notable_changes: string[];
 }
 
-export function parseStoredDiff(value: unknown): CivicContentDiff | null {
+export type CivicRowSnapshot = {
+  row_count: number;
+  col_names: string[];
+  sample_rows: Record<string, string>[];
+};
+
+export type CivicContentDiff = CivicDiffSummary;
+
+type CivicTable = {
+  columns: string[];
+  rows: Record<string, string>[];
+  rowCount?: number;
+};
+
+export function formatDiffSummary(diff: CivicDiffSummary): string {
+  const parts: string[] = [];
+  if (diff.rows_added > 0) parts.push(`+${diff.rows_added} rows added`);
+  if (diff.rows_removed > 0) parts.push(`${diff.rows_removed} rows removed`);
+  if (diff.rows_modified > 0) parts.push(`${diff.rows_modified} rows modified`);
+  return parts.join(" · ");
+}
+
+export function parseStoredDiff(value: unknown): CivicDiffSummary | null {
   let raw: Record<string, unknown> | null = null;
   try {
     raw =
@@ -43,69 +57,423 @@ export function parseStoredDiff(value: unknown): CivicContentDiff | null {
     return null;
   }
   if (!raw) return null;
-  if (
-    typeof raw.added !== "number" ||
-    typeof raw.removed !== "number" ||
-    typeof raw.modified !== "number"
-  ) {
+
+  if (isLegacyDiff(raw)) {
+    return legacyToSummary(raw);
+  }
+
+  const rowsAdded = asCount(raw.rows_added);
+  const rowsRemoved = asCount(raw.rows_removed);
+  const rowsModified = asCount(raw.rows_modified);
+  if (rowsAdded == null || rowsRemoved == null || rowsModified == null) {
     return null;
   }
+
   return {
-    added: raw.added,
-    removed: raw.removed,
-    modified: raw.modified,
-    key: raw.key == null ? null : String(raw.key),
-    added_preview: Array.isArray(raw.added_preview)
-      ? raw.added_preview.map((row) => String(row))
-      : [],
-    removed_preview: Array.isArray(raw.removed_preview)
-      ? raw.removed_preview.map((row) => String(row))
-      : [],
-    modified_preview: Array.isArray(raw.modified_preview)
-      ? raw.modified_preview.map((row) => {
-          const item = row as Record<string, unknown>;
-          return {
-            old: String(item.old ?? ""),
-            new: String(item.new ?? ""),
-          };
-        })
-      : [],
+    rows_added: rowsAdded,
+    rows_removed: rowsRemoved,
+    rows_modified: rowsModified,
+    total_rows_before: asCount(raw.total_rows_before) ?? 0,
+    total_rows_after: asCount(raw.total_rows_after) ?? 0,
+    columns: asStringArray(raw.columns),
+    sample_added: asRecordList(raw.sample_added),
+    sample_removed: asRecordList(raw.sample_removed),
+    sample_modified: asModifiedList(raw.sample_modified),
+    notable_changes: asStringArray(raw.notable_changes),
   };
 }
 
-export function diffTextFiles(
-  oldText: string,
-  newText: string,
-  url: string,
-): CivicContentDiff | null {
-  const kind = snapshotKind(url, oldText) ?? snapshotKind(url, newText);
-  if (kind === "csv") return diffTable(parseCsv(oldText), parseCsv(newText));
-  if (kind === "json") {
-    const oldRows = jsonToRows(oldText);
-    const newRows = jsonToRows(newText);
-    if (oldRows && newRows) return diffTable(oldRows, newRows);
-    return diffLines(oldText, newText);
-  }
-  return null;
+export async function diffCivicContent(
+  before: string,
+  after: string,
+  datasetName: string,
+): Promise<CivicDiffSummary> {
+  const oldTable = parseCivicTable(before);
+  const newTable = parseCivicTable(after);
+  const columns = mergeColumns(oldTable.columns, newTable.columns);
+  return buildDiff(oldTable, newTable, columns, datasetName);
 }
 
-function snapshotKind(url: string, text: string): "csv" | "json" | null {
-  const lower = url.toLowerCase();
-  if (lower.includes("rows.csv") || lower.endsWith(".csv") || lower.includes("format=csv")) {
-    return "csv";
-  }
-  if (lower.endsWith(".json") || lower.includes("format=json")) return "json";
+export function extractCivicSnapshot(text: string): CivicRowSnapshot | null {
   const trimmed = text.trimStart();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[")) return "json";
-  if (trimmed.includes(",")) return "csv";
-  return null;
+  if (!trimmed || looksLikeHtml(trimmed)) return null;
+
+  if (looksLikeJson(trimmed)) {
+    const table = jsonToTable(trimmed);
+    if (!table || table.columns.length === 0) return null;
+    return snapshotFromTable(table);
+  }
+
+  const table = csvToTable(trimmed, { sampleOnly: true });
+  if (!table || table.columns.length < 2) return null;
+  return snapshotFromTable(table);
 }
 
-function parseCsv(text: string): string[][] {
+export function civicSnapshotToText(snapshot: CivicRowSnapshot): string {
+  return tableToCsv(snapshot.col_names, snapshot.sample_rows);
+}
+
+export function refineDiffWithTotals(
+  diff: CivicDiffSummary,
+  totalBefore: number | null,
+  totalAfter: number | null,
+  datasetName: string,
+): CivicDiffSummary {
+  const next: CivicDiffSummary = {
+    ...diff,
+    total_rows_before: totalBefore ?? diff.total_rows_before,
+    total_rows_after: totalAfter ?? diff.total_rows_after,
+  };
+
+  if (totalBefore != null && totalAfter != null) {
+    const net = totalAfter - totalBefore;
+    if (next.rows_added === 0 && next.rows_removed === 0 && net !== 0) {
+      if (net > 0) next.rows_added = net;
+      else next.rows_removed = -net;
+    }
+  }
+
+  next.notable_changes = buildNotableChanges(next, datasetName);
+  return next;
+}
+
+function snapshotFromTable(table: CivicTable): CivicRowSnapshot {
+  return {
+    row_count: table.rowCount ?? table.rows.length,
+    col_names: table.columns,
+    sample_rows: table.rows.slice(0, SAMPLE_ROW_LIMIT).map(clipRecord),
+  };
+}
+
+function parseCivicTable(text: string): CivicTable {
+  const trimmed = text.trim();
+  if (!trimmed) return { columns: [], rows: [] };
+  if (looksLikeJson(trimmed)) {
+    return jsonToTable(trimmed) ?? { columns: [], rows: [] };
+  }
+  return csvToTable(trimmed) ?? { columns: [], rows: [] };
+}
+
+function csvToTable(
+  text: string,
+  options: { sampleOnly?: boolean } = {},
+): CivicTable | null {
+  const parsed = parseCsvCounted(text, options.sampleOnly ? SAMPLE_ROW_LIMIT : undefined);
+  if (!parsed) return null;
+  const rows = parsed.sample.map((cells) => recordFromCells(parsed.columns, cells));
+  if (options.sampleOnly && parsed.rowCount > rows.length) {
+    return { columns: parsed.columns, rows, rowCount: parsed.rowCount };
+  }
+  return { columns: parsed.columns, rows, rowCount: parsed.rowCount };
+}
+
+function jsonToTable(text: string): CivicTable | null {
+  try {
+    const parsed = JSON.parse(text) as unknown;
+    const records = collectJsonRecords(parsed);
+    if (!records || records.length === 0) return null;
+    const columns = mergeColumns(
+      [],
+      records.flatMap((record) => Object.keys(record)),
+    );
+    if (columns.length === 0) return null;
+    return {
+      columns,
+      rowCount: records.length,
+      rows: records.map((record) => {
+        const row: Record<string, string> = {};
+        for (const column of columns) {
+          row[column] = stringifyCell(record[column]);
+        }
+        return row;
+      }),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function collectJsonRecords(
+  value: unknown,
+): Record<string, unknown>[] | null {
+  if (Array.isArray(value)) {
+    if (value.length === 0) return [];
+    if (value.every((row) => row && typeof row === "object" && !Array.isArray(row))) {
+      return value as Record<string, unknown>[];
+    }
+    return null;
+  }
+  if (!value || typeof value !== "object") return null;
+  const obj = value as Record<string, unknown>;
+  for (const key of ["records", "data", "results", "rows", "value", "items"]) {
+    const nested = collectJsonRecords(obj[key]);
+    if (nested) return nested;
+  }
+  if (obj.result && typeof obj.result === "object") {
+    const nested = collectJsonRecords(obj.result);
+    if (nested) return nested;
+  }
+  return [obj];
+}
+
+function buildDiff(
+  oldTable: CivicTable,
+  newTable: CivicTable,
+  columns: string[],
+  datasetName: string,
+): CivicDiffSummary {
+  const oldMap = new Map<string, Record<string, string>>();
+  const newMap = new Map<string, Record<string, string>>();
+  oldTable.rows.forEach((row, index) => {
+    oldMap.set(rowIdentity(row, columns, index), row);
+  });
+  newTable.rows.forEach((row, index) => {
+    newMap.set(rowIdentity(row, columns, index), row);
+  });
+
+  const sample_added: Record<string, string>[] = [];
+  const sample_removed: Record<string, string>[] = [];
+  const sample_modified: CivicDiffSummary["sample_modified"] = [];
+  const columnHits = new Map<string, number>();
+  let rows_added = 0;
+  let rows_removed = 0;
+  let rows_modified = 0;
+
+  for (const [key, row] of newMap) {
+    const previous = oldMap.get(key);
+    if (!previous) {
+      rows_added += 1;
+      if (sample_added.length < SAMPLE_PREVIEW) sample_added.push(clipRecord(row));
+      continue;
+    }
+    const changed_fields = changedFields(previous, row, columns);
+    if (changed_fields.length > 0) {
+      rows_modified += 1;
+      for (const field of changed_fields) {
+        columnHits.set(field, (columnHits.get(field) ?? 0) + 1);
+      }
+      if (sample_modified.length < SAMPLE_PREVIEW) {
+        sample_modified.push({
+          before: clipRecord(previous),
+          after: clipRecord(row),
+          changed_fields,
+        });
+      }
+    }
+  }
+
+  for (const [key, row] of oldMap) {
+    if (!newMap.has(key)) {
+      rows_removed += 1;
+      if (sample_removed.length < SAMPLE_PREVIEW) {
+        sample_removed.push(clipRecord(row));
+      }
+    }
+  }
+
+  const summary: CivicDiffSummary = {
+    rows_added,
+    rows_removed,
+    rows_modified,
+    total_rows_before: oldTable.rows.length,
+    total_rows_after: newTable.rows.length,
+    columns,
+    sample_added,
+    sample_removed,
+    sample_modified,
+    notable_changes: [],
+  };
+  summary.notable_changes = buildNotableChanges(summary, datasetName, columnHits);
+  return summary;
+}
+
+function buildNotableChanges(
+  diff: CivicDiffSummary,
+  datasetName: string,
+  columnHits?: Map<string, number>,
+): string[] {
+  const notes: string[] = [];
+  if (diff.rows_added > 0) {
+    notes.push(`${diff.rows_added} new rows added`);
+  }
+  if (diff.rows_removed > 0) {
+    notes.push(
+      `${diff.rows_removed} ${diff.rows_removed === 1 ? "row" : "rows"} removed`,
+    );
+  }
+  if (diff.rows_modified > 0) {
+    notes.push(
+      `${diff.rows_modified} ${diff.rows_modified === 1 ? "row" : "rows"} modified`,
+    );
+  }
+
+  const hits =
+    columnHits ??
+    columnHitsFromSamples(diff.sample_modified);
+  const ranked = [...hits.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  for (const [column, count] of ranked) {
+    if (notes.length >= MAX_NOTABLE) break;
+    notes.push(
+      `Column '${column}' changed in ${count} ${count === 1 ? "row" : "rows"}`,
+    );
+  }
+
+  if (notes.length < MAX_NOTABLE && diff.sample_added[0]) {
+    const firstCol = diff.columns[0];
+    const value = firstCol ? diff.sample_added[0][firstCol] : "";
+    if (value) {
+      notes.push(`${addedNoun(datasetName)}: ${value}`);
+    }
+  }
+
+  if (
+    notes.length === 0 &&
+    (diff.total_rows_before !== diff.total_rows_after ||
+      diff.rows_added + diff.rows_removed + diff.rows_modified === 0)
+  ) {
+    notes.push("Sample rows are unchanged; the hash differs later in the file");
+  }
+
+  return notes.slice(0, MAX_NOTABLE);
+}
+
+function columnHitsFromSamples(
+  samples: CivicDiffSummary["sample_modified"],
+): Map<string, number> {
+  const hits = new Map<string, number>();
+  for (const sample of samples) {
+    for (const field of sample.changed_fields) {
+      hits.set(field, (hits.get(field) ?? 0) + 1);
+    }
+  }
+  return hits;
+}
+
+function addedNoun(datasetName: string): string {
+  const name = datasetName.toLowerCase();
+  if (name.includes("contract")) return "New contract added";
+  if (name.includes("lobby")) return "New lobbying registration added";
+  if (name.includes("employee") || name.includes("payroll")) {
+    return "New employee added";
+  }
+  if (name.includes("payment") || name.includes("check")) {
+    return "New payment added";
+  }
+  if (name.includes("permit")) return "New permit added";
+  return "New row added";
+}
+
+function rowIdentity(
+  row: Record<string, string>,
+  columns: string[],
+  index: number,
+): string {
+  const first = columns[0];
+  const key = first ? (row[first] ?? "").trim() : "";
+  if (key) return key;
+  const joined = columns.map((column) => row[column] ?? "").join("\u0001");
+  return joined || `__i:${index}`;
+}
+
+function changedFields(
+  before: Record<string, string>,
+  after: Record<string, string>,
+  columns: string[],
+): string[] {
+  return columns.filter((column) => (before[column] ?? "") !== (after[column] ?? ""));
+}
+
+function mergeColumns(a: string[], b: string[]): string[] {
+  const seen = new Set<string>();
+  const columns: string[] = [];
+  for (const column of [...a, ...b]) {
+    if (!column || seen.has(column)) continue;
+    seen.add(column);
+    columns.push(column);
+  }
+  return columns;
+}
+
+function uniqueHeaders(headers: string[]): string[] {
+  const seen = new Map<string, number>();
+  return headers.map((raw, index) => {
+    const base = raw.trim() || `column_${index + 1}`;
+    const count = seen.get(base) ?? 0;
+    seen.set(base, count + 1);
+    return count === 0 ? base : `${base}_${count + 1}`;
+  });
+}
+
+function recordFromCells(
+  columns: string[],
+  cells: string[],
+): Record<string, string> {
+  const row: Record<string, string> = {};
+  columns.forEach((column, index) => {
+    row[column] = cells[index] ?? "";
+  });
+  return row;
+}
+
+function clipRecord(row: Record<string, string>): Record<string, string> {
+  const clipped: Record<string, string> = {};
+  for (const [key, value] of Object.entries(row)) {
+    clipped[key] = clipCell(value);
+  }
+  return clipped;
+}
+
+function clipCell(value: string): string {
+  if (value.length <= MAX_CELL_CHARS) return value;
+  return `${value.slice(0, MAX_CELL_CHARS)}…`;
+}
+
+function stringifyCell(value: unknown): string {
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  return JSON.stringify(value);
+}
+
+function tableToCsv(
+  columns: string[],
+  rows: Record<string, string>[],
+): string {
+  const lines = [
+    columns.map(escapeCsv).join(","),
+    ...rows.map((row) => columns.map((column) => escapeCsv(row[column] ?? "")).join(",")),
+  ];
+  return lines.join("\n");
+}
+
+function escapeCsv(value: string): string {
+  if (/[",\n\r]/.test(value)) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+}
+
+function parseCsvCounted(
+  text: string,
+  sampleLimit?: number,
+): { columns: string[]; sample: string[][]; rowCount: number } | null {
   const rows: string[][] = [];
   let row: string[] = [];
   let field = "";
   let inQuotes = false;
+  let total = 0;
+
+  const pushRow = () => {
+    row.push(field);
+    if (row.some((cell) => cell.trim())) {
+      if (sampleLimit == null || rows.length < sampleLimit + 1) {
+        rows.push(row);
+      }
+      total += 1;
+    }
+    row = [];
+    field = "";
+  };
 
   for (let i = 0; i < text.length; i += 1) {
     const char = text[i];
@@ -132,192 +500,101 @@ function parseCsv(text: string): string[][] {
       continue;
     }
     if (char === "\n") {
-      row.push(field);
-      if (row.some((cell) => cell.trim())) rows.push(row);
-      row = [];
-      field = "";
+      pushRow();
       continue;
     }
     if (char !== "\r") field += char;
   }
-  if (field.length > 0 || row.length > 0) {
-    row.push(field);
-    if (row.some((cell) => cell.trim())) rows.push(row);
+  if (field.length > 0 || row.length > 0) pushRow();
+  if (rows.length === 0) return null;
+  const columns = uniqueHeaders(rows[0] ?? []);
+  if (columns.length === 0) return null;
+  return {
+    columns,
+    sample: rows.slice(1),
+    rowCount: Math.max(0, total - 1),
+  };
+}
+
+export function parseCsv(text: string): string[][] {
+  const parsed = parseCsvCounted(text);
+  if (!parsed) return [];
+  return [parsed.columns, ...parsed.sample];
+}
+
+function looksLikeJson(text: string): boolean {
+  const start = text.trimStart();
+  return start.startsWith("{") || start.startsWith("[");
+}
+
+function looksLikeHtml(text: string): boolean {
+  return /^\s*(<!doctype html|<html[\s>])/i.test(text);
+}
+
+function asCount(value: unknown): number | null {
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  return Math.max(0, Math.floor(value));
+}
+
+function asStringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.map((item) => String(item)) : [];
+}
+
+function asRecord(value: unknown): Record<string, string> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const record: Record<string, string> = {};
+  for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
+    record[key] = item == null ? "" : String(item);
   }
-  return rows;
+  return record;
 }
 
-function jsonToRows(text: string): string[][] | null {
-  try {
-    const parsed = JSON.parse(text) as unknown;
-    const records = Array.isArray(parsed)
-      ? parsed
-      : parsed && typeof parsed === "object"
-        ? [parsed]
-        : null;
-    if (!records || records.length === 0) return null;
-    if (!records.every((row) => row && typeof row === "object" && !Array.isArray(row))) {
-      return null;
-    }
-    const keys = new Set<string>();
-    for (const record of records) {
-      for (const key of Object.keys(record as Record<string, unknown>)) keys.add(key);
-    }
-    const headers = [...keys];
-    return [
-      headers,
-      ...records.map((record) =>
-        headers.map((key) => stringifyCell((record as Record<string, unknown>)[key])),
-      ),
-    ];
-  } catch {
-    return null;
-  }
+function asRecordList(value: unknown): Record<string, string>[] {
+  return Array.isArray(value) ? value.map(asRecord) : [];
 }
 
-function stringifyCell(value: unknown): string {
-  if (value == null) return "";
-  if (typeof value === "string") return value;
-  return JSON.stringify(value);
+function asModifiedList(
+  value: unknown,
+): CivicDiffSummary["sample_modified"] {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => {
+    const row = (item && typeof item === "object" ? item : {}) as Record<
+      string,
+      unknown
+    >;
+    return {
+      before: asRecord(row.before),
+      after: asRecord(row.after),
+      changed_fields: asStringArray(row.changed_fields),
+    };
+  });
 }
 
-function rowLine(headers: string[], cells: string[]): string {
-  return headers
-    .map((header, index) => `${header}=${cells[index] ?? ""}`)
-    .join(" · ");
-}
-
-function pickKey(headers: string[], rows: string[][]): number | null {
-  const named = headers.findIndex((header) =>
-    KEY_NAMES.has(header.trim().toLowerCase()),
+function isLegacyDiff(raw: Record<string, unknown>): boolean {
+  return (
+    typeof raw.added === "number" &&
+    typeof raw.removed === "number" &&
+    typeof raw.modified === "number" &&
+    raw.rows_added == null
   );
-  const candidates = named >= 0 ? [named] : headers.map((_, index) => index);
-  for (const index of candidates) {
-    const values = rows.map((row) => row[index] ?? "");
-    if (values.length > 0 && values.every((value) => value) && new Set(values).size === values.length) {
-      return index;
-    }
-  }
-  return null;
 }
 
-function diffTable(oldRows: string[][], newRows: string[][]): CivicContentDiff {
-  if (oldRows.length === 0 && newRows.length === 0) {
-    return emptyDiff();
-  }
-  const headers = (newRows[0] ?? oldRows[0] ?? []).map((cell) => cell.trim());
-  const oldData = oldRows.slice(1);
-  const newData = newRows.slice(1);
-  const keyIndex = pickKey(headers, [...oldData, ...newData].slice(0, 4000));
-
-  if (keyIndex == null) {
-    return diffByIndex(headers, oldData, newData);
-  }
-
-  const oldMap = new Map(oldData.map((row) => [row[keyIndex] ?? "", row]));
-  const newMap = new Map(newData.map((row) => [row[keyIndex] ?? "", row]));
-  const added_preview: string[] = [];
-  const removed_preview: string[] = [];
-  const modified_preview: { old: string; new: string }[] = [];
-  let added = 0;
-  let removed = 0;
-  let modified = 0;
-
-  for (const [key, row] of newMap) {
-    const previous = oldMap.get(key);
-    if (!previous) {
-      added += 1;
-      if (added_preview.length < PREVIEW) added_preview.push(rowLine(headers, row));
-      continue;
-    }
-    if (previous.join("\0") !== row.join("\0")) {
-      modified += 1;
-      if (modified_preview.length < PREVIEW) {
-        modified_preview.push({
-          old: rowLine(headers, previous),
-          new: rowLine(headers, row),
-        });
-      }
-    }
-  }
-  for (const [key, row] of oldMap) {
-    if (!newMap.has(key)) {
-      removed += 1;
-      if (removed_preview.length < PREVIEW) {
-        removed_preview.push(rowLine(headers, row));
-      }
-    }
-  }
-
-  return {
-    added,
-    removed,
-    modified,
-    key: headers[keyIndex] ?? null,
-    added_preview,
-    removed_preview,
-    modified_preview,
+function legacyToSummary(raw: Record<string, unknown>): CivicDiffSummary {
+  const added = asCount(raw.added) ?? 0;
+  const removed = asCount(raw.removed) ?? 0;
+  const modified = asCount(raw.modified) ?? 0;
+  const summary: CivicDiffSummary = {
+    rows_added: added,
+    rows_removed: removed,
+    rows_modified: modified,
+    total_rows_before: 0,
+    total_rows_after: 0,
+    columns: [],
+    sample_added: [],
+    sample_removed: [],
+    sample_modified: [],
+    notable_changes: [],
   };
-}
-
-function diffByIndex(
-  headers: string[],
-  oldData: string[][],
-  newData: string[][],
-): CivicContentDiff {
-  const max = Math.max(oldData.length, newData.length);
-  const added_preview: string[] = [];
-  const removed_preview: string[] = [];
-  const modified_preview: { old: string; new: string }[] = [];
-  let added = 0;
-  let removed = 0;
-  let modified = 0;
-  for (let i = 0; i < max; i += 1) {
-    const oldRow = oldData[i];
-    const newRow = newData[i];
-    if (!oldRow && newRow) {
-      added += 1;
-      if (added_preview.length < PREVIEW) added_preview.push(rowLine(headers, newRow));
-    } else if (oldRow && !newRow) {
-      removed += 1;
-      if (removed_preview.length < PREVIEW) {
-        removed_preview.push(rowLine(headers, oldRow));
-      }
-    } else if (oldRow && newRow && oldRow.join("\0") !== newRow.join("\0")) {
-      modified += 1;
-      if (modified_preview.length < PREVIEW) {
-        modified_preview.push({
-          old: rowLine(headers, oldRow),
-          new: rowLine(headers, newRow),
-        });
-      }
-    }
-  }
-  return {
-    added,
-    removed,
-    modified,
-    key: null,
-    added_preview,
-    removed_preview,
-    modified_preview,
-  };
-}
-
-function diffLines(oldText: string, newText: string): CivicContentDiff {
-  const oldLines = oldText.split(/\r?\n/);
-  const newLines = newText.split(/\r?\n/);
-  return diffByIndex(["line"], oldLines.map((line) => [line]), newLines.map((line) => [line]));
-}
-
-function emptyDiff(): CivicContentDiff {
-  return {
-    added: 0,
-    removed: 0,
-    modified: 0,
-    key: null,
-    added_preview: [],
-    removed_preview: [],
-    modified_preview: [],
-  };
+  summary.notable_changes = buildNotableChanges(summary, "");
+  return summary;
 }

@@ -44,10 +44,14 @@ export default async function NationalAuditPage() {
   const [changeRows, statsRows, cityStatRows, cityChangeRows] =
     await Promise.all([
       sql`
-        SELECT
-          id, city, state, dataset_name, resource_url, old_hash, new_hash,
-          detected_at, change_type, content_diff
-        FROM civic_changes
+        SELECT *
+        FROM (
+          SELECT DISTINCT ON (resource_url)
+            id, city, state, dataset_name, resource_url, old_hash, new_hash,
+            detected_at, change_type, content_diff
+          FROM civic_changes
+          ORDER BY resource_url, detected_at DESC
+        ) latest
         ORDER BY detected_at DESC
         LIMIT 100
       `,

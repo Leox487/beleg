@@ -80,11 +80,15 @@ export default async function CityAuditPage({
       ORDER BY retrieved_at DESC
     `,
     sql`
-      SELECT
-        id, city, state, dataset_name, resource_url, old_hash, new_hash,
-        detected_at, change_type, content_diff
-      FROM civic_changes
-      WHERE city = ${seed.city}
+      SELECT *
+      FROM (
+        SELECT DISTINCT ON (resource_url)
+          id, city, state, dataset_name, resource_url, old_hash, new_hash,
+          detected_at, change_type, content_diff
+        FROM civic_changes
+        WHERE city = ${seed.city}
+        ORDER BY resource_url, detected_at DESC
+      ) latest
       ORDER BY detected_at DESC
       LIMIT 100
     `,

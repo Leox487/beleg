@@ -39,6 +39,7 @@ export async function GET(req: Request) {
   return civicJson(
     [...rows].map((raw) => {
       const row = raw as Record<string, unknown>;
+      const content_diff = parseStoredDiff(row.content_diff);
       return {
         id: String(row.id),
         city: String(row.city ?? seed.city),
@@ -49,7 +50,8 @@ export async function GET(req: Request) {
         new_hash: String(row.new_hash),
         detected_at: asTimestamp(row.detected_at),
         change_type: String(row.change_type ?? "content_modified"),
-        content_diff: parseStoredDiff(row.content_diff),
+        summary: content_diff?.notable_changes[0] ?? null,
+        content_diff,
       };
     }),
   );

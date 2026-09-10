@@ -420,6 +420,7 @@ export async function discoverCityRecords(
         fileHash: hashed.hash,
         fileSize: hashed.size,
         sourceType: seed.type,
+        snapshot: hashed.snapshot,
       });
       known.add(resource.url);
       result.added += 1;

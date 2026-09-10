@@ -7,6 +7,14 @@ import {
   citySlug,
   type CivicCitySeed,
 } from "@/lib/civic-cities";
+import {
+  civicSnapshotToText,
+  diffCivicContent,
+  extractCivicSnapshot,
+  refineDiffWithTotals,
+  type CivicDiffSummary,
+  type CivicRowSnapshot,
+} from "@/lib/civic-diff";
 import { sendCivicChangeEmail } from "@/lib/civic-email";
 import { stampHashHex, upgradeProofBase64 } from "@/lib/ots";
 import { SITE_URL } from "@/lib/site";
@@ -37,7 +45,7 @@ export function isSkippedDataset(id: string): boolean {
 }
 
 export type CivicHashResult =
-  | { ok: true; hash: string; size: number }
+  | { ok: true; hash: string; size: number; snapshot: CivicRowSnapshot | null }
   | { ok: false; reason: "oversized" | "fetch" };
 
 export interface CivicIngestResult {
@@ -125,6 +133,8 @@ async function hashUrl(
   const hasher = createHash("sha256");
   let size = 0;
   const reader = res.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let collectText = true;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -135,13 +145,51 @@ async function hashUrl(
       return { ok: false, reason: "oversized" };
     }
     hasher.update(value);
+    if (collectText) {
+      if (chunks.length === 0 && isLikelyBinary(value)) {
+        collectText = false;
+      } else {
+        chunks.push(value);
+      }
+    }
+  }
+
+  let snapshot: CivicRowSnapshot | null = null;
+  if (collectText && chunks.length > 0) {
+    try {
+      snapshot = extractCivicSnapshot(Buffer.concat(chunks).toString("utf8"));
+    } catch {
+      snapshot = null;
+    }
   }
 
   return {
     ok: true,
     hash: hasher.digest("hex"),
     size,
+    snapshot,
   };
+}
+
+function isLikelyBinary(bytes: Uint8Array): boolean {
+  if (bytes.length >= 2 && bytes[0] === 0x50 && bytes[1] === 0x4b) return true;
+  if (
+    bytes.length >= 4 &&
+    bytes[0] === 0x25 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x44 &&
+    bytes[3] === 0x46
+  ) {
+    return true;
+  }
+  const n = Math.min(bytes.length, 512);
+  let control = 0;
+  for (let i = 0; i < n; i += 1) {
+    const byte = bytes[i];
+    if (byte === 0) return true;
+    if (byte < 7 && byte !== 9 && byte !== 10 && byte !== 13) control += 1;
+  }
+  return control > n * 0.1;
 }
 
 export async function hashResource(
@@ -161,9 +209,12 @@ export async function hashResource(
 async function latestSnapshot(url: string): Promise<{
   id: string;
   hash: string;
+  rowCount: number | null;
+  colNames: string[] | null;
+  sampleRows: Record<string, string>[] | null;
 } | null> {
   const rows = await sql`
-    SELECT id, file_hash
+    SELECT id, file_hash, row_count, col_names, sample_rows
     FROM civic_records
     WHERE resource_url = ${url}
     ORDER BY retrieved_at DESC
@@ -174,7 +225,35 @@ async function latestSnapshot(url: string): Promise<{
   return {
     id: String(row.id),
     hash: String(row.file_hash),
+    rowCount: row.row_count == null ? null : Number(row.row_count),
+    colNames: Array.isArray(row.col_names)
+      ? row.col_names.map((name) => String(name))
+      : null,
+    sampleRows: parseSampleRows(row.sample_rows),
   };
+}
+
+function parseSampleRows(value: unknown): Record<string, string>[] | null {
+  const raw =
+    typeof value === "string"
+      ? (() => {
+          try {
+            return JSON.parse(value) as unknown;
+          } catch {
+            return null;
+          }
+        })()
+      : value;
+  if (!Array.isArray(raw) || raw.length === 0) return null;
+  return raw.map((item) => {
+    const record: Record<string, string> = {};
+    if (item && typeof item === "object" && !Array.isArray(item)) {
+      for (const [key, cell] of Object.entries(item as Record<string, unknown>)) {
+        record[key] = cell == null ? "" : String(cell);
+      }
+    }
+    return record;
+  });
 }
 
 export async function insertRecord(input: {
@@ -186,6 +265,7 @@ export async function insertRecord(input: {
   fileHash: string;
   fileSize: number;
   sourceType: CivicCitySeed["type"];
+  snapshot?: CivicRowSnapshot | null;
 }): Promise<void> {
   let otsProof: string | null = null;
   const anchorStatus = "pending";
@@ -195,14 +275,19 @@ export async function insertRecord(input: {
     console.error(`OTS stamp failed for ${input.resourceUrl}:`, error);
   }
 
+  const snapshot = input.snapshot ?? null;
+
   await sql`
     INSERT INTO civic_records (
       city, state, dataset_id, dataset_name, resource_url, file_hash, file_size,
-      ots_proof, anchor_status, source_type
+      ots_proof, anchor_status, source_type, row_count, col_names, sample_rows
     ) VALUES (
       ${input.city}, ${input.state}, ${input.datasetId}, ${input.datasetName},
       ${input.resourceUrl}, ${input.fileHash}, ${input.fileSize}, ${otsProof},
-      ${anchorStatus}, ${input.sourceType}
+      ${anchorStatus}, ${input.sourceType},
+      ${snapshot?.row_count ?? null},
+      ${snapshot ? sql.array(snapshot.col_names) : null},
+      ${snapshot ? sql.json(snapshot.sample_rows) : null}
     )
   `;
 }
@@ -231,6 +316,9 @@ async function ingestResource(
 
   const previous = await latestSnapshot(resourceUrl);
   if (previous?.hash === hashed.hash) {
+    if (!previous.sampleRows && hashed.snapshot) {
+      await backfillSnapshot(previous.id, hashed.snapshot);
+    }
     return;
   }
 
@@ -244,10 +332,22 @@ async function ingestResource(
       fileHash: hashed.hash,
       fileSize: hashed.size,
       sourceType: seed.type,
+      snapshot: hashed.snapshot,
     });
     counters.new_records += 1;
 
     if (previous) {
+      const contentDiff = await diffFromSnapshots(
+        previous.sampleRows && previous.colNames
+          ? {
+              row_count: previous.rowCount ?? previous.sampleRows.length,
+              col_names: previous.colNames,
+              sample_rows: previous.sampleRows,
+            }
+          : null,
+        hashed.snapshot,
+        datasetName,
+      );
       await sql`
         INSERT INTO civic_changes (
           city, state, dataset_name, resource_url, old_hash, new_hash,
@@ -255,7 +355,7 @@ async function ingestResource(
         ) VALUES (
           ${seed.city}, ${seed.state}, ${datasetName}, ${resourceUrl},
           ${previous.hash}, ${hashed.hash}, ${"content_modified"},
-          ${null}
+          ${contentDiff ? sql.json(JSON.parse(JSON.stringify(contentDiff))) : null}
         )
       `;
       counters.changed += 1;
@@ -265,6 +365,7 @@ async function ingestResource(
         resourceUrl,
         oldHash: previous.hash,
         newHash: hashed.hash,
+        contentDiff,
       }).catch((error) => {
         console.error("Civic subscriber notify failed:", error);
       });
@@ -354,12 +455,49 @@ export async function scrapeCivicRecords(
   return counters;
 }
 
+async function backfillSnapshot(
+  id: string,
+  snapshot: CivicRowSnapshot,
+): Promise<void> {
+  await sql`
+    UPDATE civic_records
+    SET
+      row_count = ${snapshot.row_count},
+      col_names = ${sql.array(snapshot.col_names)},
+      sample_rows = ${sql.json(snapshot.sample_rows)}
+    WHERE id = ${id}
+      AND sample_rows IS NULL
+  `;
+}
+
+async function diffFromSnapshots(
+  previous: CivicRowSnapshot | null,
+  next: CivicRowSnapshot | null,
+  datasetName: string,
+): Promise<CivicDiffSummary | null> {
+  if (!previous?.sample_rows?.length || !next?.sample_rows?.length) {
+    return null;
+  }
+  const diff = await diffCivicContent(
+    civicSnapshotToText(previous),
+    civicSnapshotToText(next),
+    datasetName,
+  );
+  return refineDiffWithTotals(
+    diff,
+    previous.row_count,
+    next.row_count,
+    datasetName,
+  );
+}
+
 async function notifyCitySubscribers(input: {
   city: string;
   datasetName: string;
   resourceUrl: string;
   oldHash: string;
   newHash: string;
+  contentDiff?: CivicDiffSummary | null;
 }): Promise<void> {
   const rows = await sql`
     SELECT email
@@ -380,8 +518,8 @@ async function notifyCitySubscribers(input: {
       newHash: input.newHash,
       detectedAt,
       auditUrl,
-      diffSummary: null,
-      contentDiff: null,
+      diffSummary: input.contentDiff?.notable_changes[0] ?? null,
+      contentDiff: input.contentDiff ?? null,
     });
   }
 }
